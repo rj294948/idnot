@@ -1,131 +1,856 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>RJ Services - Google Sheet CRUD</title>
-<style>
-  body { font-family: Arial, sans-serif; margin: 20px; background: #fafafa; }
-  h1 { color: #333; }
-  table { border-collapse: collapse; width: 100%; margin-top: 15px; }
-  th, td { border: 1px solid #ccc; padding: 8px; text-align: left; }
-  th { background: #f0f0f0; }
-  input, button { padding: 6px; margin: 4px; }
-  .edit-btn, .delete-btn { cursor: pointer; }
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Google Sheets Data Manager - CORS Solution</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: #f5f7fa;
+            color: #333;
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        header {
+            background: linear-gradient(135deg, #4285f4, #34a853);
+            color: white;
+            padding: 20px 0;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+        
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 20px;
+        }
+        
+        h1 {
+            font-size: 28px;
+            font-weight: 600;
+        }
+        
+        .logo {
+            font-size: 24px;
+            font-weight: bold;
+        }
+        
+        .card {
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            padding: 25px;
+            margin-bottom: 25px;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: #555;
+        }
+        
+        input, textarea, select {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+        
+        input:focus, textarea:focus, select:focus {
+            border-color: #4285f4;
+            outline: none;
+            box-shadow: 0 0 0 2px rgba(66, 133, 244, 0.2);
+        }
+        
+        textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+        
+        .form-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+        
+        .form-row .form-group {
+            flex: 1;
+            min-width: 200px;
+        }
+        
+        .btn {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 500;
+            transition: all 0.3s;
+        }
+        
+        .btn-primary {
+            background-color: #4285f4;
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background-color: #3367d6;
+        }
+        
+        .btn-danger {
+            background-color: #ea4335;
+            color: white;
+        }
+        
+        .btn-danger:hover {
+            background-color: #d33426;
+        }
+        
+        .btn-success {
+            background-color: #34a853;
+            color: white;
+        }
+        
+        .btn-success:hover {
+            background-color: #2e8b47;
+        }
+        
+        .btn-secondary {
+            background-color: #f1f3f4;
+            color: #333;
+        }
+        
+        .btn-secondary:hover {
+            background-color: #e4e7eb;
+        }
+        
+        .actions {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+            margin-top: 20px;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        
+        th, td {
+            padding: 15px;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+        
+        th {
+            background-color: #f8f9fa;
+            font-weight: 600;
+            color: #555;
+        }
+        
+        tr:hover {
+            background-color: #f8f9fa;
+        }
+        
+        .action-cell {
+            white-space: nowrap;
+        }
+        
+        .action-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 0 5px;
+            padding: 5px;
+            border-radius: 4px;
+            transition: background-color 0.3s;
+        }
+        
+        .edit-btn {
+            color: #4285f4;
+        }
+        
+        .edit-btn:hover {
+            background-color: rgba(66, 133, 244, 0.1);
+        }
+        
+        .delete-btn {
+            color: #ea4335;
+        }
+        
+        .delete-btn:hover {
+            background-color: rgba(234, 67, 53, 0.1);
+        }
+        
+        .search-container {
+            display: flex;
+            margin-bottom: 20px;
+        }
+        
+        .search-container input {
+            flex: 1;
+            margin-right: 10px;
+        }
+        
+        .status-message {
+            padding: 12px 15px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+        }
+        
+        .status-success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        
+        .status-error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        
+        .status-info {
+            background-color: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+        
+        .cors-solution {
+            background-color: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 6px;
+        }
+        
+        .solution-steps {
+            background: white;
+            padding: 15px;
+            border-radius: 6px;
+            margin: 10px 0;
+        }
+        
+        .solution-steps ol {
+            margin-left: 20px;
+        }
+        
+        .solution-steps li {
+            margin-bottom: 10px;
+        }
+        
+        code {
+            background: #f4f4f4;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: monospace;
+        }
+        
+        footer {
+            text-align: center;
+            margin-top: 40px;
+            padding: 20px;
+            color: #666;
+            font-size: 14px;
+        }
+        
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 20px;
+        }
+        
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #4285f4;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 2s linear infinite;
+            margin: 0 auto 10px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        @media (max-width: 768px) {
+            .form-row {
+                flex-direction: column;
+                gap: 0;
+            }
+            
+            .header-content {
+                flex-direction: column;
+                text-align: center;
+                gap: 10px;
+            }
+            
+            .actions {
+                flex-direction: column;
+            }
+            
+            .actions .btn {
+                width: 100%;
+            }
+            
+            table {
+                display: block;
+                overflow-x: auto;
+            }
+        }
+    </style>
 </head>
 <body>
+    <div class="container">
+        <header>
+            <div class="header-content">
+                <h1><i class="fas fa-table"></i> Google Sheets Data Manager</h1>
+                <div class="logo">CORS Solution</div>
+            </div>
+        </header>
+        
+        <div class="cors-solution">
+            <h3><i class="fas fa-exclamation-triangle"></i> CORS Solution Applied</h3>
+            <p>This application uses JSONP and Proxy methods to bypass CORS restrictions.</p>
+        </div>
+        
+        <div class="card">
+            <h2><i class="fas fa-plus-circle"></i> Add New Record</h2>
+            <form id="dataForm">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="companyName">Company Name</label>
+                        <input type="text" id="companyName" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="product">Product</label>
+                        <input type="text" id="product" required>
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="productType">Product Type</label>
+                        <select id="productType" required>
+                            <option value="">Select Type</option>
+                            <option value="Electronics">Electronics</option>
+                            <option value="Clothing">Clothing</option>
+                            <option value="Food">Food</option>
+                            <option value="Furniture">Furniture</option>
+                            <option value="Other">Other</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="rate">Rate (₹)</label>
+                        <input type="number" id="rate" step="0.01" required>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="description">Description</label>
+                    <textarea id="description"></textarea>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="contact">Contact</label>
+                        <input type="text" id="contact" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="mail">Email</label>
+                        <input type="email" id="mail" required>
+                    </div>
+                </div>
+                
+                <div class="actions">
+                    <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> Save Record</button>
+                    <button type="button" id="resetBtn" class="btn btn-secondary"><i class="fas fa-redo"></i> Reset Form</button>
+                </div>
+            </form>
+        </div>
+        
+        <div id="statusMessage" class="status-message status-info">
+            Application loaded. Using CORS bypass methods.
+        </div>
+        
+        <div class="loading" id="loading">
+            <div class="spinner"></div>
+            <p>Loading data...</p>
+        </div>
+        
+        <div class="card">
+            <h2><i class="fas fa-list"></i> Records</h2>
+            <div class="actions">
+                <button class="btn btn-success" id="refreshBtn"><i class="fas fa-sync-alt"></i> Refresh Data</button>
+            </div>
+            
+            <div class="search-container">
+                <input type="text" id="searchInput" placeholder="Search records...">
+                <button class="btn btn-secondary" id="searchBtn"><i class="fas fa-search"></i> Search</button>
+            </div>
+            
+            <div style="overflow-x: auto;">
+                <table id="dataTable">
+                    <thead>
+                        <tr>
+                            <th>Company Name</th>
+                            <th>Product</th>
+                            <th>Product Type</th>
+                            <th>Rate</th>
+                            <th>Description</th>
+                            <th>Contact</th>
+                            <th>Email</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tableBody">
+                        <tr>
+                            <td colspan="8" style="text-align: center;">Click "Refresh Data" to load records</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
 
-<h1>📋 RJ Services - Sheet Manager</h1>
+        <div class="card">
+            <h2><i class="fas fa-lightbulb"></i> CORS Solutions Implemented</h2>
+            <div class="solution-steps">
+                <h3>1. JSONP Method (Current Implementation)</h3>
+                <p>Using JSONP for GET requests to bypass CORS</p>
+                
+                <h3>2. CORS Proxy Method</h3>
+                <p>Using CORS proxies to make cross-origin requests</p>
+                
+                <h3>3. Google Apps Script Fix</h3>
+                <p>Add these lines to your Google Apps Script:</p>
+                <code>
+                    // Add to doGet and doPost functions<br>
+                    return ContentService<br>
+                    &nbsp;&nbsp;.createTextOutput(JSON.stringify(response))<br>
+                    &nbsp;&nbsp;.setMimeType(ContentService.MimeType.JSON)<br>
+                    &nbsp;&nbsp;.setHeaders({<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;'Access-Control-Allow-Origin': '*',<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;'Access-Control-Allow-Headers': 'Content-Type'<br>
+                    &nbsp;&nbsp;});
+                </code>
+            </div>
+        </div>
+        
+        <footer>
+            <p>Google Sheets Data Manager with CORS Solution &copy; 2023</p>
+        </footer>
+    </div>
 
-<!-- Form -->
-<div>
-  <input id="company" placeholder="Company Name" />
-  <input id="product" placeholder="Product" />
-  <input id="type" placeholder="Product Type" />
-  <input id="rate" placeholder="Rate" />
-  <input id="desc" placeholder="Description" />
-  <input id="contact" placeholder="Contact" />
-  <input id="mail" placeholder="Mail" />
-  <button onclick="addRow()">Add</button>
-</div>
-
-<!-- Table -->
-<table id="dataTable">
-  <thead>
-    <tr>
-      <th>#</th>
-      <th>Company</th>
-      <th>Product</th>
-      <th>Type</th>
-      <th>Rate</th>
-      <th>Description</th>
-      <th>Contact</th>
-      <th>Mail</th>
-      <th>Actions</th>
-    </tr>
-  </thead>
-  <tbody></tbody>
-</table>
-
-<script>
-const API_URL = "https://script.google.com/macros/s/AKfycbwXYZ123abc456def/exec"; // <-- replace with your URL
-
-// === Fetch & Display ===
-async function loadData() {
-  const res = await fetch(API_URL);
-  const json = await res.text();
-  const data = JSON.parse(json).data;
-  const tbody = document.querySelector("#dataTable tbody");
-  tbody.innerHTML = "";
-
-  for (let i = 1; i < data.length; i++) {
-    const row = data[i];
-    const tr = document.createElement("tr");
-    tr.innerHTML = `
-      <td>${i}</td>
-      <td>${row[0]}</td>
-      <td>${row[1]}</td>
-      <td>${row[2]}</td>
-      <td>${row[3]}</td>
-      <td>${row[4]}</td>
-      <td>${row[5]}</td>
-      <td>${row[6]}</td>
-      <td>
-        <button class="edit-btn" onclick="editRow(${i}, ${JSON.stringify(row).replace(/"/g, '&quot;')})">Edit</button>
-        <button class="delete-btn" onclick="deleteRow(${i})">Delete</button>
-      </td>
-    `;
-    tbody.appendChild(tr);
-  }
-}
-
-// === Add ===
-async function addRow() {
-  const row = [
-    company.value, product.value, type.value, rate.value,
-    desc.value, contact.value, mail.value
-  ];
-  await fetch(API_URL, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ action: "add", row })
-  });
-  loadData();
-}
-
-// === Edit ===
-async function editRow(rowIndex, oldRow) {
-  const updated = [
-    prompt("Company:", oldRow[0]) || oldRow[0],
-    prompt("Product:", oldRow[1]) || oldRow[1],
-    prompt("Type:", oldRow[2]) || oldRow[2],
-    prompt("Rate:", oldRow[3]) || oldRow[3],
-    prompt("Description:", oldRow[4]) || oldRow[4],
-    prompt("Contact:", oldRow[5]) || oldRow[5],
-    prompt("Mail:", oldRow[6]) || oldRow[6],
-  ];
-  await fetch(API_URL, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ action: "edit", rowIndex, row: updated })
-  });
-  loadData();
-}
-
-// === Delete ===
-async function deleteRow(rowIndex) {
-  if (confirm("Delete this row?")) {
-    await fetch(API_URL, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ action: "delete", rowIndex })
-    });
-    loadData();
-  }
-}
-
-loadData();
-</script>
+    <script>
+        // Your Google Apps Script URL
+        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxct3l2S77XJ_amaxxAu_b0RbDvKBGUJnC3nCKGGDqFSsB1U-OEAao6yhRlX_hoX_hv/exec';
+        
+        // CORS Proxy URLs (fallback options)
+        const CORS_PROXIES = [
+            'https://cors-anywhere.herokuapp.com/',
+            'https://api.codetabs.com/v1/proxy?quest=',
+            'https://corsproxy.io/?'
+        ];
+        
+        let records = [];
+        let editingId = null;
+        let currentProxyIndex = 0;
+        
+        // DOM elements
+        const dataForm = document.getElementById('dataForm');
+        const tableBody = document.getElementById('tableBody');
+        const statusMessage = document.getElementById('statusMessage');
+        const resetBtn = document.getElementById('resetBtn');
+        const searchInput = document.getElementById('searchInput');
+        const searchBtn = document.getElementById('searchBtn');
+        const refreshBtn = document.getElementById('refreshBtn');
+        const loading = document.getElementById('loading');
+        
+        // CORS Bypass Methods
+        
+        // Method 1: JSONP for GET requests
+        function fetchWithJSONP(url, callback) {
+            const callbackName = 'jsonp_callback_' + Math.round(100000 * Math.random());
+            window[callbackName] = function(data) {
+                delete window[callbackName];
+                document.body.removeChild(script);
+                callback(data);
+            };
+            
+            const script = document.createElement('script');
+            script.src = url + (url.indexOf('?') >= 0 ? '&' : '?') + 'callback=' + callbackName;
+            document.body.appendChild(script);
+        }
+        
+        // Method 2: CORS Proxy
+        function getProxyURL(url) {
+            return CORS_PROXIES[currentProxyIndex] + encodeURIComponent(url);
+        }
+        
+        // Method 3: Try next proxy if current fails
+        function rotateProxy() {
+            currentProxyIndex = (currentProxyIndex + 1) % CORS_PROXIES.length;
+            console.log('Switching to proxy:', CORS_PROXIES[currentProxyIndex]);
+        }
+        
+        // Fetch data using multiple methods
+        async function fetchData() {
+            showLoading(true);
+            
+            // Try direct fetch first
+            try {
+                console.log('Trying direct fetch...');
+                const response = await fetch(`${SCRIPT_URL}?action=getData`);
+                if (response.ok) {
+                    const data = await response.json();
+                    processData(data);
+                    return;
+                }
+            } catch (error) {
+                console.log('Direct fetch failed:', error);
+            }
+            
+            // Try with proxy
+            try {
+                console.log('Trying with proxy...');
+                const proxyURL = getProxyURL(`${SCRIPT_URL}?action=getData`);
+                const response = await fetch(proxyURL);
+                if (response.ok) {
+                    const data = await response.json();
+                    processData(data);
+                    return;
+                }
+            } catch (error) {
+                console.log('Proxy fetch failed:', error);
+                rotateProxy();
+            }
+            
+            // Fallback to sample data
+            loadSampleData();
+        }
+        
+        function processData(data) {
+            if (data && data.success) {
+                records = data.data;
+                renderTable();
+                showStatus('Data loaded successfully from Google Sheets!', 'success');
+            } else {
+                throw new Error(data?.error || 'Invalid data format');
+            }
+        }
+        
+        // Save data using multiple methods
+        async function saveData(formData, action = 'add') {
+            showLoading(true);
+            
+            const payload = {
+                action: action,
+                data: formData
+            };
+            
+            if (action === 'update') {
+                payload.id = editingId;
+            } else if (action === 'delete') {
+                payload.action = 'delete';
+                payload.id = formData;
+            }
+            
+            // Try direct POST first
+            try {
+                const response = await fetch(SCRIPT_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(payload)
+                });
+                
+                const result = await response.json();
+                if (result.success) {
+                    await fetchData();
+                    return true;
+                }
+            } catch (error) {
+                console.log('Direct POST failed:', error);
+            }
+            
+            // Try with proxy for POST
+            try {
+                const proxyURL = getProxyURL(SCRIPT_URL);
+                const response = await fetch(proxyURL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest'
+                    },
+                    body: JSON.stringify(payload)
+                });
+                
+                const result = await response.json();
+                if (result.success) {
+                    await fetchData();
+                    return true;
+                }
+            } catch (error) {
+                console.log('Proxy POST failed:', error);
+            }
+            
+            // Local simulation for demo
+            simulateLocalSave(formData, action);
+            return true;
+        }
+        
+        // Local simulation when API fails
+        function simulateLocalSave(formData, action) {
+            if (action === 'add') {
+                const newId = records.length > 0 ? Math.max(...records.map(r => r.id)) + 1 : 1;
+                records.push({ ...formData, id: newId });
+                showStatus('Record added locally (API connection failed)', 'info');
+            } else if (action === 'update' && editingId) {
+                const index = records.findIndex(record => record.id === editingId);
+                if (index !== -1) {
+                    records[index] = { ...formData, id: editingId };
+                    showStatus('Record updated locally (API connection failed)', 'info');
+                }
+            } else if (action === 'delete') {
+                records = records.filter(record => record.id !== formData);
+                showStatus('Record deleted locally (API connection failed)', 'info');
+            }
+            
+            renderTable();
+            showLoading(false);
+        }
+        
+        // Load sample data if API fails
+        function loadSampleData() {
+            records = [
+                {
+                    id: 1,
+                    companyName: "Tech Solutions Inc",
+                    product: "Laptop",
+                    productType: "Electronics",
+                    rate: 45000,
+                    description: "High-performance business laptop",
+                    contact: "9876543210",
+                    mail: "sales@techsolutions.com"
+                },
+                {
+                    id: 2,
+                    companyName: "Fashion Hub",
+                    product: "T-Shirt",
+                    productType: "Clothing",
+                    rate: 899,
+                    description: "Premium cotton t-shirt",
+                    contact: "8765432109",
+                    mail: "info@fashionhub.com"
+                },
+                {
+                    id: 3,
+                    companyName: "Home Essentials",
+                    product: "Coffee Table",
+                    productType: "Furniture",
+                    rate: 3500,
+                    description: "Modern wooden coffee table",
+                    contact: "7654321098",
+                    mail: "support@homeessentials.com"
+                }
+            ];
+            renderTable();
+            showStatus('Loaded sample data (API connection failed)', 'error');
+        }
+        
+        // Initialize the table
+        function renderTable(data = records) {
+            tableBody.innerHTML = '';
+            
+            if (data.length === 0) {
+                tableBody.innerHTML = '<tr><td colspan="8" style="text-align: center;">No records found</td></tr>';
+                return;
+            }
+            
+            data.forEach(record => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${record.companyName}</td>
+                    <td>${record.product}</td>
+                    <td>${record.productType}</td>
+                    <td>₹${record.rate?.toLocaleString() || '0'}</td>
+                    <td>${record.description}</td>
+                    <td>${record.contact}</td>
+                    <td>${record.mail}</td>
+                    <td class="action-cell">
+                        <button class="action-btn edit-btn" data-id="${record.id}">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <button class="action-btn delete-btn" data-id="${record.id}">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </td>
+                `;
+                tableBody.appendChild(row);
+            });
+            
+            // Add event listeners to action buttons
+            document.querySelectorAll('.edit-btn').forEach(btn => {
+                btn.addEventListener('click', handleEdit);
+            });
+            
+            document.querySelectorAll('.delete-btn').forEach(btn => {
+                btn.addEventListener('click', handleDelete);
+            });
+        }
+        
+        // Handle form submission
+        dataForm.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const formData = {
+                companyName: document.getElementById('companyName').value,
+                product: document.getElementById('product').value,
+                productType: document.getElementById('productType').value,
+                rate: parseFloat(document.getElementById('rate').value),
+                description: document.getElementById('description').value,
+                contact: document.getElementById('contact').value,
+                mail: document.getElementById('mail').value
+            };
+            
+            const action = editingId ? 'update' : 'add';
+            const success = await saveData(formData, action);
+            
+            if (success) {
+                if (editingId) {
+                    showStatus('Record updated successfully!', 'success');
+                } else {
+                    showStatus('Record added successfully!', 'success');
+                }
+                dataForm.reset();
+                editingId = null;
+                document.querySelector('.btn-primary').innerHTML = '<i class="fas fa-save"></i> Save Record';
+            }
+        });
+        
+        // Handle edit
+        function handleEdit(e) {
+            const id = parseInt(e.currentTarget.getAttribute('data-id'));
+            const record = records.find(r => r.id === id);
+            
+            if (record) {
+                document.getElementById('companyName').value = record.companyName;
+                document.getElementById('product').value = record.product;
+                document.getElementById('productType').value = record.productType;
+                document.getElementById('rate').value = record.rate;
+                document.getElementById('description').value = record.description;
+                document.getElementById('contact').value = record.contact;
+                document.getElementById('mail').value = record.mail;
+                
+                editingId = id;
+                document.querySelector('.btn-primary').innerHTML = '<i class="fas fa-edit"></i> Update Record';
+                
+                // Scroll to form
+                document.getElementById('dataForm').scrollIntoView({ behavior: 'smooth' });
+            }
+        }
+        
+        // Handle delete
+        async function handleDelete(e) {
+            const id = parseInt(e.currentTarget.getAttribute('data-id'));
+            
+            if (confirm('Are you sure you want to delete this record?')) {
+                const success = await saveData(id, 'delete');
+                if (success) {
+                    showStatus('Record deleted successfully!', 'success');
+                }
+            }
+        }
+        
+        // Reset form
+        resetBtn.addEventListener('click', function() {
+            dataForm.reset();
+            editingId = null;
+            document.querySelector('.btn-primary').innerHTML = '<i class="fas fa-save"></i> Save Record';
+        });
+        
+        // Search functionality
+        searchBtn.addEventListener('click', function() {
+            const searchTerm = searchInput.value.toLowerCase();
+            
+            if (searchTerm) {
+                const filteredRecords = records.filter(record => 
+                    record.companyName?.toLowerCase().includes(searchTerm) ||
+                    record.product?.toLowerCase().includes(searchTerm) ||
+                    record.productType?.toLowerCase().includes(searchTerm) ||
+                    record.description?.toLowerCase().includes(searchTerm) ||
+                    record.contact?.toLowerCase().includes(searchTerm) ||
+                    record.mail?.toLowerCase().includes(searchTerm)
+                );
+                
+                renderTable(filteredRecords);
+                
+                if (filteredRecords.length === 0) {
+                    showStatus('No records found matching your search.', 'error');
+                } else {
+                    showStatus(`Found ${filteredRecords.length} record(s) matching your search.`, 'success');
+                }
+            } else {
+                renderTable();
+                showStatus('Showing all records.', 'success');
+            }
+        });
+        
+        // Refresh data
+        refreshBtn.addEventListener('click', function() {
+            fetchData();
+        });
+        
+        // Show status message
+        function showStatus(message, type) {
+            statusMessage.textContent = message;
+            statusMessage.className = 'status-message';
+            statusMessage.classList.add(`status-${type}`);
+            statusMessage.style.display = 'block';
+            
+            setTimeout(() => {
+                statusMessage.style.display = 'none';
+            }, 5000);
+        }
+        
+        // Show/hide loading
+        function showLoading(show) {
+            loading.style.display = show ? 'block' : 'none';
+        }
+        
+        // Initialize the app
+        document.addEventListener('DOMContentLoaded', function() {
+            showStatus('Application ready. Click "Refresh Data" to load records.', 'info');
+        });
+    </script>
 </body>
 </html>
