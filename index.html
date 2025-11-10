@@ -1,212 +1,131 @@
-<!--
-File: index.html  (Frontend)
-Description: Simple page to display Google Sheet rows and allow Add / Edit / Delete.
-Instructions: Deploy the Apps Script (server) provided below as a Web App and set WEB_APP_URL in the fetch calls.
--->
-
-<!doctype html>
-<html lang="hi">
+<!DOCTYPE html>
+<html lang="en">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>Sheets CRUD - RJ Services</title>
-  <style>
-    body{font-family:Arial, Helvetica, sans-serif;margin:16px}
-    table{border-collapse:collapse;width:100%}
-    th,td{border:1px solid #ccc;padding:8px;text-align:left}
-    th{background:#f2f2f2}
-    button{padding:6px 10px;margin:2px}
-    .form-row{display:flex;gap:8px;flex-wrap:wrap;margin:8px 0}
-    .form-row input,.form-row textarea{flex:1;padding:6px}
-    .hidden{display:none}
-  </style>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>RJ Services - Google Sheet CRUD</title>
+<style>
+  body { font-family: Arial, sans-serif; margin: 20px; background: #fafafa; }
+  h1 { color: #333; }
+  table { border-collapse: collapse; width: 100%; margin-top: 15px; }
+  th, td { border: 1px solid #ccc; padding: 8px; text-align: left; }
+  th { background: #f0f0f0; }
+  input, button { padding: 6px; margin: 4px; }
+  .edit-btn, .delete-btn { cursor: pointer; }
+</style>
 </head>
 <body>
-  <h2>Google Sheet - CRUD (company, product, product type, rate, description, contact, mail)</h2>
 
-  <div>
-    <button id="refreshBtn">Refresh</button>
-    <button id="addNewBtn">Add New Row</button>
-  </div>
+<h1>📋 RJ Services - Sheet Manager</h1>
 
-  <div id="tableWrap"></div>
+<!-- Form -->
+<div>
+  <input id="company" placeholder="Company Name" />
+  <input id="product" placeholder="Product" />
+  <input id="type" placeholder="Product Type" />
+  <input id="rate" placeholder="Rate" />
+  <input id="desc" placeholder="Description" />
+  <input id="contact" placeholder="Contact" />
+  <input id="mail" placeholder="Mail" />
+  <button onclick="addRow()">Add</button>
+</div>
 
-  <div id="formWrap" class="hidden">
-    <h3 id="formTitle">Add / Edit Row</h3>
-    <div class="form-row">
-      <input id="company" placeholder="Company name">
-      <input id="product" placeholder="Product">
-      <input id="productType" placeholder="Product Type">
-    </div>
-    <div class="form-row">
-      <input id="rate" placeholder="Rate">
-      <input id="contact" placeholder="Contact">
-      <input id="mail" placeholder="Email">
-    </div>
-    <div class="form-row">
-      <textarea id="description" placeholder="Description" rows="3"></textarea>
-    </div>
-    <div>
-      <button id="saveBtn">Save</button>
-      <button id="cancelBtn">Cancel</button>
-    </div>
-  </div>
+<!-- Table -->
+<table id="dataTable">
+  <thead>
+    <tr>
+      <th>#</th>
+      <th>Company</th>
+      <th>Product</th>
+      <th>Type</th>
+      <th>Rate</th>
+      <th>Description</th>
+      <th>Contact</th>
+      <th>Mail</th>
+      <th>Actions</th>
+    </tr>
+  </thead>
+  <tbody></tbody>
+</table>
 
-  <script>
-    // ===== CONFIG =====
-    // Replace this with the URL of your deployed Apps Script web app.
-    const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbwXYZ123abc456def/exec';
+<script>
+const API_URL = "https://script.google.com/macros/s/AKfycbwXYZ123abc456def/exec"; // <-- replace with your URL
 
+// === Fetch & Display ===
+async function loadData() {
+  const res = await fetch(API_URL);
+  const json = await res.text();
+  const data = JSON.parse(json).data;
+  const tbody = document.querySelector("#dataTable tbody");
+  tbody.innerHTML = "";
 
-    // Column order in the sheet (1-based indexing for reference):
-    // company name, product, product type, rate, description, contact, mail
-    // The backend expects the sheet to have a header row in the same order.
+  for (let i = 1; i < data.length; i++) {
+    const row = data[i];
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td>${i}</td>
+      <td>${row[0]}</td>
+      <td>${row[1]}</td>
+      <td>${row[2]}</td>
+      <td>${row[3]}</td>
+      <td>${row[4]}</td>
+      <td>${row[5]}</td>
+      <td>${row[6]}</td>
+      <td>
+        <button class="edit-btn" onclick="editRow(${i}, ${JSON.stringify(row).replace(/"/g, '&quot;')})">Edit</button>
+        <button class="delete-btn" onclick="deleteRow(${i})">Delete</button>
+      </td>
+    `;
+    tbody.appendChild(tr);
+  }
+}
 
-    // ===== UI Logic =====
-    const tableWrap = document.getElementById('tableWrap');
-    const refreshBtn = document.getElementById('refreshBtn');
-    const addNewBtn = document.getElementById('addNewBtn');
-    const formWrap = document.getElementById('formWrap');
-    const saveBtn = document.getElementById('saveBtn');
-    const cancelBtn = document.getElementById('cancelBtn');
-    const formTitle = document.getElementById('formTitle');
+// === Add ===
+async function addRow() {
+  const row = [
+    company.value, product.value, type.value, rate.value,
+    desc.value, contact.value, mail.value
+  ];
+  await fetch(API_URL, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ action: "add", row })
+  });
+  loadData();
+}
 
-    let editingRowIndex = null; // 1-based row index in sheet (not counting header)
-    let currentData = [];
+// === Edit ===
+async function editRow(rowIndex, oldRow) {
+  const updated = [
+    prompt("Company:", oldRow[0]) || oldRow[0],
+    prompt("Product:", oldRow[1]) || oldRow[1],
+    prompt("Type:", oldRow[2]) || oldRow[2],
+    prompt("Rate:", oldRow[3]) || oldRow[3],
+    prompt("Description:", oldRow[4]) || oldRow[4],
+    prompt("Contact:", oldRow[5]) || oldRow[5],
+    prompt("Mail:", oldRow[6]) || oldRow[6],
+  ];
+  await fetch(API_URL, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ action: "edit", rowIndex, row: updated })
+  });
+  loadData();
+}
 
-    async function apiRequest(payload){
-      const res = await fetch(WEB_APP_URL, {
-        method: 'POST',
-        headers: {'Content-Type':'application/json'},
-        body: JSON.stringify(payload)
-      });
-      if(!res.ok) throw new Error('Server returned ' + res.status);
-      return res.json();
-    }
-
-    async function loadData(){
-      tableWrap.innerHTML = 'Loading...';
-      try{
-        const resp = await apiRequest({action:'getAll'});
-        if(resp.success){
-          currentData = resp.data; // array of rows (each row is object)
-          renderTable(currentData);
-        } else tableWrap.innerHTML = 'Error: ' + resp.message;
-      }catch(e){ tableWrap.innerHTML = 'Error: ' + e.message }
-    }
-
-    function renderTable(rows){
-      if(!rows || rows.length === 0){
-        tableWrap.innerHTML = '<p>No data found.</p>';
-        return;
-      }
-      const table = document.createElement('table');
-      const thead = document.createElement('thead');
-      thead.innerHTML = '<tr>' +
-        '<th>#</th><th>Company</th><th>Product</th><th>Product Type</th><th>Rate</th><th>Description</th><th>Contact</th><th>Mail</th><th>Actions</th>'+
-        '</tr>';
-      table.appendChild(thead);
-      const tbody = document.createElement('tbody');
-      rows.forEach((r,i)=>{
-        const tr = document.createElement('tr');
-        tr.innerHTML = `
-          <td>${i+1}</td>
-          <td>${escapeHtml(r.company||'')}</td>
-          <td>${escapeHtml(r.product||'')}</td>
-          <td>${escapeHtml(r.productType||'')}</td>
-          <td>${escapeHtml(r.rate||'')}</td>
-          <td>${escapeHtml(r.description||'')}</td>
-          <td>${escapeHtml(r.contact||'')}</td>
-          <td>${escapeHtml(r.mail||'')}</td>
-          <td>
-            <button data-i="${i}" class="editBtn">Edit</button>
-            <button data-i="${i}" class="deleteBtn">Delete</button>
-          </td>
-        `;
-        tbody.appendChild(tr);
-      });
-      table.appendChild(tbody);
-      tableWrap.innerHTML = '';
-      tableWrap.appendChild(table);
-
-      // attach handlers
-      document.querySelectorAll('.editBtn').forEach(btn=>btn.addEventListener('click', onEdit));
-      document.querySelectorAll('.deleteBtn').forEach(btn=>btn.addEventListener('click', onDelete));
-    }
-
-    function escapeHtml(s){ return String(s).replace(/[&<>"']/g, c=>({
-      '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'
-    }[c])) }
-
-    function onEdit(e){
-      const idx = Number(e.currentTarget.dataset.i);
-      const row = currentData[idx];
-      editingRowIndex = idx + 1; // 1-based
-      formTitle.textContent = 'Edit Row #' + (idx+1);
-      document.getElementById('company').value = row.company||'';
-      document.getElementById('product').value = row.product||'';
-      document.getElementById('productType').value = row.productType||'';
-      document.getElementById('rate').value = row.rate||'';
-      document.getElementById('description').value = row.description||'';
-      document.getElementById('contact').value = row.contact||'';
-      document.getElementById('mail').value = row.mail||'';
-      formWrap.classList.remove('hidden');
-    }
-
-    async function onDelete(e){
-      if(!confirm('Delete this row?')) return;
-      const idx = Number(e.currentTarget.dataset.i);
-      try{
-        const resp = await apiRequest({action:'delete', rowIndex: idx+1});
-        if(resp.success) loadData(); else alert('Delete failed: '+resp.message);
-      }catch(err){alert(err.message)}
-    }
-
-    addNewBtn.addEventListener('click', ()=>{
-      editingRowIndex = null;
-      formTitle.textContent = 'Add New Row';
-      document.getElementById('company').value='';
-      document.getElementById('product').value='';
-      document.getElementById('productType').value='';
-      document.getElementById('rate').value='';
-      document.getElementById('description').value='';
-      document.getElementById('contact').value='';
-      document.getElementById('mail').value='';
-      formWrap.classList.remove('hidden');
+// === Delete ===
+async function deleteRow(rowIndex) {
+  if (confirm("Delete this row?")) {
+    await fetch(API_URL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ action: "delete", rowIndex })
     });
-
-    cancelBtn.addEventListener('click', ()=>{ formWrap.classList.add('hidden'); });
-
-    saveBtn.addEventListener('click', async ()=>{
-      const payload = {
-        action: editingRowIndex ? 'update' : 'add',
-        rowIndex: editingRowIndex, // only for update
-        row: {
-          company: document.getElementById('company').value.trim(),
-          product: document.getElementById('product').value.trim(),
-          productType: document.getElementById('productType').value.trim(),
-          rate: document.getElementById('rate').value.trim(),
-          description: document.getElementById('description').value.trim(),
-          contact: document.getElementById('contact').value.trim(),
-          mail: document.getElementById('mail').value.trim()
-        }
-      };
-      try{
-        const resp = await apiRequest(payload);
-        if(resp.success){
-          formWrap.classList.add('hidden');
-          loadData();
-        } else alert('Save failed: '+resp.message);
-      }catch(err){alert(err.message)}
-    });
-
-    refreshBtn.addEventListener('click', loadData);
-
-    // load initially
     loadData();
-  </script>
+  }
+}
+
+loadData();
+</script>
 </body>
 </html>
-
-
-
