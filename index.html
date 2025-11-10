@@ -1,217 +1,32 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Google Sheet CRUD | RJ Services</title>
-
-<style>
-  body {
-    font-family: Arial, sans-serif;
-    background: #f9fafc;
-    color: #222;
-    padding: 20px;
-  }
-  h1 {
-    text-align: center;
-    color: #007bff;
-  }
-  .form-container {
-    background: white;
-    padding: 20px;
-    border-radius: 12px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-    max-width: 600px;
-    margin: 20px auto;
-  }
-  label {
-    display: block;
-    margin-top: 10px;
-    font-weight: bold;
-  }
-  input, textarea {
-    width: 100%;
-    padding: 8px;
-    margin-top: 5px;
-    border-radius: 8px;
-    border: 1px solid #ccc;
-  }
-  button {
-    margin-top: 15px;
-    padding: 10px 16px;
-    background-color: #007bff;
-    color: white;
-    border: none;
-    border-radius: 8px;
-    cursor: pointer;
-  }
-  button:hover {
-    background-color: #0056b3;
-  }
-  table {
-    width: 100%;
-    margin-top: 20px;
-    border-collapse: collapse;
-  }
-  th, td {
-    border: 1px solid #ddd;
-    padding: 8px;
-    text-align: left;
-  }
-  th {
-    background-color: #007bff;
-    color: white;
-  }
-  tr:nth-child(even) {
-    background-color: #f2f2f2;
-  }
-</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Google Sheet Data</title>
 </head>
-
 <body>
-  <h1>RJ Services - Google Sheet CRUD</h1>
+  <h2>Load Google Sheet Data</h2>
+  <button onclick="loadData()">Load Data</button>
+  <pre id="output"></pre>
 
-  <div class="form-container">
-    <label>Company Name</label>
-    <input type="text" id="companyName">
+  <script>
+    const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbypseaOhWp4MOBPWlbITtdtBUpYXgdqz0V668KcF32Lzrb3ue1UiT2bQaUJkpwgcAo/exec";
 
-    <label>Product</label>
-    <input type="text" id="product">
-
-    <label>Product Type</label>
-    <input type="text" id="productType">
-
-    <label>Rate</label>
-    <input type="text" id="rate">
-
-    <label>Description</label>
-    <textarea id="description"></textarea>
-
-    <label>Contact</label>
-    <input type="text" id="contact">
-
-    <label>Mail</label>
-    <input type="text" id="mail">
-
-    <button onclick="addRecord()">➕ Add Record</button>
-    <button onclick="loadData()">🔄 Refresh Data</button>
-  </div>
-
-  <table id="dataTable">
-    <thead>
-      <tr>
-        <th>ID</th>
-        <th>Company</th>
-        <th>Product</th>
-        <th>Type</th>
-        <th>Rate</th>
-        <th>Description</th>
-        <th>Contact</th>
-        <th>Mail</th>
-        <th>Action</th>
-      </tr>
-    </thead>
-    <tbody></tbody>
-  </table>
-
-<script>
-const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyHgxcUzGLsQ19M9tUdn5QId9NlIOnMaxPf1ZrMgsaRPCgpSlOlYsghraz5u2HdtTPi/exec"; // <-- Replace with your own Web App URL
-
-// === Fetch all data ===
-async function loadData() {
-  const tableBody = document.querySelector("#dataTable tbody");
-  tableBody.innerHTML = "<tr><td colspan='9'>Loading...</td></tr>";
-  
-  try {
-    const res = await fetch(`${SCRIPT_URL}?action=getData`);
-    const json = await res.json();
-    
-    if (json.success && json.data.length > 0) {
-      tableBody.innerHTML = "";
-      json.data.forEach(row => {
-        const tr = document.createElement("tr");
-        tr.innerHTML = `
-          <td>${row.id}</td>
-          <td>${row.companyname}</td>
-          <td>${row.product}</td>
-          <td>${row.producttype}</td>
-          <td>${row.rate}</td>
-          <td>${row.description}</td>
-          <td>${row.contact}</td>
-          <td>${row.mail}</td>
-          <td>
-            <button onclick="deleteRecord(${row.id})" style="background:red;">❌</button>
-          </td>
-        `;
-        tableBody.appendChild(tr);
-      });
-    } else {
-      tableBody.innerHTML = "<tr><td colspan='9'>No data found</td></tr>";
+    async function loadData() {
+      try {
+        const res = await fetch(`${WEB_APP_URL}?action=getData`, {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        });
+        const data = await res.json();
+        document.getElementById("output").innerText = JSON.stringify(data, null, 2);
+      } catch (err) {
+        document.getElementById("output").innerText = "❌ Error: " + err.message;
+      }
     }
-  } catch (err) {
-    tableBody.innerHTML = `<tr><td colspan='9' style='color:red;'>Error: ${err.message}</td></tr>`;
-  }
-}
-
-// === Add new record ===
-async function addRecord() {
-  const data = {
-    companyName: document.getElementById("companyName").value,
-    product: document.getElementById("product").value,
-    productType: document.getElementById("productType").value,
-    rate: document.getElementById("rate").value,
-    description: document.getElementById("description").value,
-    contact: document.getElementById("contact").value,
-    mail: document.getElementById("mail").value
-  };
-
-  if (!data.companyName || !data.product) {
-    alert("Company Name and Product are required!");
-    return;
-  }
-
-  try {
-    const res = await fetch(SCRIPT_URL, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ action: "add", data })
-    });
-    const json = await res.json();
-
-    if (json.success) {
-      alert("✅ Record added successfully!");
-      loadData();
-    } else {
-      alert("❌ Failed: " + json.error);
-    }
-  } catch (err) {
-    alert("Error: " + err.message);
-  }
-}
-
-// === Delete record ===
-async function deleteRecord(id) {
-  if (!confirm("Are you sure to delete this record?")) return;
-  try {
-    const res = await fetch(SCRIPT_URL, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ action: "delete", id })
-    });
-    const json = await res.json();
-    if (json.success) {
-      alert("🗑️ Record deleted!");
-      loadData();
-    } else {
-      alert("❌ Error: " + json.error);
-    }
-  } catch (err) {
-    alert("Error: " + err.message);
-  }
-}
-
-window.onload = loadData;
-</script>
+  </script>
 </body>
 </html>
-
