@@ -1,181 +1,122 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Company Product Data</title>
-
-<style>
-body {
-  font-family: Arial, sans-serif;
-  margin: 20px;
-  background: #f3f6f9;
-}
-h2 { text-align: center; color: #333; }
-
-form {
-  background: white;
-  padding: 15px;
-  border-radius: 8px;
-  margin-bottom: 20px;
-  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-}
-input, textarea {
-  width: 100%;
-  margin: 6px 0;
-  padding: 8px;
-  border: 1px solid #ccc;
-  border-radius: 5px;
-}
-button {
-  background: #007bff;
-  color: white;
-  border: none;
-  padding: 8px 15px;
-  border-radius: 5px;
-  cursor: pointer;
-}
-button:hover { background: #0056b3; }
-
-table {
-  width: 100%;
-  border-collapse: collapse;
-  background: white;
-}
-th, td {
-  border: 1px solid #ccc;
-  padding: 8px;
-  text-align: center;
-}
-th { background: #007bff; color: white; }
-tr:nth-child(even) { background: #f9f9f9; }
-</style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>RJ Data Manager</title>
+  <style>
+    body { font-family: Arial; margin: 20px; background: #f8f9fa; }
+    h2 { color: #333; }
+    table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+    th, td { border: 1px solid #ccc; padding: 8px; text-align: center; }
+    th { background: #007bff; color: white; }
+    button { padding: 5px 10px; cursor: pointer; border: none; border-radius: 4px; }
+    .addBtn { background: #28a745; color: #fff; }
+    .editBtn { background: #ffc107; }
+    .deleteBtn { background: #dc3545; color: #fff; }
+    form { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px; }
+    input { padding: 8px; border: 1px solid #ccc; border-radius: 4px; }
+  </style>
 </head>
-
 <body>
-<h2>📋 Company Product Manager</h2>
+  <h2>📊 Company Product Management</h2>
 
-<form id="dataForm">
-  <input type="hidden" id="oldCompanyName">
-  <label>Company Name:</label><input type="text" id="company" required>
-  <label>Product:</label><input type="text" id="product" required>
-  <label>Product Type:</label><input type="text" id="type">
-  <label>Rate:</label><input type="text" id="rate">
-  <label>Description:</label><textarea id="description" rows="2"></textarea>
-  <label>Contact:</label><input type="text" id="contact">
-  <label>Mail:</label><input type="email" id="mail">
-  <button type="submit">💾 Save / Update</button>
-</form>
+  <form id="dataForm">
+    <input type="hidden" id="row" />
+    <input type="text" id="company name" placeholder="Company Name" required />
+    <input type="text" id="product" placeholder="Product" required />
+    <input type="text" id="product type" placeholder="Product Type" />
+    <input type="text" id="rate" placeholder="Rate" />
+    <input type="text" id="description" placeholder="Description" />
+    <input type="text" id="contact" placeholder="Contact" />
+    <input type="email" id="mail" placeholder="Mail" />
+    <button type="submit" class="addBtn">Add / Update</button>
+  </form>
 
-<h3>All Records</h3>
-<table id="dataTable">
-  <thead>
-    <tr>
-      <th>Company Name</th>
-      <th>Product</th>
-      <th>Product Type</th>
-      <th>Rate</th>
-      <th>Description</th>
-      <th>Contact</th>
-      <th>Mail</th>
-      <th>Action</th>
-    </tr>
-  </thead>
-  <tbody></tbody>
-</table>
+  <table id="dataTable">
+    <thead>
+      <tr>
+        <th>Row</th>
+        <th>Company</th>
+        <th>Product</th>
+        <th>Product Type</th>
+        <th>Rate</th>
+        <th>Description</th>
+        <th>Contact</th>
+        <th>Mail</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
 
-<script>
-const sheetURL = "https://script.google.com/macros/s/AKfycby_H0WaVNgBZU-D0VUQs73YIXY4_OBPd-gPFoo2mTMatdg0lsQhjoRJ2uCKdLDRMse2/exec";
-const proxy = "https://thingproxy.freeboard.io/fetch/"; // ✅ Stable CORS proxy
+  <script>
+    const SHEET_URL = "https://script.google.com/macros/s/AKfycby_H0WaVNgBZU-D0VUQs73YIXY4_OBPd-gPFoo2mTMatdg0lsQhjoRJ2uCKdLDRMse2/exec";
 
-async function loadData() {
-  try {
-    const res = await fetch(proxy + sheetURL);
-    const json = await res.json();
-    const tbody = document.querySelector("#dataTable tbody");
-    tbody.innerHTML = "";
+    async function loadData() {
+      try {
+        const res = await fetch(`${SHEET_URL}?action=getAll`);
+        const data = await res.json();
+        const tbody = document.querySelector("#dataTable tbody");
+        tbody.innerHTML = "";
 
-    json.data.forEach(row => {
-      const tr = document.createElement("tr");
-      tr.innerHTML = `
-        <td>${row["company name"]}</td>
-        <td>${row["product"]}</td>
-        <td>${row["product type"]}</td>
-        <td>${row["rate"]}</td>
-        <td>${row["description"]}</td>
-        <td>${row["contact"]}</td>
-        <td>${row["mail"]}</td>
-        <td>
-          <button onclick='editData(${JSON.stringify(row)})'>✏️ Edit</button>
-          <button onclick='deleteData("${row["company name"]}")'>🗑️ Delete</button>
-        </td>
-      `;
-      tbody.appendChild(tr);
+        data.data.forEach((row, index) => {
+          const tr = document.createElement("tr");
+          tr.innerHTML = `
+            <td>${index + 2}</td>
+            <td>${row["company name"] || ""}</td>
+            <td>${row["product"] || ""}</td>
+            <td>${row["product type"] || ""}</td>
+            <td>${row["rate"] || ""}</td>
+            <td>${row["description"] || ""}</td>
+            <td>${row["contact"] || ""}</td>
+            <td>${row["mail"] || ""}</td>
+            <td>
+              <button class="editBtn" onclick='editRow(${index + 2}, ${JSON.stringify(row)})'>✏️</button>
+              <button class="deleteBtn" onclick='deleteRow(${index + 2})'>🗑️</button>
+            </td>`;
+          tbody.appendChild(tr);
+        });
+      } catch (err) {
+        console.error("❌ Load Error:", err);
+      }
+    }
+
+    document.getElementById("dataForm").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const row = document.getElementById("row").value;
+      const data = {
+        "company name": document.getElementById("company name").value,
+        "product": document.getElementById("product").value,
+        "product type": document.getElementById("product type").value,
+        "rate": document.getElementById("rate").value,
+        "description": document.getElementById("description").value,
+        "contact": document.getElementById("contact").value,
+        "mail": document.getElementById("mail").value
+      };
+      const action = row ? "edit" : "add";
+      const params = new URLSearchParams({ action, row, ...data });
+
+      await fetch(`${SHEET_URL}?${params}`);
+      e.target.reset();
+      document.getElementById("row").value = "";
+      loadData();
     });
-  } catch (err) {
-    console.error("❌ Load Error:", err);
-  }
-}
 
-// Add or Update
-document.getElementById("dataForm").addEventListener("submit", async e => {
-  e.preventDefault();
-  const formData = {
-    action: document.getElementById("oldCompanyName").value ? "edit" : "add",
-    oldCompanyName: document.getElementById("oldCompanyName").value,
-    "company name": document.getElementById("company").value,
-    "product": document.getElementById("product").value,
-    "product type": document.getElementById("type").value,
-    "rate": document.getElementById("rate").value,
-    "description": document.getElementById("description").value,
-    "contact": document.getElementById("contact").value,
-    "mail": document.getElementById("mail").value
-  };
+    async function deleteRow(row) {
+      if (!confirm("Are you sure to delete?")) return;
+      await fetch(`${SHEET_URL}?action=delete&row=${row}`);
+      loadData();
+    }
 
-  try {
-    const res = await fetch(proxy + sheetURL, {
-      method: "POST",
-      body: JSON.stringify(formData),
-      headers: { "Content-Type": "application/json" }
-    });
-    const json = await res.json();
-    alert(json.message || "Saved!");
-    e.target.reset();
-    document.getElementById("oldCompanyName").value = "";
+    function editRow(row, data) {
+      document.getElementById("row").value = row;
+      for (const key in data) {
+        if (document.getElementById(key)) document.getElementById(key).value = data[key];
+      }
+    }
+
     loadData();
-  } catch (err) {
-    console.error("Save error", err);
-  }
-});
-
-function editData(row) {
-  document.getElementById("oldCompanyName").value = row["company name"];
-  document.getElementById("company").value = row["company name"];
-  document.getElementById("product").value = row["product"];
-  document.getElementById("type").value = row["product type"];
-  document.getElementById("rate").value = row["rate"];
-  document.getElementById("description").value = row["description"];
-  document.getElementById("contact").value = row["contact"];
-  document.getElementById("mail").value = row["mail"];
-}
-
-async function deleteData(company) {
-  if (!confirm("Delete record for " + company + "?")) return;
-  try {
-    const res = await fetch(proxy + sheetURL, {
-      method: "POST",
-      body: JSON.stringify({ action: "delete", company }),
-      headers: { "Content-Type": "application/json" }
-    });
-    const json = await res.json();
-    alert(json.message || "Deleted!");
-    loadData();
-  } catch (err) {
-    console.error("Delete error", err);
-  }
-}
-
-loadData();
-</script>
+  </script>
 </body>
 </html>
