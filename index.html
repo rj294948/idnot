@@ -1,145 +1,212 @@
-<!DOCTYPE html>
-<html lang="en">
+<!--
+File: index.html  (Frontend)
+Description: Simple page to display Google Sheet rows and allow Add / Edit / Delete.
+Instructions: Deploy the Apps Script (server) provided below as a Web App and set WEB_APP_URL in the fetch calls.
+-->
 
+<!doctype html>
+<html lang="hi">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI Chat App</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            background-color: #f0f0f0;
-            flex-direction: column;
-        }
-
-        #chat-container {
-            width: 80%;
-            max-width: 600px;
-            margin: auto;
-            background: white;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            padding: 20px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-        }
-
-        #messages {
-            height: 300px;
-            overflow-y: auto;
-            border-bottom: 1px solid #ddd;
-            margin-bottom: 20px;
-            padding: 10px;
-        }
-
-        .message {
-            padding: 5px;
-            margin: 5px 0;
-            border-radius: 4px;
-            background: #2c7aef;
-            color: white;
-        }
-
-        .user-message {
-            text-align: right;
-            background: #f9f9f9;
-            color: black;
-        }
-
-        .user-message .message {
-            background: #e0f7fa;
-        }
-
-        #chat-input {
-            display: flex;
-        }
-
-        #chat-input input {
-            flex-grow: 1;
-            padding: 10px;
-            margin-right: 10px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-        }
-
-        #chat-input button {
-            padding: 10px 20px;
-            background: #007bff;
-            color: white;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-        }
-
-        #chat-input button:hover {
-            background: #0056b3;
-        }
-
-        .typing-indicator {
-            font-size: 0.9em;
-            color: gray;
-        }
-    </style>
-    <script src="https://js.puter.com/v2/"></script>
-
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Sheets CRUD - RJ Services</title>
+  <style>
+    body{font-family:Arial, Helvetica, sans-serif;margin:16px}
+    table{border-collapse:collapse;width:100%}
+    th,td{border:1px solid #ccc;padding:8px;text-align:left}
+    th{background:#f2f2f2}
+    button{padding:6px 10px;margin:2px}
+    .form-row{display:flex;gap:8px;flex-wrap:wrap;margin:8px 0}
+    .form-row input,.form-row textarea{flex:1;padding:6px}
+    .hidden{display:none}
+  </style>
 </head>
-
 <body>
-    <div id="chat-container">
-        <div id="messages"></div>
-        <div id="typing-indicator" class="typing-indicator" style="display: none;">AI is typing...</div>
-        <div id="chat-input">
-            <input type="text" id="input-message" placeholder="Type a message...">
-            <button onclick="sendMessage()">Send</button>
-        </div>
+  <h2>Google Sheet - CRUD (company, product, product type, rate, description, contact, mail)</h2>
+
+  <div>
+    <button id="refreshBtn">Refresh</button>
+    <button id="addNewBtn">Add New Row</button>
+  </div>
+
+  <div id="tableWrap"></div>
+
+  <div id="formWrap" class="hidden">
+    <h3 id="formTitle">Add / Edit Row</h3>
+    <div class="form-row">
+      <input id="company" placeholder="Company name">
+      <input id="product" placeholder="Product">
+      <input id="productType" placeholder="Product Type">
     </div>
-    <p>Created using Puter.JS</p>
+    <div class="form-row">
+      <input id="rate" placeholder="Rate">
+      <input id="contact" placeholder="Contact">
+      <input id="mail" placeholder="Email">
+    </div>
+    <div class="form-row">
+      <textarea id="description" placeholder="Description" rows="3"></textarea>
+    </div>
+    <div>
+      <button id="saveBtn">Save</button>
+      <button id="cancelBtn">Cancel</button>
+    </div>
+  </div>
 
-    <script>
-        const messages = [];
-        function addMessage(msg, isUser) {
-            const messagesDiv = document.getElementById("messages");
-            const messageDiv = document.createElement("div");
-            messageDiv.classList.add("message");
-            if (isUser) {
-                messageDiv.classList.add("user-message");
-            }
-            messageDiv.textContent = msg;
-            messagesDiv.appendChild(messageDiv);
-            messagesDiv.scrollTop = messagesDiv.scrollHeight;
+  <script>
+    // ===== CONFIG =====
+    // Replace this with the URL of your deployed Apps Script web app.
+    const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbwXYZ123abc456def/exec';
+
+
+    // Column order in the sheet (1-based indexing for reference):
+    // company name, product, product type, rate, description, contact, mail
+    // The backend expects the sheet to have a header row in the same order.
+
+    // ===== UI Logic =====
+    const tableWrap = document.getElementById('tableWrap');
+    const refreshBtn = document.getElementById('refreshBtn');
+    const addNewBtn = document.getElementById('addNewBtn');
+    const formWrap = document.getElementById('formWrap');
+    const saveBtn = document.getElementById('saveBtn');
+    const cancelBtn = document.getElementById('cancelBtn');
+    const formTitle = document.getElementById('formTitle');
+
+    let editingRowIndex = null; // 1-based row index in sheet (not counting header)
+    let currentData = [];
+
+    async function apiRequest(payload){
+      const res = await fetch(WEB_APP_URL, {
+        method: 'POST',
+        headers: {'Content-Type':'application/json'},
+        body: JSON.stringify(payload)
+      });
+      if(!res.ok) throw new Error('Server returned ' + res.status);
+      return res.json();
+    }
+
+    async function loadData(){
+      tableWrap.innerHTML = 'Loading...';
+      try{
+        const resp = await apiRequest({action:'getAll'});
+        if(resp.success){
+          currentData = resp.data; // array of rows (each row is object)
+          renderTable(currentData);
+        } else tableWrap.innerHTML = 'Error: ' + resp.message;
+      }catch(e){ tableWrap.innerHTML = 'Error: ' + e.message }
+    }
+
+    function renderTable(rows){
+      if(!rows || rows.length === 0){
+        tableWrap.innerHTML = '<p>No data found.</p>';
+        return;
+      }
+      const table = document.createElement('table');
+      const thead = document.createElement('thead');
+      thead.innerHTML = '<tr>' +
+        '<th>#</th><th>Company</th><th>Product</th><th>Product Type</th><th>Rate</th><th>Description</th><th>Contact</th><th>Mail</th><th>Actions</th>'+
+        '</tr>';
+      table.appendChild(thead);
+      const tbody = document.createElement('tbody');
+      rows.forEach((r,i)=>{
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td>${i+1}</td>
+          <td>${escapeHtml(r.company||'')}</td>
+          <td>${escapeHtml(r.product||'')}</td>
+          <td>${escapeHtml(r.productType||'')}</td>
+          <td>${escapeHtml(r.rate||'')}</td>
+          <td>${escapeHtml(r.description||'')}</td>
+          <td>${escapeHtml(r.contact||'')}</td>
+          <td>${escapeHtml(r.mail||'')}</td>
+          <td>
+            <button data-i="${i}" class="editBtn">Edit</button>
+            <button data-i="${i}" class="deleteBtn">Delete</button>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+      table.appendChild(tbody);
+      tableWrap.innerHTML = '';
+      tableWrap.appendChild(table);
+
+      // attach handlers
+      document.querySelectorAll('.editBtn').forEach(btn=>btn.addEventListener('click', onEdit));
+      document.querySelectorAll('.deleteBtn').forEach(btn=>btn.addEventListener('click', onDelete));
+    }
+
+    function escapeHtml(s){ return String(s).replace(/[&<>"']/g, c=>({
+      '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'
+    }[c])) }
+
+    function onEdit(e){
+      const idx = Number(e.currentTarget.dataset.i);
+      const row = currentData[idx];
+      editingRowIndex = idx + 1; // 1-based
+      formTitle.textContent = 'Edit Row #' + (idx+1);
+      document.getElementById('company').value = row.company||'';
+      document.getElementById('product').value = row.product||'';
+      document.getElementById('productType').value = row.productType||'';
+      document.getElementById('rate').value = row.rate||'';
+      document.getElementById('description').value = row.description||'';
+      document.getElementById('contact').value = row.contact||'';
+      document.getElementById('mail').value = row.mail||'';
+      formWrap.classList.remove('hidden');
+    }
+
+    async function onDelete(e){
+      if(!confirm('Delete this row?')) return;
+      const idx = Number(e.currentTarget.dataset.i);
+      try{
+        const resp = await apiRequest({action:'delete', rowIndex: idx+1});
+        if(resp.success) loadData(); else alert('Delete failed: '+resp.message);
+      }catch(err){alert(err.message)}
+    }
+
+    addNewBtn.addEventListener('click', ()=>{
+      editingRowIndex = null;
+      formTitle.textContent = 'Add New Row';
+      document.getElementById('company').value='';
+      document.getElementById('product').value='';
+      document.getElementById('productType').value='';
+      document.getElementById('rate').value='';
+      document.getElementById('description').value='';
+      document.getElementById('contact').value='';
+      document.getElementById('mail').value='';
+      formWrap.classList.remove('hidden');
+    });
+
+    cancelBtn.addEventListener('click', ()=>{ formWrap.classList.add('hidden'); });
+
+    saveBtn.addEventListener('click', async ()=>{
+      const payload = {
+        action: editingRowIndex ? 'update' : 'add',
+        rowIndex: editingRowIndex, // only for update
+        row: {
+          company: document.getElementById('company').value.trim(),
+          product: document.getElementById('product').value.trim(),
+          productType: document.getElementById('productType').value.trim(),
+          rate: document.getElementById('rate').value.trim(),
+          description: document.getElementById('description').value.trim(),
+          contact: document.getElementById('contact').value.trim(),
+          mail: document.getElementById('mail').value.trim()
         }
+      };
+      try{
+        const resp = await apiRequest(payload);
+        if(resp.success){
+          formWrap.classList.add('hidden');
+          loadData();
+        } else alert('Save failed: '+resp.message);
+      }catch(err){alert(err.message)}
+    });
 
-        function sendMessage() {
-            const input = document.getElementById("input-message");
-            const message = input.value.trim();
-            if (message) {
-                addMessage(message, true);
-                input.value = '';
-                messages.push({ content: message, role: 'user' });
+    refreshBtn.addEventListener('click', loadData);
 
-                // Show typing indicator
-                document.getElementById("typing-indicator").style.display = "block";
-
-                // Call AI chat function
-                puter.ai.chat(messages).then(response => {
-                    // Hide typing indicator
-                    document.getElementById("typing-indicator").style.display = "none";
-                    addMessage(response, false);
-                    messages.push(response.message);
-                }).catch(error => {
-                    console.error("AI response error:", error);
-                    // Hide typing indicator
-                    document.getElementById("typing-indicator").style.display = "none";
-                    addMessage("Sorry, something went wrong.", false);
-                });
-            }
-        }
-    </script>
+    // load initially
+    loadData();
+  </script>
 </body>
-
 </html>
+
+
+
