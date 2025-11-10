@@ -1,161 +1,154 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Sheet Data Manager</title>
-  <style>
-    body { font-family: Arial; padding: 20px; }
-    table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-    th, td { border: 1px solid #ccc; padding: 8px; text-align: left; }
-    th { background-color: #f2f2f2; }
-    input, button { padding: 6px; margin: 2px 0; width: 100%; }
-    .form-container { max-width: 800px; margin: auto; }
-    .actions button { margin-right: 5px; }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ID Not Table</title>
+<style>
+  body { font-family: Arial, sans-serif; margin: 20px; }
+  table { border-collapse: collapse; width: 100%; margin-top: 20px; }
+  th, td { border: 1px solid #ccc; padding: 8px; text-align: left; }
+  th { background-color: #f2f2f2; }
+  input { padding: 5px; width: 100%; box-sizing: border-box; }
+  button { padding: 5px 10px; margin: 2px; cursor: pointer; }
+</style>
 </head>
 <body>
 
-  <h2>Google Sheet Data Manager</h2>
+<h2>Company Products Table</h2>
 
-  <div class="form-container">
-    <input type="hidden" id="rowId">
-    <label>Company Name:</label>
-    <input type="text" id="companyname">
-    <label>Product:</label>
-    <input type="text" id="product">
-    <label>Product Type:</label>
-    <input type="text" id="producttype">
-    <label>Rate:</label>
-    <input type="text" id="rate">
-    <label>Description:</label>
-    <input type="text" id="description">
-    <label>Contact:</label>
-    <input type="text" id="contact">
-    <label>Mail:</label>
-    <input type="text" id="mail">
-    <button onclick="saveRow()">Save / Update</button>
-  </div>
+<!-- Form to add new data -->
+<div>
+  <input type="text" id="companyName" placeholder="Company Name">
+  <input type="text" id="product" placeholder="Product">
+  <input type="text" id="productType" placeholder="Product Type">
+  <input type="text" id="rate" placeholder="Rate">
+  <input type="text" id="description" placeholder="Description">
+  <input type="text" id="contact" placeholder="Contact">
+  <input type="email" id="mail" placeholder="Email">
+  <button onclick="addRow()">Add</button>
+</div>
 
-  <table id="dataTable">
-    <thead>
-      <tr>
-        <th>#</th>
-        <th>Company Name</th>
-        <th>Product</th>
-        <th>Product Type</th>
-        <th>Rate</th>
-        <th>Description</th>
-        <th>Contact</th>
-        <th>Mail</th>
-        <th>Actions</th>
-      </tr>
-    </thead>
-    <tbody></tbody>
-  </table>
+<!-- Table to show data -->
+<table>
+  <thead>
+    <tr>
+      <th>Company Name</th>
+      <th>Product</th>
+      <th>Product Type</th>
+      <th>Rate</th>
+      <th>Description</th>
+      <th>Contact</th>
+      <th>Mail</th>
+      <th>Actions</th>
+    </tr>
+  </thead>
+  <tbody id="tableBody"></tbody>
+</table>
 
 <script>
-const API_URL = 'https://script.google.com/macros/s/AKfycby_H0WaVNgBZU-D0VUQs73YIXY4_OBPd-gPFoo2mTMatdg0lsQhjoRJ2uCKdLDRMse2/exec'; // replace with your script URL
+const API_URL = 'https://script.google.com/macros/s/AKfycby_H0WaVNgBZU-D0VUQs73YIXY4_OBPd-gPFoo2mTMatdg0lsQhjoRJ2uCKdLDRMse2/exec';
 
-// Load data from sheet
 async function loadData() {
   try {
     const res = await fetch(`${API_URL}?action=getData`);
     const json = await res.json();
-    const tbody = document.querySelector('#dataTable tbody');
-    tbody.innerHTML = '';
-
-    if(!json.data || !Array.isArray(json.data)) {
-      alert('Data format error. Check Apps Script.');
-      return;
+    if(json.status === 'success') {
+      renderTable(json.data);
+    } else {
+      console.error('❌ Data not loaded', json);
     }
-
-    json.data.forEach((row, index) => {
-      const tr = document.createElement('tr');
-      tr.innerHTML = `
-        <td>${index + 1}</td>
-        <td>${row.companyname || ''}</td>
-        <td>${row.product || ''}</td>
-        <td>${row.producttype || ''}</td>
-        <td>${row.rate || ''}</td>
-        <td>${row.description || ''}</td>
-        <td>${row.contact || ''}</td>
-        <td>${row.mail || ''}</td>
-        <td class="actions">
-          <button onclick='editRow(${row.id}, ${JSON.stringify(row)})'>Edit</button>
-          <button onclick='deleteRow(${row.id})'>Delete</button>
-        </td>
-      `;
-      tbody.appendChild(tr);
-    });
-  } catch (err) {
-    console.error('Load Error:', err);
+  } catch(err) {
+    console.error('❌ Load Error:', err);
   }
 }
 
-// Edit a row
-function editRow(id, row) {
-  document.getElementById('rowId').value = id;
-  document.getElementById('companyname').value = row.companyname || '';
-  document.getElementById('product').value = row.product || '';
-  document.getElementById('producttype').value = row.producttype || '';
-  document.getElementById('rate').value = row.rate || '';
-  document.getElementById('description').value = row.description || '';
-  document.getElementById('contact').value = row.contact || '';
-  document.getElementById('mail').value = row.mail || '';
+function renderTable(data) {
+  const tbody = document.getElementById('tableBody');
+  tbody.innerHTML = '';
+  data.forEach(row => {
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td><input value="${row.companyName}" onchange="updateRow(${row.id}, 'companyName', this.value)"></td>
+      <td><input value="${row.product}" onchange="updateRow(${row.id}, 'product', this.value)"></td>
+      <td><input value="${row.productType}" onchange="updateRow(${row.id}, 'productType', this.value)"></td>
+      <td><input value="${row.rate}" onchange="updateRow(${row.id}, 'rate', this.value)"></td>
+      <td><input value="${row.description}" onchange="updateRow(${row.id}, 'description', this.value)"></td>
+      <td><input value="${row.contact}" onchange="updateRow(${row.id}, 'contact', this.value)"></td>
+      <td><input value="${row.mail}" onchange="updateRow(${row.id}, 'mail', this.value)"></td>
+      <td>
+        <button onclick="deleteRow(${row.id})">Delete</button>
+      </td>
+    `;
+    tbody.appendChild(tr);
+  });
 }
 
-// Save or update row
-async function saveRow() {
-  const id = document.getElementById('rowId').value;
+// Add new row
+async function addRow() {
   const data = {
-    companyName: document.getElementById('companyname').value,
+    companyName: document.getElementById('companyName').value,
     product: document.getElementById('product').value,
-    productType: document.getElementById('producttype').value,
+    productType: document.getElementById('productType').value,
     rate: document.getElementById('rate').value,
     description: document.getElementById('description').value,
     contact: document.getElementById('contact').value,
     mail: document.getElementById('mail').value
   };
-
   try {
-    const action = id ? 'update' : 'add';
     const res = await fetch(API_URL, {
       method: 'POST',
-      body: JSON.stringify({ action, id, data }),
-      headers: { 'Content-Type': 'application/json' }
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action: 'add', data })
     });
     const json = await res.json();
-    if(json.success) {
-      alert(json.message);
-      document.getElementById('rowId').value = '';
-      document.querySelectorAll('input[type=text]').forEach(input => input.value = '');
-      loadData();
-    } else {
-      alert('Error: ' + json.error);
-    }
-  } catch (err) {
-    console.error('Save Error:', err);
+    console.log(json);
+    loadData();
+  } catch(err) {
+    console.error('Add Error:', err);
+  }
+}
+
+// Update single field
+async function updateRow(id, field, value) {
+  // Get full row data first
+  const rowEl = Array.from(document.querySelectorAll(`#tableBody tr`)).find(tr => tr.querySelector(`input[value="${value}"]`));
+  const inputs = rowEl.querySelectorAll('input');
+  const data = {
+    companyName: inputs[0].value,
+    product: inputs[1].value,
+    productType: inputs[2].value,
+    rate: inputs[3].value,
+    description: inputs[4].value,
+    contact: inputs[5].value,
+    mail: inputs[6].value
+  };
+  try {
+    const res = await fetch(API_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action: 'update', id, data })
+    });
+    const json = await res.json();
+    console.log(json);
+    loadData();
+  } catch(err) {
+    console.error('Update Error:', err);
   }
 }
 
 // Delete row
 async function deleteRow(id) {
-  if(!confirm('Are you sure you want to delete this record?')) return;
-
   try {
     const res = await fetch(API_URL, {
       method: 'POST',
-      body: JSON.stringify({ action: 'delete', id }),
-      headers: { 'Content-Type': 'application/json' }
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action: 'delete', id })
     });
     const json = await res.json();
-    if(json.success) {
-      alert(json.message);
-      loadData();
-    } else {
-      alert('Error: ' + json.error);
-    }
-  } catch (err) {
+    console.log(json);
+    loadData();
+  } catch(err) {
     console.error('Delete Error:', err);
   }
 }
