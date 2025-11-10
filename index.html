@@ -2,35 +2,19 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ID Not Table</title>
+<title>Sheet CRUD</title>
 <style>
-  body { font-family: Arial, sans-serif; margin: 20px; }
-  table { border-collapse: collapse; width: 100%; margin-top: 20px; }
-  th, td { border: 1px solid #ccc; padding: 8px; text-align: left; }
-  th { background-color: #f2f2f2; }
-  input { padding: 5px; width: 100%; box-sizing: border-box; }
-  button { padding: 5px 10px; margin: 2px; cursor: pointer; }
+  table {border-collapse: collapse; width: 100%;}
+  th, td {border: 1px solid #ccc; padding: 8px;}
+  th {background: #f0f0f0;}
+  input {width: 100%;}
+  button {margin: 2px;}
 </style>
 </head>
 <body>
 
-<h2>Company Products Table</h2>
-
-<!-- Form to add new data -->
-<div>
-  <input type="text" id="companyName" placeholder="Company Name">
-  <input type="text" id="product" placeholder="Product">
-  <input type="text" id="productType" placeholder="Product Type">
-  <input type="text" id="rate" placeholder="Rate">
-  <input type="text" id="description" placeholder="Description">
-  <input type="text" id="contact" placeholder="Contact">
-  <input type="email" id="mail" placeholder="Email">
-  <button onclick="addRow()">Add</button>
-</div>
-
-<!-- Table to show data -->
-<table>
+<h2>Company Products</h2>
+<table id="dataTable">
   <thead>
     <tr>
       <th>Company Name</th>
@@ -43,119 +27,102 @@
       <th>Actions</th>
     </tr>
   </thead>
-  <tbody id="tableBody"></tbody>
+  <tbody></tbody>
 </table>
+
+<h3>Add New Row</h3>
+<input id="CompanyName" placeholder="Company Name">
+<input id="Product" placeholder="Product">
+<input id="ProductType" placeholder="Product Type">
+<input id="Rate" placeholder="Rate">
+<input id="Description" placeholder="Description">
+<input id="Contact" placeholder="Contact">
+<input id="Mail" placeholder="Mail">
+<button onclick="addData()">Add</button>
 
 <script>
 const API_URL = 'https://script.google.com/macros/s/AKfycby_H0WaVNgBZU-D0VUQs73YIXY4_OBPd-gPFoo2mTMatdg0lsQhjoRJ2uCKdLDRMse2/exec';
+const CORS_PROXY = 'https://corsproxy.io/?';
+
+let tableBody = document.querySelector("#dataTable tbody");
 
 async function loadData() {
   try {
-    const res = await fetch(`${API_URL}?action=getData`);
+    const res = await fetch(`${CORS_PROXY}${API_URL}?action=getAll`);
     const json = await res.json();
-    if(json.status === 'success') {
-      renderTable(json.data);
-    } else {
-      console.error('❌ Data not loaded', json);
-    }
-  } catch(err) {
-    console.error('❌ Load Error:', err);
+    const data = json.data;
+    tableBody.innerHTML = "";
+    data.forEach(row => {
+      const tr = document.createElement("tr");
+      tr.innerHTML = `
+        <td><input value="${row.CompanyName || ''}"></td>
+        <td><input value="${row.Product || ''}"></td>
+        <td><input value="${row.ProductType || ''}"></td>
+        <td><input value="${row.Rate || ''}"></td>
+        <td><input value="${row.Description || ''}"></td>
+        <td><input value="${row.Contact || ''}"></td>
+        <td><input value="${row.Mail || ''}"></td>
+        <td>
+          <button onclick='saveRow(${row.id}, this)'>Save</button>
+          <button onclick='deleteRow(${row.id})'>Delete</button>
+        </td>
+      `;
+      tableBody.appendChild(tr);
+    });
+  } catch(e) {
+    console.error("❌ Load Error:", e);
   }
 }
 
-function renderTable(data) {
-  const tbody = document.getElementById('tableBody');
-  tbody.innerHTML = '';
-  data.forEach(row => {
-    const tr = document.createElement('tr');
-    tr.innerHTML = `
-      <td><input value="${row.companyName}" onchange="updateRow(${row.id}, 'companyName', this.value)"></td>
-      <td><input value="${row.product}" onchange="updateRow(${row.id}, 'product', this.value)"></td>
-      <td><input value="${row.productType}" onchange="updateRow(${row.id}, 'productType', this.value)"></td>
-      <td><input value="${row.rate}" onchange="updateRow(${row.id}, 'rate', this.value)"></td>
-      <td><input value="${row.description}" onchange="updateRow(${row.id}, 'description', this.value)"></td>
-      <td><input value="${row.contact}" onchange="updateRow(${row.id}, 'contact', this.value)"></td>
-      <td><input value="${row.mail}" onchange="updateRow(${row.id}, 'mail', this.value)"></td>
-      <td>
-        <button onclick="deleteRow(${row.id})">Delete</button>
-      </td>
-    `;
-    tbody.appendChild(tr);
-  });
-}
-
-// Add new row
-async function addRow() {
-  const data = {
-    companyName: document.getElementById('companyName').value,
-    product: document.getElementById('product').value,
-    productType: document.getElementById('productType').value,
-    rate: document.getElementById('rate').value,
-    description: document.getElementById('description').value,
-    contact: document.getElementById('contact').value,
-    mail: document.getElementById('mail').value
+async function addData() {
+  const params = {
+    action: "add",
+    CompanyName: document.getElementById("CompanyName").value,
+    Product: document.getElementById("Product").value,
+    ProductType: document.getElementById("ProductType").value,
+    Rate: document.getElementById("Rate").value,
+    Description: document.getElementById("Description").value,
+    Contact: document.getElementById("Contact").value,
+    Mail: document.getElementById("Mail").value
   };
   try {
-    const res = await fetch(API_URL, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ action: 'add', data })
-    });
-    const json = await res.json();
-    console.log(json);
+    const query = new URLSearchParams(params).toString();
+    await fetch(`${CORS_PROXY}${API_URL}?${query}`);
     loadData();
-  } catch(err) {
-    console.error('Add Error:', err);
-  }
+  } catch(e) { console.error("Add Error:", e); }
 }
 
-// Update single field
-async function updateRow(id, field, value) {
-  // Get full row data first
-  const rowEl = Array.from(document.querySelectorAll(`#tableBody tr`)).find(tr => tr.querySelector(`input[value="${value}"]`));
-  const inputs = rowEl.querySelectorAll('input');
-  const data = {
-    companyName: inputs[0].value,
-    product: inputs[1].value,
-    productType: inputs[2].value,
-    rate: inputs[3].value,
-    description: inputs[4].value,
-    contact: inputs[5].value,
-    mail: inputs[6].value
+async function saveRow(id, btn) {
+  const tr = btn.closest("tr");
+  const inputs = tr.querySelectorAll("input");
+  const params = {
+    action: "edit",
+    id: id,
+    CompanyName: inputs[0].value,
+    Product: inputs[1].value,
+    ProductType: inputs[2].value,
+    Rate: inputs[3].value,
+    Description: inputs[4].value,
+    Contact: inputs[5].value,
+    Mail: inputs[6].value
   };
   try {
-    const res = await fetch(API_URL, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ action: 'update', id, data })
-    });
-    const json = await res.json();
-    console.log(json);
+    const query = new URLSearchParams(params).toString();
+    await fetch(`${CORS_PROXY}${API_URL}?${query}`);
     loadData();
-  } catch(err) {
-    console.error('Update Error:', err);
-  }
+  } catch(e) { console.error("Save Error:", e); }
 }
 
-// Delete row
 async function deleteRow(id) {
+  if(!confirm("Delete this row?")) return;
   try {
-    const res = await fetch(API_URL, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ action: 'delete', id })
-    });
-    const json = await res.json();
-    console.log(json);
+    const query = new URLSearchParams({action:"delete", id:id}).toString();
+    await fetch(`${CORS_PROXY}${API_URL}?${query}`);
     loadData();
-  } catch(err) {
-    console.error('Delete Error:', err);
-  }
+  } catch(e) { console.error("Delete Error:", e); }
 }
 
-// Initial load
 loadData();
 </script>
-
 </body>
 </html>
