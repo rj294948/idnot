@@ -1,155 +1,42 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Google Sheet Editor</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      background: #f7f7f7;
-      padding: 20px;
-    }
-    h2 { color: #333; }
-    input, textarea {
-      width: 100%;
-      margin-bottom: 8px;
-      padding: 8px;
-      border: 1px solid #ccc;
-      border-radius: 6px;
-    }
-    button {
-      background: #007bff;
-      color: white;
-      border: none;
-      padding: 8px 14px;
-      border-radius: 5px;
-      cursor: pointer;
-    }
-    button:hover { background: #0056b3; }
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-top: 15px;
-      background: white;
-    }
-    th, td {
-      border: 1px solid #ccc;
-      padding: 8px;
-      text-align: left;
-    }
-    th { background: #007bff; color: white; }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Google Sheet CRUD</title>
 </head>
 <body>
-  <h2>Google Sheet Data Manager</h2>
-
-  <div>
-    <input id="company" placeholder="Company Name" />
-    <input id="product" placeholder="Product" />
-    <input id="productType" placeholder="Product Type" />
-    <input id="rate" placeholder="Rate" />
-    <textarea id="description" placeholder="Description"></textarea>
-    <input id="contact" placeholder="Contact" />
-    <input id="mail" placeholder="Email" />
-    <button onclick="addData()">Add</button>
-  </div>
-
-  <table id="dataTable">
-    <thead>
-      <tr>
-        <th>Company</th>
-        <th>Product</th>
-        <th>Type</th>
-        <th>Rate</th>
-        <th>Description</th>
-        <th>Contact</th>
-        <th>Email</th>
-        <th>Actions</th>
-      </tr>
-    </thead>
-    <tbody></tbody>
-  </table>
+  <h2>📊 Company Product Data</h2>
+  <button onclick="loadData()">🔄 Load Data</button>
+  <table border="1" id="dataTable"></table>
 
   <script>
-    // ✅ FIXED: CORS-safe endpoint using cors.sh proxy
-    const CORS = "https://proxy.cors.sh/";
-    const SHEET_URL = "https://script.google.com/macros/s/AKfycby_H0WaVNgBZU-D0VUQs73YIXY4_OBPd-gPFoo2mTMatdg0lsQhjoRJ2uCKdLDRMse2/exec";
-    const ENDPOINT = `${CORS}${SHEET_URL}`;
-    const HEADERS = { "x-cors-api-key": "temp_cors_key" };
+    const proxy = "https://api.allorigins.win/raw?url=";
+    const scriptURL = "https://script.google.com/macros/s/AKfycby_H0WaVNgBZU-D0VUQs73YIXY4_OBPd-gPFoo2mTMatdg0lsQhjoRJ2uCKdLDRMse2/exec";
 
     async function loadData() {
       try {
-        const res = await fetch(`${ENDPOINT}?action=getAll`, { headers: HEADERS });
-        const json = await res.json();
-        if (!json.success) throw new Error(json.message);
-        const tbody = document.querySelector("#dataTable tbody");
-        tbody.innerHTML = "";
-        json.data.forEach((row, i) => {
-          const tr = document.createElement("tr");
-          tr.innerHTML = `
-            <td>${row.company}</td>
-            <td>${row.product}</td>
-            <td>${row.productType}</td>
-            <td>${row.rate}</td>
-            <td>${row.description}</td>
-            <td>${row.contact}</td>
-            <td>${row.mail}</td>
-            <td>
-              <button onclick="editRow(${i})">Edit</button>
-              <button onclick="deleteRow(${i})" style="background:#dc3545">Delete</button>
-            </td>`;
-          tbody.appendChild(tr);
+        const res = await fetch(proxy + encodeURIComponent(`${scriptURL}?action=getAll`));
+        const data = await res.json();
+        if (!data.success) throw new Error("Failed to load");
+
+        const table = document.getElementById("dataTable");
+        table.innerHTML = "";
+        let headerRow = "<tr>";
+        for (const key of Object.keys(data.data[0])) headerRow += `<th>${key}</th>`;
+        headerRow += "</tr>";
+        table.innerHTML += headerRow;
+
+        data.data.forEach(row => {
+          let tr = "<tr>";
+          for (const key in row) tr += `<td>${row[key]}</td>`;
+          tr += "</tr>";
+          table.innerHTML += tr;
         });
       } catch (err) {
         console.error("❌ Load Error:", err);
       }
     }
-
-    async function addData() {
-      const row = {
-        company: company.value,
-        product: product.value,
-        productType: productType.value,
-        rate: rate.value,
-        description: description.value,
-        contact: contact.value,
-        mail: mail.value
-      };
-      await fetch(ENDPOINT, {
-        method: "POST",
-        headers: { ...HEADERS },
-        body: JSON.stringify({ action: "add", row })
-      });
-      loadData();
-      alert("✅ Row added!");
-    }
-
-    async function editRow(i) {
-      const newCompany = prompt("Enter new company name:");
-      if (!newCompany) return;
-      const row = { company: newCompany };
-      await fetch(ENDPOINT, {
-        method: "POST",
-        headers: { ...HEADERS },
-        body: JSON.stringify({ action: "update", rowIndex: i + 1, row })
-      });
-      loadData();
-      alert("✅ Row updated!");
-    }
-
-    async function deleteRow(i) {
-      if (!confirm("Delete this row?")) return;
-      await fetch(ENDPOINT, {
-        method: "POST",
-        headers: { ...HEADERS },
-        body: JSON.stringify({ action: "delete", rowIndex: i + 1 })
-      });
-      loadData();
-      alert("🗑️ Row deleted!");
-    }
-
-    loadData();
   </script>
 </body>
 </html>
