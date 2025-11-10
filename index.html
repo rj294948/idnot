@@ -1,22 +1,39 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>RJ Services Data Manager</title>
+  <meta charset="UTF-8">
+  <title>CRUD App</title>
   <style>
-    table { border-collapse: collapse; width: 100%; }
-    th, td { border: 1px solid #ccc; padding: 8px; text-align: left; }
-    th { background: #f2f2f2; }
-    input { width: 90%; padding: 4px; }
+    body { font-family: Arial, sans-serif; padding: 20px; }
+    table { border-collapse: collapse; width: 100%; margin-top: 20px; }
+    th, td { border: 1px solid #ddd; padding: 8px; }
+    th { background-color: #f2f2f2; text-align: left; }
+    input { padding: 5px; width: 100%; }
     button { padding: 5px 10px; margin: 2px; }
   </style>
 </head>
 <body>
-  <h2>RJ Services Data Manager</h2>
+  <h2>Google Sheet CRUD App</h2>
+  
+  <h3>Add / Edit Row</h3>
+  <form id="rowForm">
+    <input type="hidden" id="rowId">
+    <input type="text" id="companyname" placeholder="Company Name" required>
+    <input type="text" id="product" placeholder="Product" required>
+    <input type="text" id="producttype" placeholder="Product Type" required>
+    <input type="text" id="rate" placeholder="Rate">
+    <input type="text" id="description" placeholder="Description">
+    <input type="text" id="contact" placeholder="Contact">
+    <input type="email" id="mail" placeholder="Mail">
+    <button type="submit">Save</button>
+    <button type="button" onclick="clearForm()">Clear</button>
+  </form>
 
+  <h3>Data Table</h3>
   <table id="dataTable">
     <thead>
       <tr>
-        <th>ID</th>
+        <th>#</th>
         <th>Company Name</th>
         <th>Product</th>
         <th>Product Type</th>
@@ -30,79 +47,59 @@
     <tbody></tbody>
   </table>
 
-  <h3>Add / Edit Data</h3>
-  <form id="dataForm">
-    <input type="hidden" id="rowId" />
-    <input type="text" id="companyname" placeholder="Company Name" required />
-    <input type="text" id="product" placeholder="Product" required />
-    <input type="text" id="producttype" placeholder="Product Type" />
-    <input type="number" id="rate" placeholder="Rate" />
-    <input type="text" id="description" placeholder="Description" />
-    <input type="text" id="contact" placeholder="Contact" />
-    <input type="email" id="mail" placeholder="Mail" />
-    <button type="submit">Save</button>
-    <button type="button" onclick="clearForm()">Clear</button>
-  </form>
-
   <script>
-    // Load data on page load
     function loadData() {
       google.script.run.withSuccessHandler(renderTable).getAllData();
     }
 
-    // Render table
     function renderTable(data) {
       const tbody = document.querySelector('#dataTable tbody');
       tbody.innerHTML = '';
-      data.forEach((row, i) => {
+      data.forEach((row, index) => {
         const tr = document.createElement('tr');
         tr.innerHTML = `
-          <td>${i+1}</td>
-          <td>${row.companyname || ''}</td>
-          <td>${row.product || ''}</td>
-          <td>${row.producttype || ''}</td>
-          <td>${row.rate || ''}</td>
-          <td>${row.description || ''}</td>
-          <td>${row.contact || ''}</td>
-          <td>${row.mail || ''}</td>
+          <td>${index + 1}</td>
+          <td>${row.companyname}</td>
+          <td>${row.product}</td>
+          <td>${row.producttype}</td>
+          <td>${row.rate}</td>
+          <td>${row.description}</td>
+          <td>${row.contact}</td>
+          <td>${row.mail}</td>
           <td>
-            <button onclick="editRow(${i}, ${JSON.stringify(row).replace(/"/g, '&quot;')})">Edit</button>
-            <button onclick="deleteRow(${i})">Delete</button>
+            <button onclick="editRow(${index}, ${JSON.stringify(row)})">Edit</button>
+            <button onclick="deleteRow(${index})">Delete</button>
           </td>
         `;
         tbody.appendChild(tr);
       });
     }
 
-    // Edit row
-    function editRow(id, row) {
+    function editRow(id, rowData) {
       document.getElementById('rowId').value = id;
-      document.getElementById('companyname').value = row.companyname;
-      document.getElementById('product').value = row.product;
-      document.getElementById('producttype').value = row.producttype;
-      document.getElementById('rate').value = row.rate;
-      document.getElementById('description').value = row.description;
-      document.getElementById('contact').value = row.contact;
-      document.getElementById('mail').value = row.mail;
+      document.getElementById('companyname').value = rowData.companyname;
+      document.getElementById('product').value = rowData.product;
+      document.getElementById('producttype').value = rowData.producttype;
+      document.getElementById('rate').value = rowData.rate;
+      document.getElementById('description').value = rowData.description;
+      document.getElementById('contact').value = rowData.contact;
+      document.getElementById('mail').value = rowData.mail;
     }
 
-    // Delete row
     function deleteRow(id) {
-      if (confirm('Are you sure to delete this row?')) {
-        google.script.run.withSuccessHandler(loadData).deleteData(id);
+      if(confirm('Are you sure to delete?')) {
+        google.script.run.withSuccessHandler(loadData).deleteRow(id);
       }
     }
 
-    // Clear form
     function clearForm() {
-      document.getElementById('dataForm').reset();
+      document.getElementById('rowForm').reset();
       document.getElementById('rowId').value = '';
     }
 
-    // Form submit
-    document.getElementById('dataForm').addEventListener('submit', function(e) {
+    document.getElementById('rowForm').addEventListener('submit', function(e) {
       e.preventDefault();
-      const id = document.getElementById('rowId').value;
+      const rowId = document.getElementById('rowId').value;
       const rowData = {
         companyname: document.getElementById('companyname').value,
         product: document.getElementById('product').value,
@@ -112,15 +109,15 @@
         contact: document.getElementById('contact').value,
         mail: document.getElementById('mail').value
       };
-      if (id) {
-        google.script.run.withSuccessHandler(loadData).updateData(parseInt(id), rowData);
+      if(rowId === '') {
+        google.script.run.withSuccessHandler(function(){ loadData(); clearForm(); }).addRow(rowData);
       } else {
-        google.script.run.withSuccessHandler(loadData).addData(rowData);
+        google.script.run.withSuccessHandler(function(){ loadData(); clearForm(); }).updateRow(parseInt(rowId), rowData);
       }
-      clearForm();
     });
 
-    loadData();
+    // Load data on page load
+    window.onload = loadData;
   </script>
 </body>
 </html>
