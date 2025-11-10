@@ -3,35 +3,41 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>RJ Sheet Data Manager</title>
+<title>RJ Company Products</title>
 <style>
-body { font-family: Arial; background: #f8f9fa; padding: 20px; }
-h2 { color: #007bff; }
-input { margin: 5px; padding: 8px; width: 200px; }
-button { margin: 5px; padding: 8px 12px; cursor: pointer; }
-table { border-collapse: collapse; width: 100%; margin-top: 20px; background: #fff; }
-th, td { border: 1px solid #ccc; padding: 8px; text-align: left; }
-th { background: #007bff; color: white; }
+body {font-family: Arial; background: #f9f9f9; padding: 20px;}
+table {border-collapse: collapse; width: 100%; background: white;}
+th, td {border: 1px solid #ccc; padding: 8px; text-align: left;}
+th {background: #007bff; color: white;}
+button {padding: 5px 10px; border: none; cursor: pointer;}
+.add, .update {background: #28a745; color: white; margin-top: 10px;}
+.delete {background: #dc3545; color: white;}
+.edit {background: #ffc107; color: black;}
+input {padding: 6px; width: 100%; margin-top: 5px;}
 </style>
 </head>
 <body>
 
-<h2>📋 RJ Product Records</h2>
+<h2>🧾 RJ Company Product Manager</h2>
 
-<div>
-  <input id="company" placeholder="Company Name">
-  <input id="product" placeholder="Product">
-  <input id="ptype" placeholder="Product Type">
-  <input id="rate" placeholder="Rate">
-  <input id="desc" placeholder="Description">
-  <input id="contact" placeholder="Contact">
-  <input id="mail" placeholder="Mail">
-  <button onclick="addData()">Add</button>
-</div>
+<form id="dataForm">
+  <input type="hidden" id="rowId">
+  <label>Company Name:</label><input id="company_name"><br>
+  <label>Product:</label><input id="product"><br>
+  <label>Product Type:</label><input id="product_type"><br>
+  <label>Rate:</label><input id="rate"><br>
+  <label>Description:</label><input id="description"><br>
+  <label>Contact:</label><input id="contact"><br>
+  <label>Mail:</label><input id="mail"><br>
+  <button type="button" class="add" onclick="addData()">Add Data</button>
+  <button type="button" class="update" onclick="updateData()">Update Data</button>
+</form>
 
+<h3>📋 Records</h3>
 <table id="dataTable">
   <thead>
     <tr>
+      <th>#</th>
       <th>Company Name</th>
       <th>Product</th>
       <th>Product Type</th>
@@ -39,104 +45,85 @@ th { background: #007bff; color: white; }
       <th>Description</th>
       <th>Contact</th>
       <th>Mail</th>
-      <th>Action</th>
+      <th>Actions</th>
     </tr>
   </thead>
   <tbody></tbody>
 </table>
 
 <script>
-const API_URL = "https://script.google.com/macros/s/AKfycby_H0WaVNgBZU-D0VUQs73YIXY4_OBPd-gPFoo2mTMatdg0lsQhjoRJ2uCKdLDRMse2/exec";
+const SHEET_URL = "https://script.google.com/macros/s/AKfycby_H0WaVNgBZU-D0VUQs73YIXY4_OBPd-gPFoo2mTMatdg0lsQhjoRJ2uCKdLDRMse2/exec";
 
-// ✅ Load Data
 async function loadData() {
   try {
-    const res = await fetch(`${API_URL}?action=getAll`);
-    const text = await res.text(); // first get raw
-    let data;
-    try { data = JSON.parse(text); } 
-    catch(e) { console.error("Not valid JSON:", text); return; }
+    const res = await fetch(SHEET_URL);
+    const json = await res.json();
 
-    if (!Array.isArray(data)) {
-      console.error("❌ Data is not an array:", data);
+    if (!json.data || !Array.isArray(json.data)) {
+      console.error("❌ Data is not an array:", json);
       return;
     }
 
-    const tbody = document.querySelector("#dataTable tbody");
-    tbody.innerHTML = "";
-    data.forEach(r => {
-      tbody.innerHTML += `
-        <tr>
-          <td>${r["company name"] || ""}</td>
-          <td>${r["product"] || ""}</td>
-          <td>${r["product type"] || ""}</td>
-          <td>${r["rate"] || ""}</td>
-          <td>${r["description"] || ""}</td>
-          <td>${r["contact"] || ""}</td>
-          <td>${r["mail"] || ""}</td>
-          <td>
-            <button onclick='editRow("${r["company name"]}")'>✏️</button>
-            <button onclick='deleteRow("${r["company name"]}")'>🗑️</button>
-          </td>
-        </tr>`;
+    const table = document.querySelector("#dataTable tbody");
+    table.innerHTML = "";
+    json.data.forEach((r, i) => {
+      const row = `<tr>
+        <td>${i+1}</td>
+        <td>${r["company name"]||""}</td>
+        <td>${r["product"]||""}</td>
+        <td>${r["product type"]||""}</td>
+        <td>${r["rate"]||""}</td>
+        <td>${r["description"]||""}</td>
+        <td>${r["contact"]||""}</td>
+        <td>${r["mail"]||""}</td>
+        <td>
+          <button class="edit" onclick='editRow(${i}, ${JSON.stringify(r)})'>Edit</button>
+          <button class="delete" onclick='deleteRow(${i})'>Delete</button>
+        </td>
+      </tr>`;
+      table.insertAdjacentHTML("beforeend", row);
     });
   } catch (err) {
     console.error("❌ Load Error:", err);
   }
 }
 
-// ✅ Add Row
 async function addData() {
-  const data = {
-    action: "add",
-    "company name": company.value.trim(),
-    product: product.value,
-    "product type": ptype.value,
-    rate: rate.value,
-    description: desc.value,
-    contact: contact.value,
-    mail: mail.value
-  };
-
-  await fetch(API_URL, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(data)
+  const form = new FormData();
+  form.append("action", "add");
+  ["company_name","product","product_type","rate","description","contact","mail"].forEach(id=>{
+    form.append(id, document.getElementById(id).value);
   });
+  await fetch(SHEET_URL, { method:"POST", body:form });
   loadData();
 }
 
-// ✅ Edit Row
-async function editRow(name) {
-  const data = {
-    action: "edit",
-    "company name": name,
-    product: prompt("New product?"),
-    "product type": prompt("New product type?"),
-    rate: prompt("New rate?"),
-    description: prompt("New description?"),
-    contact: prompt("New contact?"),
-    mail: prompt("New mail?")
-  };
+function editRow(index, r) {
+  document.getElementById("rowId").value = index;
+  for (let key in r) {
+    let id = key.replace(" ", "_");
+    if (document.getElementById(id)) document.getElementById(id).value = r[key];
+  }
+}
 
-  await fetch(API_URL, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(data)
+async function updateData() {
+  const id = document.getElementById("rowId").value;
+  if (id === "") return alert("Select a row to edit!");
+  const form = new FormData();
+  form.append("action", "edit");
+  form.append("id", id);
+  ["company_name","product","product_type","rate","description","contact","mail"].forEach(id=>{
+    form.append(id, document.getElementById(id).value);
   });
+  await fetch(SHEET_URL, { method:"POST", body:form });
   loadData();
 }
 
-// ✅ Delete Row
-async function deleteRow(name) {
-  if (!confirm("Are you sure to delete this company?")) return;
-  const data = { action: "delete", "company name": name };
-
-  await fetch(API_URL, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(data)
-  });
+async function deleteRow(id) {
+  const form = new FormData();
+  form.append("action", "delete");
+  form.append("id", id);
+  await fetch(SHEET_URL, { method:"POST", body:form });
   loadData();
 }
 
