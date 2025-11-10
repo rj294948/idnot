@@ -1,123 +1,129 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <meta charset="UTF-8">
-  <title>CRUD App</title>
-  <style>
-    body { font-family: Arial, sans-serif; padding: 20px; }
-    table { border-collapse: collapse; width: 100%; margin-top: 20px; }
-    th, td { border: 1px solid #ddd; padding: 8px; }
-    th { background-color: #f2f2f2; text-align: left; }
-    input { padding: 5px; width: 100%; }
-    button { padding: 5px 10px; margin: 2px; }
-  </style>
+<meta charset="UTF-8">
+<title>CRUD App</title>
+<style>
+body{font-family:Arial;padding:20px;}
+table{border-collapse:collapse;width:100%;margin-top:20px;}
+th,td{border:1px solid #ddd;padding:8px;}
+th{background:#f2f2f2;}
+input{padding:5px;width:100%;}
+button{padding:5px 10px;margin:2px;}
+</style>
 </head>
 <body>
-  <h2>Google Sheet CRUD App</h2>
+<h2>CRUD App</h2>
+
+<h3>Add / Edit Row</h3>
+<form id="rowForm">
+<input type="hidden" id="rowId">
+<input placeholder="Company Name" id="companyname" required>
+<input placeholder="Product" id="product" required>
+<input placeholder="Product Type" id="producttype" required>
+<input placeholder="Rate" id="rate">
+<input placeholder="Description" id="description">
+<input placeholder="Contact" id="contact">
+<input placeholder="Mail" id="mail">
+<button type="submit">Save</button>
+<button type="button" onclick="clearForm()">Clear</button>
+</form>
+
+<h3>Data Table</h3>
+<table id="dataTable">
+<thead>
+<tr>
+<th>#</th><th>Company Name</th><th>Product</th><th>Product Type</th><th>Rate</th><th>Description</th><th>Contact</th><th>Mail</th><th>Actions</th>
+</tr>
+</thead>
+<tbody></tbody>
+</table>
+
+<script>
+const API_URL = 'https://script.google.com/macros/s/AKfycby_H0WaVNgBZU-D0VUQs73YIXY4_OBPd-gPFoo2mTMatdg0lsQhjoRJ2uCKdLDRMse2/exec'; // replace with web app URL
+
+async function fetchAPI(action,data,rowId){
+  const params = new URLSearchParams();
+  params.append('action',action);
+  if(data) params.append('data',JSON.stringify(data));
+  if(rowId!=null) params.append('rowId',rowId);
   
-  <h3>Add / Edit Row</h3>
-  <form id="rowForm">
-    <input type="hidden" id="rowId">
-    <input type="text" id="companyname" placeholder="Company Name" required>
-    <input type="text" id="product" placeholder="Product" required>
-    <input type="text" id="producttype" placeholder="Product Type" required>
-    <input type="text" id="rate" placeholder="Rate">
-    <input type="text" id="description" placeholder="Description">
-    <input type="text" id="contact" placeholder="Contact">
-    <input type="email" id="mail" placeholder="Mail">
-    <button type="submit">Save</button>
-    <button type="button" onclick="clearForm()">Clear</button>
-  </form>
+  const res = await fetch(`${API_URL}?${params.toString()}`);
+  return await res.json();
+}
 
-  <h3>Data Table</h3>
-  <table id="dataTable">
-    <thead>
-      <tr>
-        <th>#</th>
-        <th>Company Name</th>
-        <th>Product</th>
-        <th>Product Type</th>
-        <th>Rate</th>
-        <th>Description</th>
-        <th>Contact</th>
-        <th>Mail</th>
-        <th>Actions</th>
-      </tr>
-    </thead>
-    <tbody></tbody>
-  </table>
-
-  <script>
-    function loadData() {
-      google.script.run.withSuccessHandler(renderTable).getAllData();
-    }
-
-    function renderTable(data) {
-      const tbody = document.querySelector('#dataTable tbody');
-      tbody.innerHTML = '';
-      data.forEach((row, index) => {
-        const tr = document.createElement('tr');
-        tr.innerHTML = `
-          <td>${index + 1}</td>
-          <td>${row.companyname}</td>
-          <td>${row.product}</td>
-          <td>${row.producttype}</td>
-          <td>${row.rate}</td>
-          <td>${row.description}</td>
-          <td>${row.contact}</td>
-          <td>${row.mail}</td>
-          <td>
-            <button onclick="editRow(${index}, ${JSON.stringify(row)})">Edit</button>
-            <button onclick="deleteRow(${index})">Delete</button>
-          </td>
-        `;
-        tbody.appendChild(tr);
-      });
-    }
-
-    function editRow(id, rowData) {
-      document.getElementById('rowId').value = id;
-      document.getElementById('companyname').value = rowData.companyname;
-      document.getElementById('product').value = rowData.product;
-      document.getElementById('producttype').value = rowData.producttype;
-      document.getElementById('rate').value = rowData.rate;
-      document.getElementById('description').value = rowData.description;
-      document.getElementById('contact').value = rowData.contact;
-      document.getElementById('mail').value = rowData.mail;
-    }
-
-    function deleteRow(id) {
-      if(confirm('Are you sure to delete?')) {
-        google.script.run.withSuccessHandler(loadData).deleteRow(id);
-      }
-    }
-
-    function clearForm() {
-      document.getElementById('rowForm').reset();
-      document.getElementById('rowId').value = '';
-    }
-
-    document.getElementById('rowForm').addEventListener('submit', function(e) {
-      e.preventDefault();
-      const rowId = document.getElementById('rowId').value;
-      const rowData = {
-        companyname: document.getElementById('companyname').value,
-        product: document.getElementById('product').value,
-        producttype: document.getElementById('producttype').value,
-        rate: document.getElementById('rate').value,
-        description: document.getElementById('description').value,
-        contact: document.getElementById('contact').value,
-        mail: document.getElementById('mail').value
-      };
-      if(rowId === '') {
-        google.script.run.withSuccessHandler(function(){ loadData(); clearForm(); }).addRow(rowData);
-      } else {
-        google.script.run.withSuccessHandler(function(){ loadData(); clearForm(); }).updateRow(parseInt(rowId), rowData);
-      }
+async function loadData(){
+  try{
+    const result = await fetchAPI('getAll');
+    if(!Array.isArray(result.data)) throw new Error('Data is not array');
+    const tbody = document.querySelector('#dataTable tbody');
+    tbody.innerHTML='';
+    result.data.forEach((row,index)=>{
+      const tr = document.createElement('tr');
+      tr.innerHTML=`<td>${index+1}</td>
+      <td>${row.companyname}</td>
+      <td>${row.product}</td>
+      <td>${row.producttype}</td>
+      <td>${row.rate}</td>
+      <td>${row.description}</td>
+      <td>${row.contact}</td>
+      <td>${row.mail}</td>
+      <td>
+        <button onclick='editRow(${index},${JSON.stringify(row)})'>Edit</button>
+        <button onclick='deleteRow(${index})'>Delete</button>
+      </td>`;
+      tbody.appendChild(tr);
     });
+  } catch(err){
+    console.error('❌ Load Error:',err);
+  }
+}
 
-    // Load data on page load
-    window.onload = loadData;
-  </script>
+function editRow(id,row){
+  document.getElementById('rowId').value=id;
+  document.getElementById('companyname').value=row.companyname;
+  document.getElementById('product').value=row.product;
+  document.getElementById('producttype').value=row.producttype;
+  document.getElementById('rate').value=row.rate;
+  document.getElementById('description').value=row.description;
+  document.getElementById('contact').value=row.contact;
+  document.getElementById('mail').value=row.mail;
+}
+
+async function deleteRow(id){
+  if(confirm('Are you sure?')){
+    await fetchAPI('delete',null,id);
+    loadData();
+  }
+}
+
+function clearForm(){
+  document.getElementById('rowForm').reset();
+  document.getElementById('rowId').value='';
+}
+
+document.getElementById('rowForm').addEventListener('submit',async function(e){
+  e.preventDefault();
+  const rowId = document.getElementById('rowId').value;
+  const rowData={
+    companyname:document.getElementById('companyname').value,
+    product:document.getElementById('product').value,
+    producttype:document.getElementById('producttype').value,
+    rate:document.getElementById('rate').value,
+    description:document.getElementById('description').value,
+    contact:document.getElementById('contact').value,
+    mail:document.getElementById('mail').value
+  };
+  if(rowId===''){
+    await fetchAPI('add',rowData);
+  }else{
+    await fetchAPI('update',rowData,rowId);
+  }
+  clearForm();
+  loadData();
+});
+
+window.onload=loadData;
+</script>
 </body>
 </html>
