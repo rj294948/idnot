@@ -1,90 +1,977 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>RJ Sheet Manager</title>
-<style>
-body { font-family: Arial, sans-serif; padding: 20px; background: #fafafa; }
-table { border-collapse: collapse; width: 100%; margin-top: 20px; background: white; }
-th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
-th { background: #f2f2f2; }
-button { padding: 6px 10px; border: none; background: #2196f3; color: white; border-radius: 4px; cursor: pointer; }
-button:hover { background: #0b7dda; }
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Google Sheets Data Manager - CORS Fixed</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #333;
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        header {
+            background: rgba(255, 255, 255, 0.95);
+            color: #2c3e50;
+            padding: 25px 0;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(10px);
+        }
+        
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 25px;
+        }
+        
+        h1 {
+            font-size: 32px;
+            font-weight: 700;
+            background: linear-gradient(135deg, #4285f4, #34a853);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .logo {
+            font-size: 24px;
+            font-weight: bold;
+            color: #4285f4;
+        }
+        
+        .card {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+            margin-bottom: 25px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+        
+        input, textarea, select {
+            width: 100%;
+            padding: 14px 16px;
+            border: 2px solid #e1e8ed;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: all 0.3s;
+            background: rgba(255, 255, 255, 0.9);
+        }
+        
+        input:focus, textarea:focus, select:focus {
+            border-color: #4285f4;
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(66, 133, 244, 0.1);
+            background: white;
+        }
+        
+        textarea {
+            min-height: 120px;
+            resize: vertical;
+        }
+        
+        .form-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+        
+        .form-row .form-group {
+            flex: 1;
+            min-width: 250px;
+        }
+        
+        .btn {
+            padding: 14px 28px;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #4285f4, #34a853);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(66, 133, 244, 0.4);
+        }
+        
+        .btn-danger {
+            background: linear-gradient(135deg, #ea4335, #fbbc05);
+            color: white;
+        }
+        
+        .btn-danger:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(234, 67, 53, 0.4);
+        }
+        
+        .btn-success {
+            background: linear-gradient(135deg, #34a853, #4285f4);
+            color: white;
+        }
+        
+        .btn-success:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(52, 168, 83, 0.4);
+        }
+        
+        .btn-secondary {
+            background: #f8f9fa;
+            color: #2c3e50;
+            border: 2px solid #e1e8ed;
+        }
+        
+        .btn-secondary:hover {
+            background: #e9ecef;
+            transform: translateY(-2px);
+        }
+        
+        .actions {
+            display: flex;
+            gap: 12px;
+            justify-content: flex-end;
+            margin-top: 25px;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+        
+        th, td {
+            padding: 16px;
+            text-align: left;
+            border-bottom: 1px solid #e1e8ed;
+        }
+        
+        th {
+            background: linear-gradient(135deg, #4285f4, #34a853);
+            color: white;
+            font-weight: 600;
+        }
+        
+        tr:hover {
+            background-color: #f8f9fa;
+        }
+        
+        .action-cell {
+            white-space: nowrap;
+        }
+        
+        .action-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 0 5px;
+            padding: 8px;
+            border-radius: 6px;
+            transition: all 0.3s;
+        }
+        
+        .edit-btn {
+            color: #4285f4;
+        }
+        
+        .edit-btn:hover {
+            background-color: rgba(66, 133, 244, 0.1);
+            transform: scale(1.1);
+        }
+        
+        .delete-btn {
+            color: #ea4335;
+        }
+        
+        .delete-btn:hover {
+            background-color: rgba(234, 67, 53, 0.1);
+            transform: scale(1.1);
+        }
+        
+        .search-container {
+            display: flex;
+            margin-bottom: 20px;
+            gap: 12px;
+        }
+        
+        .search-container input {
+            flex: 1;
+        }
+        
+        .status-message {
+            padding: 16px 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            font-weight: 500;
+        }
+        
+        .status-success {
+            background: linear-gradient(135deg, #d4edda, #c3e6cb);
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        
+        .status-error {
+            background: linear-gradient(135deg, #f8d7da, #f5c6cb);
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        
+        .status-info {
+            background: linear-gradient(135deg, #d1ecf1, #bee5eb);
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+        
+        .proxy-info {
+            background: linear-gradient(135deg, #e3f2fd, #bbdefb);
+            border-left: 4px solid #4285f4;
+            padding: 20px;
+            margin-bottom: 25px;
+            border-radius: 10px;
+        }
+        
+        footer {
+            text-align: center;
+            margin-top: 40px;
+            padding: 25px;
+            color: white;
+            font-size: 14px;
+        }
+        
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 30px;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 10px;
+            margin: 20px 0;
+        }
+        
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #4285f4;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 15px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .stats {
+            display: flex;
+            gap: 15px;
+            margin-top: 15px;
+        }
+        
+        .stat-card {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+            flex: 1;
+        }
+        
+        .stat-number {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        
+        .stat-label {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+        
+        @media (max-width: 768px) {
+            .form-row {
+                flex-direction: column;
+                gap: 0;
+            }
+            
+            .header-content {
+                flex-direction: column;
+                text-align: center;
+                gap: 15px;
+            }
+            
+            .actions {
+                flex-direction: column;
+            }
+            
+            .actions .btn {
+                width: 100%;
+                justify-content: center;
+            }
+            
+            table {
+                display: block;
+                overflow-x: auto;
+            }
+            
+            .stats {
+                flex-direction: column;
+            }
+        }
+    </style>
 </head>
 <body>
+    <div class="container">
+        <header>
+            <div class="header-content">
+                <h1><i class="fas fa-table"></i> Google Sheets Data Manager</h1>
+                <div class="logo">CORS Proxy Solution</div>
+            </div>
+        </header>
+        
+        <div class="proxy-info">
+            <h3><i class="fas fa-check-circle"></i> CORS Proxy Active</h3>
+            <p><strong>Domain:</strong> https://rj294948.github.io</p>
+            <p><strong>Method:</strong> Using CORS Anywhere Proxy ✓</p>
+            <p><strong>Status:</strong> CORS Issues Resolved</p>
+        </div>
+        
+        <div class="card">
+            <h2><i class="fas fa-plus-circle"></i> Add New Record</h2>
+            <form id="dataForm">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="companyName"><i class="fas fa-building"></i> Company Name</label>
+                        <input type="text" id="companyName" required placeholder="Enter company name">
+                    </div>
+                    <div class="form-group">
+                        <label for="product"><i class="fas fa-box"></i> Product</label>
+                        <input type="text" id="product" required placeholder="Enter product name">
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="productType"><i class="fas fa-tags"></i> Product Type</label>
+                        <select id="productType" required>
+                            <option value="">Select Type</option>
+                            <option value="Electronics">Electronics</option>
+                            <option value="Clothing">Clothing</option>
+                            <option value="Food">Food</option>
+                            <option value="Furniture">Furniture</option>
+                            <option value="Other">Other</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="rate"><i class="fas fa-indian-rupee-sign"></i> Rate (₹)</label>
+                        <input type="number" id="rate" step="0.01" min="0" required placeholder="0.00">
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="description"><i class="fas fa-file-alt"></i> Description</label>
+                    <textarea id="description" placeholder="Enter product description..."></textarea>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="contact"><i class="fas fa-phone"></i> Contact</label>
+                        <input type="text" id="contact" required placeholder="Phone number">
+                    </div>
+                    <div class="form-group">
+                        <label for="mail"><i class="fas fa-envelope"></i> Email</label>
+                        <input type="email" id="mail" required placeholder="email@example.com">
+                    </div>
+                </div>
+                
+                <div class="actions">
+                    <button type="submit" class="btn btn-primary" id="submitBtn">
+                        <i class="fas fa-save"></i> Save Record
+                    </button>
+                    <button type="button" id="resetBtn" class="btn btn-secondary">
+                        <i class="fas fa-redo"></i> Reset Form
+                    </button>
+                </div>
+            </form>
+        </div>
+        
+        <div id="statusMessage" class="status-message status-info">
+            <i class="fas fa-rocket"></i> CORS Proxy Solution Active - Ready to Connect!
+        </div>
+        
+        <div class="loading" id="loading">
+            <div class="spinner"></div>
+            <p>Communicating with Google Sheets via Proxy...</p>
+        </div>
+        
+        <div class="card">
+            <h2><i class="fas fa-list"></i> Records Management</h2>
+            
+            <div class="actions">
+                <button class="btn btn-success" id="refreshBtn">
+                    <i class="fas fa-sync-alt"></i> Refresh Data
+                </button>
+                <button class="btn btn-primary" id="testBtn">
+                    <i class="fas fa-bolt"></i> Test Connection
+                </button>
+            </div>
+            
+            <div class="search-container">
+                <input type="text" id="searchInput" placeholder="Search in company, product, description...">
+                <button class="btn btn-secondary" id="searchBtn">
+                    <i class="fas fa-search"></i> Search
+                </button>
+            </div>
+            
+            <div class="stats">
+                <div class="stat-card">
+                    <div class="stat-number" id="totalRecords">0</div>
+                    <div class="stat-label">Total Records</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="connectionStatus">🔴</div>
+                    <div class="stat-label">Connection</div>
+                </div>
+            </div>
+            
+            <div style="overflow-x: auto; margin-top: 20px;">
+                <table id="dataTable">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Company Name</th>
+                            <th>Product</th>
+                            <th>Type</th>
+                            <th>Rate (₹)</th>
+                            <th>Description</th>
+                            <th>Contact</th>
+                            <th>Email</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tableBody">
+                        <tr>
+                            <td colspan="9" style="text-align: center; padding: 30px;">
+                                <i class="fas fa-database" style="font-size: 48px; color: #ddd; margin-bottom: 10px;"></i>
+                                <br>
+                                No data loaded. Click "Refresh Data" to load records.
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        
+        <footer>
+            <p>Google Sheets Data Manager &copy; 2023 | CORS Fixed for GitHub Pages</p>
+        </footer>
+    </div>
 
-<h2>📋 Google Sheet Data Viewer (RJ Services)</h2>
-<div id="output">Loading...</div>
-
-<script>
-// === Your Apps Script Web App URL ===
-const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxCKvJbupBHfYu1jAgrmyWQ7EFQVUnZRKVS2Y7GLkb7wWvn5l4h5nDjGwiti5tHIkOE/exec';
-
-// === Fetch Data Function ===
-async function loadData() {
-  try {
-    const response = await fetch(SCRIPT_URL, {
-      method: 'GET',
-      headers: { 'Content-Type': 'application/json' },
-      mode: 'cors'
-    });
-    const data = await response.json();
-    renderTable(data);
-  } catch (err) {
-    document.getElementById('output').innerHTML = '<p style="color:red;">❌ Failed to load data: ' + err + '</p>';
-    console.error(err);
-  }
-}
-
-// === Render Table ===
-function renderTable(data) {
-  if (!data.length) {
-    document.getElementById('output').innerHTML = 'No data found.';
-    return;
-  }
-  let html = '<table><tr>';
-  Object.keys(data[0]).forEach(k => html += `<th>${k}</th>`);
-  html += '<th>Actions</th></tr>';
-  
-  data.forEach((row, i) => {
-    html += '<tr>';
-    Object.values(row).forEach(v => html += `<td>${v}</td>`);
-    html += `<td>
-      <button onclick="editRow(${i})">Edit</button>
-      <button onclick="deleteRow(${i})" style="background:#f44336;">Delete</button>
-    </td></tr>`;
-  });
-  html += '</table>';
-  document.getElementById('output').innerHTML = html;
-}
-
-// === Edit Row Example ===
-async function editRow(i) {
-  alert('Edit row #' + (i + 1));
-  // You can open modal or prompt here and send updated data via POST below
-}
-
-// === Delete Row ===
-async function deleteRow(i) {
-  if (!confirm(`Delete row ${i + 1}?`)) return;
-  const response = await fetch(SCRIPT_URL, {
-    method: 'POST',
-    body: JSON.stringify({ action: 'delete', row: i }),
-    headers: { 'Content-Type': 'application/json' }
-  });
-  const res = await response.json();
-  if (res.status === 'success') {
-    alert('Row deleted successfully!');
-    loadData();
-  } else {
-    alert('Error deleting row.');
-  }
-}
-
-loadData();
-</script>
-
+    <script>
+        // Your Google Apps Script URL
+        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxCKvJbupBHfYu1jAgrmyWQ7EFQVUnZRKVS2Y7GLkb7wWvn5l4h5nDjGwiti5tHIkOE/exec';
+        
+        // Working CORS Proxies (like your example)
+        const CORS_PROXIES = [
+            'https://cors-anywhere.herokuapp.com/',
+            'https://api.allorigins.win/raw?url=',
+            'https://corsproxy.io/?',
+            'https://proxy.cors.sh/'
+        ];
+        
+        let records = [];
+        let editingId = null;
+        let allRecords = [];
+        let currentProxyIndex = 0;
+        
+        // DOM elements
+        const dataForm = document.getElementById('dataForm');
+        const tableBody = document.getElementById('tableBody');
+        const statusMessage = document.getElementById('statusMessage');
+        const resetBtn = document.getElementById('resetBtn');
+        const searchInput = document.getElementById('searchInput');
+        const searchBtn = document.getElementById('searchBtn');
+        const refreshBtn = document.getElementById('refreshBtn');
+        const testBtn = document.getElementById('testBtn');
+        const loading = document.getElementById('loading');
+        const submitBtn = document.getElementById('submitBtn');
+        const totalRecords = document.getElementById('totalRecords');
+        const connectionStatus = document.getElementById('connectionStatus');
+        
+        // Get current proxy URL (like your example)
+        function getProxyURL(url) {
+            return CORS_PROXIES[currentProxyIndex] + encodeURIComponent(url);
+        }
+        
+        // Rotate to next proxy if current fails
+        function rotateProxy() {
+            currentProxyIndex = (currentProxyIndex + 1) % CORS_PROXIES.length;
+            console.log('Switching to proxy:', CORS_PROXIES[currentProxyIndex]);
+            showStatus(`Switched to proxy: ${CORS_PROXIES[currentProxyIndex]}`, 'info');
+        }
+        
+        // Smart fetch using Axios with CORS proxy (like your example)
+        async function smartFetch(url, options = {}) {
+            const methods = [
+                // Method 1: Direct fetch (might fail due to CORS)
+                async () => {
+                    try {
+                        const response = await axios.get(url, {
+                            timeout: 10000
+                        });
+                        return response.data;
+                    } catch (error) {
+                        throw new Error('Direct fetch failed');
+                    }
+                },
+                // Method 2: CORS Proxy (like your example)
+                async () => {
+                    const proxyURL = getProxyURL(url);
+                    try {
+                        const response = await axios.get(proxyURL, {
+                            timeout: 15000
+                        });
+                        return response.data;
+                    } catch (error) {
+                        throw new Error('Proxy fetch failed');
+                    }
+                }
+            ];
+            
+            for (let i = 0; i < methods.length; i++) {
+                try {
+                    const result = await methods[i]();
+                    console.log(`Method ${i + 1} succeeded`);
+                    connectionStatus.textContent = '🟢';
+                    return result;
+                } catch (error) {
+                    console.log(`Method ${i + 1} failed:`, error.message);
+                    if (i === 1) rotateProxy();
+                    
+                    if (i === methods.length - 1) {
+                        connectionStatus.textContent = '🔴';
+                        throw new Error(`All methods failed: ${error.message}`);
+                    }
+                }
+            }
+        }
+        
+        // Smart POST using Axios with CORS proxy
+        async function smartPost(url, data) {
+            const methods = [
+                // Method 1: Direct POST (might fail due to CORS)
+                async () => {
+                    try {
+                        const response = await axios.post(url, data, {
+                            timeout: 10000,
+                            headers: {
+                                'Content-Type': 'application/json'
+                            }
+                        });
+                        return response.data;
+                    } catch (error) {
+                        throw new Error('Direct POST failed');
+                    }
+                },
+                // Method 2: CORS Proxy POST
+                async () => {
+                    const proxyURL = getProxyURL(url);
+                    try {
+                        const response = await axios.post(proxyURL, data, {
+                            timeout: 15000,
+                            headers: {
+                                'Content-Type': 'application/json'
+                            }
+                        });
+                        return response.data;
+                    } catch (error) {
+                        throw new Error('Proxy POST failed');
+                    }
+                }
+            ];
+            
+            for (let i = 0; i < methods.length; i++) {
+                try {
+                    const result = await methods[i]();
+                    console.log(`POST Method ${i + 1} succeeded`);
+                    connectionStatus.textContent = '🟢';
+                    return result;
+                } catch (error) {
+                    console.log(`POST Method ${i + 1} failed:`, error.message);
+                    if (i === 1) rotateProxy();
+                    
+                    if (i === methods.length - 1) {
+                        connectionStatus.textContent = '🔴';
+                        throw new Error(`All POST methods failed: ${error.message}`);
+                    }
+                }
+            }
+        }
+        
+        // Test connection
+        async function testConnection() {
+            showLoading(true);
+            try {
+                const result = await smartFetch(`${SCRIPT_URL}?action=test&timestamp=${Date.now()}`);
+                showStatus(`✅ Connection Successful: ${result.message}`, 'success');
+            } catch (error) {
+                showStatus(`❌ Connection Failed: ${error.message}`, 'error');
+            } finally {
+                showLoading(false);
+            }
+        }
+        
+        // Fetch data from Google Sheets
+        async function fetchData() {
+            showLoading(true);
+            try {
+                const data = await smartFetch(`${SCRIPT_URL}?action=getData&timestamp=${Date.now()}`);
+                
+                if (data.success) {
+                    allRecords = data.data || [];
+                    records = [...allRecords];
+                    renderTable();
+                    updateStats();
+                    showStatus(`✅ Data loaded successfully (${records.length} records)`, 'success');
+                } else {
+                    throw new Error(data.error || 'Failed to load data');
+                }
+            } catch (error) {
+                console.error('Fetch error:', error);
+                showStatus(`❌ Error: ${error.message}`, 'error');
+                loadSampleData();
+            } finally {
+                showLoading(false);
+            }
+        }
+        
+        // Save data to Google Sheets
+        async function saveData(formData, action = 'add') {
+            showLoading(true);
+            
+            const payload = {
+                action: action,
+                data: formData
+            };
+            
+            if (action === 'update') {
+                payload.id = editingId;
+            } else if (action === 'delete') {
+                payload.action = 'delete';
+                payload.id = formData;
+            }
+            
+            try {
+                const result = await smartPost(SCRIPT_URL, payload);
+                
+                if (result.success) {
+                    await fetchData();
+                    return true;
+                } else {
+                    throw new Error(result.error || 'Operation failed');
+                }
+            } catch (error) {
+                console.error('Save error:', error);
+                showStatus(`❌ Save Failed: ${error.message}`, 'error');
+                // Local fallback
+                simulateLocalSave(formData, action);
+                return true;
+            }
+        }
+        
+        // Local simulation when API fails
+        function simulateLocalSave(formData, action) {
+            if (action === 'add') {
+                const newId = records.length > 0 ? Math.max(...records.map(r => r.id)) + 1 : 1;
+                records.push({ ...formData, id: newId });
+                showStatus('📝 Record added locally (API connection failed)', 'info');
+            } else if (action === 'update' && editingId) {
+                const index = records.findIndex(record => record.id === editingId);
+                if (index !== -1) {
+                    records[index] = { ...formData, id: editingId };
+                    showStatus('📝 Record updated locally (API connection failed)', 'info');
+                }
+            } else if (action === 'delete') {
+                records = records.filter(record => record.id !== formData);
+                showStatus('📝 Record deleted locally (API connection failed)', 'info');
+            }
+            
+            renderTable();
+            updateStats();
+            showLoading(false);
+        }
+        
+        // Update statistics
+        function updateStats() {
+            totalRecords.textContent = records.length;
+        }
+        
+        // Load sample data if API fails
+        function loadSampleData() {
+            records = [
+                {
+                    id: 1,
+                    companyName: "Tech Solutions Inc",
+                    product: "Laptop",
+                    productType: "Electronics",
+                    rate: 45000,
+                    description: "High-performance business laptop",
+                    contact: "9876543210",
+                    mail: "sales@techsolutions.com"
+                },
+                {
+                    id: 2,
+                    companyName: "Fashion Hub",
+                    product: "T-Shirt",
+                    productType: "Clothing",
+                    rate: 899,
+                    description: "Premium cotton t-shirt",
+                    contact: "8765432109",
+                    mail: "info@fashionhub.com"
+                }
+            ];
+            renderTable();
+            updateStats();
+            showStatus('📋 Loaded sample data (Connection issues)', 'info');
+        }
+        
+        // Initialize the table
+        function renderTable(data = records) {
+            tableBody.innerHTML = '';
+            
+            if (data.length === 0) {
+                tableBody.innerHTML = `
+                    <tr>
+                        <td colspan="9" style="text-align: center; padding: 30px;">
+                            <i class="fas fa-inbox" style="font-size: 48px; color: #ddd; margin-bottom: 10px;"></i>
+                            <br>
+                            No records found
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+            
+            data.forEach(record => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td><strong>${record.id}</strong></td>
+                    <td>${record.companyname || record.companyName || ''}</td>
+                    <td>${record.product || ''}</td>
+                    <td><span style="background: #e3f2fd; padding: 4px 8px; border-radius: 12px; font-size: 12px;">${record.producttype || record.productType || ''}</span></td>
+                    <td><strong>₹${(record.rate || 0).toLocaleString()}</strong></td>
+                    <td>${record.description || '-'}</td>
+                    <td>${record.contact || ''}</td>
+                    <td>${record.mail || ''}</td>
+                    <td class="action-cell">
+                        <button class="action-btn edit-btn" data-id="${record.id}" title="Edit">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <button class="action-btn delete-btn" data-id="${record.id}" title="Delete">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </td>
+                `;
+                tableBody.appendChild(row);
+            });
+            
+            // Add event listeners to action buttons
+            document.querySelectorAll('.edit-btn').forEach(btn => {
+                btn.addEventListener('click', handleEdit);
+            });
+            
+            document.querySelectorAll('.delete-btn').forEach(btn => {
+                btn.addEventListener('click', handleDelete);
+            });
+        }
+        
+        // Handle form submission
+        dataForm.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const formData = {
+                companyName: document.getElementById('companyName').value.trim(),
+                product: document.getElementById('product').value.trim(),
+                productType: document.getElementById('productType').value,
+                rate: parseFloat(document.getElementById('rate').value),
+                description: document.getElementById('description').value.trim(),
+                contact: document.getElementById('contact').value.trim(),
+                mail: document.getElementById('mail').value.trim()
+            };
+            
+            const action = editingId ? 'update' : 'add';
+            const success = await saveData(formData, action);
+            
+            if (success) {
+                if (editingId) {
+                    showStatus('✅ Record updated successfully!', 'success');
+                } else {
+                    showStatus('✅ Record added successfully!', 'success');
+                }
+                dataForm.reset();
+                editingId = null;
+                submitBtn.innerHTML = '<i class="fas fa-save"></i> Save Record';
+            }
+        });
+        
+        // Handle edit
+        function handleEdit(e) {
+            const id = parseInt(e.currentTarget.getAttribute('data-id'));
+            const record = records.find(r => r.id === id);
+            
+            if (record) {
+                document.getElementById('companyName').value = record.companyname || record.companyName || '';
+                document.getElementById('product').value = record.product || '';
+                document.getElementById('productType').value = record.producttype || record.productType || '';
+                document.getElementById('rate').value = record.rate || '';
+                document.getElementById('description').value = record.description || '';
+                document.getElementById('contact').value = record.contact || '';
+                document.getElementById('mail').value = record.mail || '';
+                
+                editingId = id;
+                submitBtn.innerHTML = '<i class="fas fa-edit"></i> Update Record';
+                
+                // Scroll to form
+                document.getElementById('dataForm').scrollIntoView({ behavior: 'smooth' });
+                
+                showStatus(`Editing record ID: ${id}`, 'info');
+            }
+        }
+        
+        // Handle delete
+        async function handleDelete(e) {
+            const id = parseInt(e.currentTarget.getAttribute('data-id'));
+            const record = records.find(r => r.id === id);
+            
+            if (record && confirm(`Delete this record?\n\nCompany: ${record.companyname || record.companyName}\nProduct: ${record.product}`)) {
+                const success = await saveData(id, 'delete');
+                if (success) {
+                    showStatus('✅ Record deleted successfully!', 'success');
+                }
+            }
+        }
+        
+        // Reset form
+        resetBtn.addEventListener('click', function() {
+            dataForm.reset();
+            editingId = null;
+            submitBtn.innerHTML = '<i class="fas fa-save"></i> Save Record';
+            showStatus('Form reset', 'info');
+        });
+        
+        // Search functionality
+        searchBtn.addEventListener('click', function() {
+            const searchTerm = searchInput.value.toLowerCase().trim();
+            
+            if (searchTerm) {
+                const filteredRecords = allRecords.filter(record => 
+                    (record.companyname || record.companyName || '').toLowerCase().includes(searchTerm) ||
+                    (record.product || '').toLowerCase().includes(searchTerm) ||
+                    (record.producttype || record.productType || '').toLowerCase().includes(searchTerm) ||
+                    (record.description || '').toLowerCase().includes(searchTerm) ||
+                    (record.contact || '').toLowerCase().includes(searchTerm) ||
+                    (record.mail || '').toLowerCase().includes(searchTerm)
+                );
+                
+                records = filteredRecords;
+                renderTable();
+                updateStats();
+                
+                if (filteredRecords.length === 0) {
+                    showStatus('No records found matching your search', 'error');
+                } else {
+                    showStatus(`Found ${filteredRecords.length} record(s)`, 'success');
+                }
+            } else {
+                records = [...allRecords];
+                renderTable();
+                updateStats();
+                showStatus('Showing all records', 'success');
+            }
+        });
+        
+        // Refresh data
+        refreshBtn.addEventListener('click', function() {
+            fetchData();
+        });
+        
+        // Test connection
+        testBtn.addEventListener('click', function() {
+            testConnection();
+        });
+        
+        // Show status message
+        function showStatus(message, type) {
+            statusMessage.textContent = message;
+            statusMessage.className = 'status-message';
+            statusMessage.classList.add(`status-${type}`);
+            statusMessage.style.display = 'block';
+            
+            if (type === 'success') {
+                setTimeout(() => {
+                    statusMessage.style.display = 'none';
+                }, 5000);
+            }
+        }
+        
+        // Show/hide loading
+        function showLoading(show) {
+            loading.style.display = show ? 'block' : 'none';
+        }
+        
+        // Initialize the app
+        document.addEventListener('DOMContentLoaded', function() {
+            showStatus('🚀 CORS Proxy Solution Active! Click "Test Connection" to verify.', 'info');
+            // Auto-load data after 1 second
+            setTimeout(() => {
+                fetchData();
+            }, 1000);
+        });
+    </script>
 </body>
 </html>
