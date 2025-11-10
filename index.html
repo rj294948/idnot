@@ -1,138 +1,155 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Company Product Manager</title>
-<style>
-  body { font-family: Arial, sans-serif; background: #f9f9f9; padding: 20px; }
-  table { width: 100%; border-collapse: collapse; background: white; margin-top: 20px; }
-  th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
-  th { background: #007bff; color: white; }
-  button { cursor: pointer; padding: 5px 10px; border: none; border-radius: 4px; }
-  .edit-btn { background: #ffc107; }
-  .delete-btn { background: #dc3545; color: white; }
-  .add-btn { background: #28a745; color: white; margin-top: 10px; }
-  input { padding: 6px; margin: 3px; }
-</style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Google Sheet Editor</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f7f7f7;
+      padding: 20px;
+    }
+    h2 { color: #333; }
+    input, textarea {
+      width: 100%;
+      margin-bottom: 8px;
+      padding: 8px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+    }
+    button {
+      background: #007bff;
+      color: white;
+      border: none;
+      padding: 8px 14px;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    button:hover { background: #0056b3; }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 15px;
+      background: white;
+    }
+    th, td {
+      border: 1px solid #ccc;
+      padding: 8px;
+      text-align: left;
+    }
+    th { background: #007bff; color: white; }
+  </style>
 </head>
 <body>
+  <h2>Google Sheet Data Manager</h2>
 
-<h2>📊 Company Product Data</h2>
+  <div>
+    <input id="company" placeholder="Company Name" />
+    <input id="product" placeholder="Product" />
+    <input id="productType" placeholder="Product Type" />
+    <input id="rate" placeholder="Rate" />
+    <textarea id="description" placeholder="Description"></textarea>
+    <input id="contact" placeholder="Contact" />
+    <input id="mail" placeholder="Email" />
+    <button onclick="addData()">Add</button>
+  </div>
 
-<div id="form">
-  <input id="company" placeholder="Company Name">
-  <input id="product" placeholder="Product">
-  <input id="type" placeholder="Product Type">
-  <input id="rate" placeholder="Rate">
-  <input id="desc" placeholder="Description">
-  <input id="contact" placeholder="Contact">
-  <input id="mail" placeholder="Mail">
-  <button class="add-btn" onclick="addData()">Add</button>
-</div>
+  <table id="dataTable">
+    <thead>
+      <tr>
+        <th>Company</th>
+        <th>Product</th>
+        <th>Type</th>
+        <th>Rate</th>
+        <th>Description</th>
+        <th>Contact</th>
+        <th>Email</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
 
-<table>
-  <thead>
-    <tr>
-      <th>Company Name</th>
-      <th>Product</th>
-      <th>Product Type</th>
-      <th>Rate</th>
-      <th>Description</th>
-      <th>Contact</th>
-      <th>Mail</th>
-      <th>Action</th>
-    </tr>
-  </thead>
-  <tbody id="dataTable"></tbody>
-</table>
+  <script>
+    // ✅ FIXED: CORS-safe endpoint using cors.sh proxy
+    const CORS = "https://proxy.cors.sh/";
+    const SHEET_URL = "https://script.google.com/macros/s/AKfycby_H0WaVNgBZU-D0VUQs73YIXY4_OBPd-gPFoo2mTMatdg0lsQhjoRJ2uCKdLDRMse2/exec";
+    const ENDPOINT = `${CORS}${SHEET_URL}`;
+    const HEADERS = { "x-cors-api-key": "temp_cors_key" };
 
-<script>
-const API = "https://script.google.com/macros/s/AKfycby_H0WaVNgBZU-D0VUQs73YIXY4_OBPd-gPFoo2mTMatdg0lsQhjoRJ2uCKdLDRMse2/exec";
+    async function loadData() {
+      try {
+        const res = await fetch(`${ENDPOINT}?action=getAll`, { headers: HEADERS });
+        const json = await res.json();
+        if (!json.success) throw new Error(json.message);
+        const tbody = document.querySelector("#dataTable tbody");
+        tbody.innerHTML = "";
+        json.data.forEach((row, i) => {
+          const tr = document.createElement("tr");
+          tr.innerHTML = `
+            <td>${row.company}</td>
+            <td>${row.product}</td>
+            <td>${row.productType}</td>
+            <td>${row.rate}</td>
+            <td>${row.description}</td>
+            <td>${row.contact}</td>
+            <td>${row.mail}</td>
+            <td>
+              <button onclick="editRow(${i})">Edit</button>
+              <button onclick="deleteRow(${i})" style="background:#dc3545">Delete</button>
+            </td>`;
+          tbody.appendChild(tr);
+        });
+      } catch (err) {
+        console.error("❌ Load Error:", err);
+      }
+    }
 
-// ✅ Load data from Sheet
-async function loadData() {
-  const res = await fetch(API);
-  const json = await res.json();
-  const tbody = document.getElementById("dataTable");
-  tbody.innerHTML = "";
-  json.data.forEach(row => {
-    const tr = document.createElement("tr");
-    tr.innerHTML = `
-      <td>${row["company name"]}</td>
-      <td>${row["product"]}</td>
-      <td>${row["product type"]}</td>
-      <td>${row["rate"]}</td>
-      <td>${row["description"]}</td>
-      <td>${row["contact"]}</td>
-      <td>${row["mail"]}</td>
-      <td>
-        <button class="edit-btn" onclick='editRow(${row.id})'>Edit</button>
-        <button class="delete-btn" onclick='deleteRow(${row.id})'>Delete</button>
-      </td>
-    `;
-    tbody.appendChild(tr);
-  });
-}
+    async function addData() {
+      const row = {
+        company: company.value,
+        product: product.value,
+        productType: productType.value,
+        rate: rate.value,
+        description: description.value,
+        contact: contact.value,
+        mail: mail.value
+      };
+      await fetch(ENDPOINT, {
+        method: "POST",
+        headers: { ...HEADERS },
+        body: JSON.stringify({ action: "add", row })
+      });
+      loadData();
+      alert("✅ Row added!");
+    }
 
-// ✅ Add data
-async function addData() {
-  const body = {
-    action: "add",
-    "company name": document.getElementById("company").value,
-    "product": document.getElementById("product").value,
-    "product type": document.getElementById("type").value,
-    "rate": document.getElementById("rate").value,
-    "description": document.getElementById("desc").value,
-    "contact": document.getElementById("contact").value,
-    "mail": document.getElementById("mail").value
-  };
+    async function editRow(i) {
+      const newCompany = prompt("Enter new company name:");
+      if (!newCompany) return;
+      const row = { company: newCompany };
+      await fetch(ENDPOINT, {
+        method: "POST",
+        headers: { ...HEADERS },
+        body: JSON.stringify({ action: "update", rowIndex: i + 1, row })
+      });
+      loadData();
+      alert("✅ Row updated!");
+    }
 
-  await fetch(API, {
-    method: "POST",
-    body: JSON.stringify(body),
-  });
-  alert("✅ Data Added!");
-  loadData();
-}
+    async function deleteRow(i) {
+      if (!confirm("Delete this row?")) return;
+      await fetch(ENDPOINT, {
+        method: "POST",
+        headers: { ...HEADERS },
+        body: JSON.stringify({ action: "delete", rowIndex: i + 1 })
+      });
+      loadData();
+      alert("🗑️ Row deleted!");
+    }
 
-// ✅ Edit data (prompt user)
-async function editRow(id) {
-  const company = prompt("Enter new Company Name:");
-  const product = prompt("Enter new Product:");
-  const type = prompt("Enter new Product Type:");
-  const rate = prompt("Enter new Rate:");
-  const desc = prompt("Enter new Description:");
-  const contact = prompt("Enter new Contact:");
-  const mail = prompt("Enter new Mail:");
-
-  const body = {
-    action: "edit", id,
-    "company name": company,
-    "product": product,
-    "product type": type,
-    "rate": rate,
-    "description": desc,
-    "contact": contact,
-    "mail": mail
-  };
-
-  await fetch(API, { method: "POST", body: JSON.stringify(body) });
-  alert("✏️ Row Updated!");
-  loadData();
-}
-
-// ✅ Delete row
-async function deleteRow(id) {
-  if (confirm("Are you sure to delete this row?")) {
-    await fetch(API, { method: "POST", body: JSON.stringify({ action: "delete", id }) });
-    alert("🗑️ Row Deleted!");
     loadData();
-  }
-}
-
-// Load when page opens
-loadData();
-</script>
+  </script>
 </body>
 </html>
