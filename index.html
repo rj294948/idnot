@@ -1,42 +1,218 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Google Sheet CRUD</title>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Company Product Management</title>
+
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    margin: 20px;
+    background: #f5f5f5;
+  }
+
+  h2 {
+    text-align: center;
+    color: #333;
+  }
+
+  form {
+    background: #fff;
+    padding: 15px;
+    border-radius: 10px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    margin-bottom: 20px;
+  }
+
+  input, textarea {
+    width: 100%;
+    padding: 8px;
+    margin: 5px 0 12px 0;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+  }
+
+  button {
+    background: #0066cc;
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+
+  button:hover {
+    background: #004c99;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    background: #fff;
+  }
+
+  th, td {
+    border: 1px solid #ddd;
+    padding: 8px;
+    text-align: center;
+  }
+
+  th {
+    background: #0073e6;
+    color: white;
+  }
+
+  tr:nth-child(even) { background: #f2f2f2; }
+</style>
 </head>
+
 <body>
-  <h2>📊 Company Product Data</h2>
-  <button onclick="loadData()">🔄 Load Data</button>
-  <table border="1" id="dataTable"></table>
+<h2>📊 Company Product Details</h2>
 
-  <script>
-    const proxy = "https://api.allorigins.win/raw?url=";
-    const scriptURL = "https://script.google.com/macros/s/AKfycby_H0WaVNgBZU-D0VUQs73YIXY4_OBPd-gPFoo2mTMatdg0lsQhjoRJ2uCKdLDRMse2/exec";
+<form id="dataForm">
+  <input type="hidden" id="oldCompanyName" />
+  <label>Company Name:</label>
+  <input type="text" id="company" required />
 
-    async function loadData() {
-      try {
-        const res = await fetch(proxy + encodeURIComponent(`${scriptURL}?action=getAll`));
-        const data = await res.json();
-        if (!data.success) throw new Error("Failed to load");
+  <label>Product:</label>
+  <input type="text" id="product" required />
 
-        const table = document.getElementById("dataTable");
-        table.innerHTML = "";
-        let headerRow = "<tr>";
-        for (const key of Object.keys(data.data[0])) headerRow += `<th>${key}</th>`;
-        headerRow += "</tr>";
-        table.innerHTML += headerRow;
+  <label>Product Type:</label>
+  <input type="text" id="type" required />
 
-        data.data.forEach(row => {
-          let tr = "<tr>";
-          for (const key in row) tr += `<td>${row[key]}</td>`;
-          tr += "</tr>";
-          table.innerHTML += tr;
-        });
-      } catch (err) {
-        console.error("❌ Load Error:", err);
-      }
+  <label>Rate:</label>
+  <input type="text" id="rate" />
+
+  <label>Description:</label>
+  <textarea id="description" rows="3"></textarea>
+
+  <label>Contact:</label>
+  <input type="text" id="contact" />
+
+  <label>Mail:</label>
+  <input type="email" id="mail" />
+
+  <button type="submit">💾 Save / Update</button>
+</form>
+
+<h3>All Company Data</h3>
+<table id="dataTable">
+  <thead>
+    <tr>
+      <th>Company Name</th>
+      <th>Product</th>
+      <th>Product Type</th>
+      <th>Rate</th>
+      <th>Description</th>
+      <th>Contact</th>
+      <th>Mail</th>
+      <th>Action</th>
+    </tr>
+  </thead>
+  <tbody></tbody>
+</table>
+
+<script>
+  const proxy = "https://api.allorigins.win/raw?url=";
+  const scriptURL = "https://script.google.com/macros/s/AKfycby_H0WaVNgBZU-D0VUQs73YIXY4_OBPd-gPFoo2mTMatdg0lsQhjoRJ2uCKdLDRMse2/exec";
+
+  // ✅ Load data from Google Sheet
+  async function loadData() {
+    try {
+      const res = await fetch(proxy + encodeURIComponent(`${scriptURL}?action=getAll`));
+      const data = await res.json();
+
+      if (!data.success) throw new Error("Data fetch failed");
+
+      const tbody = document.querySelector("#dataTable tbody");
+      tbody.innerHTML = "";
+
+      data.data.forEach((row) => {
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td>${row["company name"]}</td>
+          <td>${row["product"]}</td>
+          <td>${row["product type"]}</td>
+          <td>${row["rate"]}</td>
+          <td>${row["description"]}</td>
+          <td>${row["contact"]}</td>
+          <td>${row["mail"]}</td>
+          <td>
+            <button onclick='editData(${JSON.stringify(row)})'>✏️ Edit</button>
+            <button onclick='deleteData("${row["company name"]}")'>🗑️ Delete</button>
+          </td>`;
+        tbody.appendChild(tr);
+      });
+    } catch (err) {
+      console.error("❌ Load Error:", err);
     }
-  </script>
+  }
+
+  // ✅ Add or Update data
+  document.getElementById("dataForm").addEventListener("submit", async (e) => {
+    e.preventDefault();
+
+    const formData = {
+      action: document.getElementById("oldCompanyName").value ? "edit" : "add",
+      oldCompanyName: document.getElementById("oldCompanyName").value,
+      "company name": document.getElementById("company").value,
+      "product": document.getElementById("product").value,
+      "product type": document.getElementById("type").value,
+      "rate": document.getElementById("rate").value,
+      "description": document.getElementById("description").value,
+      "contact": document.getElementById("contact").value,
+      "mail": document.getElementById("mail").value
+    };
+
+    try {
+      const res = await fetch(scriptURL, {
+        method: "POST",
+        body: JSON.stringify(formData),
+      });
+
+      const result = await res.json();
+      alert(result.message || "Saved!");
+      e.target.reset();
+      document.getElementById("oldCompanyName").value = "";
+      loadData();
+    } catch (err) {
+      alert("❌ Failed to save data.");
+      console.error(err);
+    }
+  });
+
+  // ✅ Edit data (fill in form)
+  function editData(row) {
+    document.getElementById("oldCompanyName").value = row["company name"];
+    document.getElementById("company").value = row["company name"];
+    document.getElementById("product").value = row["product"];
+    document.getElementById("type").value = row["product type"];
+    document.getElementById("rate").value = row["rate"];
+    document.getElementById("description").value = row["description"];
+    document.getElementById("contact").value = row["contact"];
+    document.getElementById("mail").value = row["mail"];
+  }
+
+  // ✅ Delete data
+  async function deleteData(company) {
+    if (!confirm(`Delete record for "${company}"?`)) return;
+    try {
+      const res = await fetch(scriptURL, {
+        method: "POST",
+        body: JSON.stringify({ action: "delete", company }),
+      });
+      const result = await res.json();
+      alert(result.message || "Deleted!");
+      loadData();
+    } catch (err) {
+      alert("❌ Failed to delete record.");
+      console.error(err);
+    }
+  }
+
+  // ✅ Load on page start
+  loadData();
+</script>
 </body>
 </html>
