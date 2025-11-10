@@ -3,19 +3,20 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>RJ Sheet CRUD</title>
+<title>RJ Sheet Data Manager</title>
 <style>
-body { font-family: Arial; margin: 20px; background: #f8f9fa; }
-table { border-collapse: collapse; width: 100%; background: white; }
+body { font-family: Arial; background: #f8f9fa; padding: 20px; }
+h2 { color: #007bff; }
+input { margin: 5px; padding: 8px; width: 200px; }
+button { margin: 5px; padding: 8px 12px; cursor: pointer; }
+table { border-collapse: collapse; width: 100%; margin-top: 20px; background: #fff; }
 th, td { border: 1px solid #ccc; padding: 8px; text-align: left; }
 th { background: #007bff; color: white; }
-button { margin: 4px; padding: 6px 10px; cursor: pointer; }
-input { margin: 5px; padding: 5px; width: 200px; }
 </style>
 </head>
 <body>
 
-<h2>📋 RJ Product Data</h2>
+<h2>📋 RJ Product Records</h2>
 
 <div>
   <input id="company" placeholder="Company Name">
@@ -47,25 +48,35 @@ input { margin: 5px; padding: 5px; width: 200px; }
 <script>
 const API_URL = "https://script.google.com/macros/s/AKfycby_H0WaVNgBZU-D0VUQs73YIXY4_OBPd-gPFoo2mTMatdg0lsQhjoRJ2uCKdLDRMse2/exec";
 
+// ✅ Load Data
 async function loadData() {
   try {
     const res = await fetch(`${API_URL}?action=getAll`);
-    const data = await res.json();
+    const text = await res.text(); // first get raw
+    let data;
+    try { data = JSON.parse(text); } 
+    catch(e) { console.error("Not valid JSON:", text); return; }
+
+    if (!Array.isArray(data)) {
+      console.error("❌ Data is not an array:", data);
+      return;
+    }
+
     const tbody = document.querySelector("#dataTable tbody");
     tbody.innerHTML = "";
     data.forEach(r => {
       tbody.innerHTML += `
         <tr>
-          <td>${r["company name"]}</td>
-          <td>${r["product"]}</td>
-          <td>${r["product type"]}</td>
-          <td>${r["rate"]}</td>
-          <td>${r["description"]}</td>
-          <td>${r["contact"]}</td>
-          <td>${r["mail"]}</td>
+          <td>${r["company name"] || ""}</td>
+          <td>${r["product"] || ""}</td>
+          <td>${r["product type"] || ""}</td>
+          <td>${r["rate"] || ""}</td>
+          <td>${r["description"] || ""}</td>
+          <td>${r["contact"] || ""}</td>
+          <td>${r["mail"] || ""}</td>
           <td>
-            <button onclick='editRow("${r["company name"]}")'>✏️ Edit</button>
-            <button onclick='deleteRow("${r["company name"]}")'>🗑️ Delete</button>
+            <button onclick='editRow("${r["company name"]}")'>✏️</button>
+            <button onclick='deleteRow("${r["company name"]}")'>🗑️</button>
           </td>
         </tr>`;
     });
@@ -74,10 +85,11 @@ async function loadData() {
   }
 }
 
+// ✅ Add Row
 async function addData() {
   const data = {
     action: "add",
-    "company name": company.value,
+    "company name": company.value.trim(),
     product: product.value,
     "product type": ptype.value,
     rate: rate.value,
@@ -85,14 +97,16 @@ async function addData() {
     contact: contact.value,
     mail: mail.value
   };
+
   await fetch(API_URL, {
     method: "POST",
-    body: JSON.stringify(data),
-    headers: { "Content-Type": "application/json" }
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data)
   });
   loadData();
 }
 
+// ✅ Edit Row
 async function editRow(name) {
   const data = {
     action: "edit",
@@ -104,26 +118,30 @@ async function editRow(name) {
     contact: prompt("New contact?"),
     mail: prompt("New mail?")
   };
+
   await fetch(API_URL, {
     method: "POST",
-    body: JSON.stringify(data),
-    headers: { "Content-Type": "application/json" }
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data)
   });
   loadData();
 }
 
+// ✅ Delete Row
 async function deleteRow(name) {
-  if (!confirm("Delete this row?")) return;
+  if (!confirm("Are you sure to delete this company?")) return;
   const data = { action: "delete", "company name": name };
+
   await fetch(API_URL, {
     method: "POST",
-    body: JSON.stringify(data),
-    headers: { "Content-Type": "application/json" }
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data)
   });
   loadData();
 }
 
 loadData();
 </script>
+
 </body>
 </html>
