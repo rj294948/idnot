@@ -1,142 +1,83 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ID NOT | RJ Services</title>
-<style>
-  body { font-family: Arial, sans-serif; background: #f7f7f7; padding: 20px; }
-  h1 { text-align: center; color: #333; }
-  table { width: 100%; border-collapse: collapse; margin-top: 20px; background: white; }
-  th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
-  th { background: #4CAF50; color: white; }
-  tr:nth-child(even) { background: #f2f2f2; }
-  button { margin: 2px; padding: 6px 10px; border: none; border-radius: 4px; cursor: pointer; }
-  .edit-btn { background: #2196F3; color: white; }
-  .delete-btn { background: #f44336; color: white; }
-  #formDiv { margin-top: 20px; background: white; padding: 15px; border-radius: 6px; box-shadow: 0 0 5px #ccc; }
-  input { padding: 6px; margin: 5px; border: 1px solid #ccc; border-radius: 4px; }
-  #loading { text-align: center; margin-top: 10px; color: #888; }
-</style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Company Product List</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f7f7f7;
+      padding: 20px;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background: white;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    }
+    th, td {
+      border: 1px solid #ddd;
+      padding: 8px;
+      text-align: left;
+    }
+    th {
+      background: #007bff;
+      color: white;
+    }
+  </style>
 </head>
 <body>
-<h1>🧾 ID NOT | Google Sheet Data</h1>
+  <h2>Company Product Data</h2>
+  <table id="dataTable">
+    <thead>
+      <tr>
+        <th>Company Name</th>
+        <th>Product</th>
+        <th>Product Type</th>
+        <th>Rate</th>
+        <th>Description</th>
+        <th>Contact</th>
+        <th>Mail</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
 
-<div id="loading">Loading data...</div>
+  <script>
+    const sheetURL = 'https://script.google.com/macros/s/AKfycby8mEp0sJcd5kVUJ84VHGleA0xWUBCOYEsVp20WPLe3CZZ-hbhJJEByQs39thNtJXXt/exec';
 
-<table id="dataTable" style="display:none;">
-  <thead id="thead"></thead>
-  <tbody id="tbody"></tbody>
-</table>
+    async function loadData() {
+      try {
+        const res = await fetch(sheetURL + '?action=getData');
+        const json = await res.json();
+        const tbody = document.querySelector('#dataTable tbody');
 
-<div id="formDiv">
-  <h3>Add / Edit Record</h3>
-  <form id="dataForm">
-    <input type="text" id="col1" placeholder="Column 1">
-    <input type="text" id="col2" placeholder="Column 2">
-    <input type="text" id="col3" placeholder="Column 3">
-    <button type="submit">Save</button>
-  </form>
-</div>
-
-<script>
-const scriptURL = "https://script.google.com/macros/s/AKfycby8mEp0sJcd5kVUJ84VHGleA0xWUBCOYEsVp20WPLe3CZZ-hbhJJEByQs39thNtJXXt/exec"; // ⚠️ Replace with your Apps Script Web App URL
-
-async function loadData() {
-  try {
-    document.getElementById("loading").textContent = "Fetching data...";
-    const res = await fetch(`${scriptURL}?action=getData`);
-    const result = await res.json();
-
-    if (!result.success) throw new Error(result.message);
-    const data = result.data;
-
-    const thead = document.getElementById("thead");
-    const tbody = document.getElementById("tbody");
-    thead.innerHTML = "";
-    tbody.innerHTML = "";
-
-    if (data.length === 0) {
-      document.getElementById("loading").textContent = "No data found.";
-      return;
+        if (json.status === 'success') {
+          json.data.forEach(row => {
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+              <td>${row["company name"] || ''}</td>
+              <td>${row["product"] || ''}</td>
+              <td>${row["product type"] || ''}</td>
+              <td>${row["rate"] || ''}</td>
+              <td>${row["description"] || ''}</td>
+              <td>${row["contact"] || ''}</td>
+              <td>${row["mail"] || ''}</td>
+            `;
+            tbody.appendChild(tr);
+          });
+        } else {
+          tbody.innerHTML = `<tr><td colspan="7">Error loading data</td></tr>`;
+        }
+      } catch (err) {
+        console.error(err);
+        document.querySelector('#dataTable tbody').innerHTML =
+          `<tr><td colspan="7">Failed to fetch data. Check CORS or URL.</td></tr>`;
+      }
     }
 
-    const headers = Object.keys(data[0]);
-    thead.innerHTML = "<tr>" + headers.map(h => `<th>${h}</th>`).join("") + "<th>Action</th></tr>";
-
-    data.forEach((row, i) => {
-      const tr = document.createElement("tr");
-      tr.innerHTML = headers.map(h => `<td>${row[h]}</td>`).join("") +
-        `<td>
-          <button class="edit-btn" onclick="editRow(${i})">Edit</button>
-          <button class="delete-btn" onclick="deleteRow(${i})">Delete</button>
-        </td>`;
-      tbody.appendChild(tr);
-    });
-
-    document.getElementById("dataTable").style.display = "table";
-    document.getElementById("loading").style.display = "none";
-    window.sheetData = data;
-
-  } catch (err) {
-    document.getElementById("loading").textContent = "❌ " + err.message;
-    console.error(err);
-  }
-}
-
-async function addRow(row) {
-  await fetch(scriptURL, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ action: "add", row })
-  });
-  loadData();
-}
-
-async function deleteRow(i) {
-  if (!confirm("Delete this record?")) return;
-  await fetch(scriptURL, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ action: "delete", id: i })
-  });
-  loadData();
-}
-
-function editRow(i) {
-  const row = window.sheetData[i];
-  document.getElementById("col1").value = row[Object.keys(row)[1]];
-  document.getElementById("col2").value = row[Object.keys(row)[2]];
-  document.getElementById("col3").value = row[Object.keys(row)[3]];
-  document.getElementById("dataForm").dataset.editIndex = i;
-}
-
-document.getElementById("dataForm").addEventListener("submit", async (e) => {
-  e.preventDefault();
-  const form = e.target;
-  const row = [
-    document.getElementById("col1").value,
-    document.getElementById("col2").value,
-    document.getElementById("col3").value
-  ];
-  const editIndex = form.dataset.editIndex;
-
-  if (editIndex !== undefined) {
-    await fetch(scriptURL, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ action: "edit", id: parseInt(editIndex), row })
-    });
-    delete form.dataset.editIndex;
-  } else {
-    await addRow(row);
-  }
-
-  form.reset();
-  loadData();
-});
-
-loadData();
-</script>
+    loadData();
+  </script>
 </body>
 </html>
