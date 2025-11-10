@@ -1,32 +1,90 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Google Sheet Data</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RJ Sheet Manager</title>
+<style>
+body { font-family: Arial, sans-serif; padding: 20px; background: #fafafa; }
+table { border-collapse: collapse; width: 100%; margin-top: 20px; background: white; }
+th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+th { background: #f2f2f2; }
+button { padding: 6px 10px; border: none; background: #2196f3; color: white; border-radius: 4px; cursor: pointer; }
+button:hover { background: #0b7dda; }
+</style>
 </head>
 <body>
-  <h2>Load Google Sheet Data</h2>
-  <button onclick="loadData()">Load Data</button>
-  <pre id="output"></pre>
 
-  <script>
-    const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbypseaOhWp4MOBPWlbITtdtBUpYXgdqz0V668KcF32Lzrb3ue1UiT2bQaUJkpwgcAo/exec";
+<h2>📋 Google Sheet Data Viewer (RJ Services)</h2>
+<div id="output">Loading...</div>
 
-    async function loadData() {
-      try {
-        const res = await fetch(`${WEB_APP_URL}?action=getData`, {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-          },
-        });
-        const data = await res.json();
-        document.getElementById("output").innerText = JSON.stringify(data, null, 2);
-      } catch (err) {
-        document.getElementById("output").innerText = "❌ Error: " + err.message;
-      }
-    }
-  </script>
+<script>
+// === Your Apps Script Web App URL ===
+const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxCKvJbupBHfYu1jAgrmyWQ7EFQVUnZRKVS2Y7GLkb7wWvn5l4h5nDjGwiti5tHIkOE/exec';
+
+// === Fetch Data Function ===
+async function loadData() {
+  try {
+    const response = await fetch(SCRIPT_URL, {
+      method: 'GET',
+      headers: { 'Content-Type': 'application/json' },
+      mode: 'cors'
+    });
+    const data = await response.json();
+    renderTable(data);
+  } catch (err) {
+    document.getElementById('output').innerHTML = '<p style="color:red;">❌ Failed to load data: ' + err + '</p>';
+    console.error(err);
+  }
+}
+
+// === Render Table ===
+function renderTable(data) {
+  if (!data.length) {
+    document.getElementById('output').innerHTML = 'No data found.';
+    return;
+  }
+  let html = '<table><tr>';
+  Object.keys(data[0]).forEach(k => html += `<th>${k}</th>`);
+  html += '<th>Actions</th></tr>';
+  
+  data.forEach((row, i) => {
+    html += '<tr>';
+    Object.values(row).forEach(v => html += `<td>${v}</td>`);
+    html += `<td>
+      <button onclick="editRow(${i})">Edit</button>
+      <button onclick="deleteRow(${i})" style="background:#f44336;">Delete</button>
+    </td></tr>`;
+  });
+  html += '</table>';
+  document.getElementById('output').innerHTML = html;
+}
+
+// === Edit Row Example ===
+async function editRow(i) {
+  alert('Edit row #' + (i + 1));
+  // You can open modal or prompt here and send updated data via POST below
+}
+
+// === Delete Row ===
+async function deleteRow(i) {
+  if (!confirm(`Delete row ${i + 1}?`)) return;
+  const response = await fetch(SCRIPT_URL, {
+    method: 'POST',
+    body: JSON.stringify({ action: 'delete', row: i }),
+    headers: { 'Content-Type': 'application/json' }
+  });
+  const res = await response.json();
+  if (res.status === 'success') {
+    alert('Row deleted successfully!');
+    loadData();
+  } else {
+    alert('Error deleting row.');
+  }
+}
+
+loadData();
+</script>
+
 </body>
 </html>
