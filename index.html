@@ -2,19 +2,22 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Sheet CRUD</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ID Not - Products</title>
 <style>
-  table {border-collapse: collapse; width: 100%;}
-  th, td {border: 1px solid #ccc; padding: 8px;}
-  th {background: #f0f0f0;}
-  input {width: 100%;}
-  button {margin: 2px;}
+  body { font-family: Arial, sans-serif; padding: 20px; background: #f5f5f5; }
+  table { border-collapse: collapse; width: 100%; background: #fff; }
+  th, td { border: 1px solid #ccc; padding: 8px; text-align: left; }
+  th { background: #eee; }
+  input { width: 100%; padding: 5px; box-sizing: border-box; }
+  button { padding: 5px 10px; margin: 2px; cursor: pointer; }
 </style>
 </head>
 <body>
 
-<h2>Company Products</h2>
-<table id="dataTable">
+<h2>Product List</h2>
+
+<table id="productTable">
   <thead>
     <tr>
       <th>Company Name</th>
@@ -30,99 +33,125 @@
   <tbody></tbody>
 </table>
 
-<h3>Add New Row</h3>
-<input id="CompanyName" placeholder="Company Name">
-<input id="Product" placeholder="Product">
-<input id="ProductType" placeholder="Product Type">
-<input id="Rate" placeholder="Rate">
-<input id="Description" placeholder="Description">
-<input id="Contact" placeholder="Contact">
-<input id="Mail" placeholder="Mail">
-<button onclick="addData()">Add</button>
+<h3>Add New Product</h3>
+<div>
+  <input type="text" id="companyName" placeholder="Company Name">
+  <input type="text" id="product" placeholder="Product">
+  <input type="text" id="productType" placeholder="Product Type">
+  <input type="number" id="rate" placeholder="Rate">
+  <input type="text" id="description" placeholder="Description">
+  <input type="text" id="contact" placeholder="Contact">
+  <input type="email" id="mail" placeholder="Mail">
+  <button onclick="addData()">Add Product</button>
+</div>
 
 <script>
-const API_URL = 'https://script.google.com/macros/s/AKfycby_H0WaVNgBZU-D0VUQs73YIXY4_OBPd-gPFoo2mTMatdg0lsQhjoRJ2uCKdLDRMse2/exec';
-const CORS_PROXY = 'https://corsproxy.io/?';
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycby_H0WaVNgBZU-D0VUQs73YIXY4_OBPd-gPFoo2mTMatdg0lsQhjoRJ2uCKdLDRMse2/exec";
 
-let tableBody = document.querySelector("#dataTable tbody");
-
+// Load data from sheet
 async function loadData() {
   try {
-    const res = await fetch(`${CORS_PROXY}${API_URL}?action=getAll`);
+    const res = await fetch(`${SCRIPT_URL}?action=getAll`);
     const json = await res.json();
-    const data = json.data;
-    tableBody.innerHTML = "";
-    data.forEach(row => {
-      const tr = document.createElement("tr");
-      tr.innerHTML = `
-        <td><input value="${row.CompanyName || ''}"></td>
-        <td><input value="${row.Product || ''}"></td>
-        <td><input value="${row.ProductType || ''}"></td>
-        <td><input value="${row.Rate || ''}"></td>
-        <td><input value="${row.Description || ''}"></td>
-        <td><input value="${row.Contact || ''}"></td>
-        <td><input value="${row.Mail || ''}"></td>
-        <td>
-          <button onclick='saveRow(${row.id}, this)'>Save</button>
-          <button onclick='deleteRow(${row.id})'>Delete</button>
-        </td>
-      `;
-      tableBody.appendChild(tr);
-    });
-  } catch(e) {
-    console.error("❌ Load Error:", e);
+    if (Array.isArray(json.data)) {
+      renderTable(json.data);
+    } else {
+      console.error("❌ Data is not an array:", json);
+    }
+  } catch (err) {
+    console.error("❌ Load Error:", err);
   }
 }
 
+// Render table rows
+function renderTable(data) {
+  const tbody = document.querySelector("#productTable tbody");
+  tbody.innerHTML = "";
+  data.forEach((row, index) => {
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td><input type="text" value="${row.CompanyName || ''}" data-index="${index}" data-field="CompanyName"></td>
+      <td><input type="text" value="${row.Product || ''}" data-index="${index}" data-field="Product"></td>
+      <td><input type="text" value="${row.ProductType || ''}" data-index="${index}" data-field="ProductType"></td>
+      <td><input type="number" value="${row.Rate || ''}" data-index="${index}" data-field="Rate"></td>
+      <td><input type="text" value="${row.Description || ''}" data-index="${index}" data-field="Description"></td>
+      <td><input type="text" value="${row.Contact || ''}" data-index="${index}" data-field="Contact"></td>
+      <td><input type="email" value="${row.Mail || ''}" data-index="${index}" data-field="Mail"></td>
+      <td>
+        <button onclick="saveRow(${index})">Save</button>
+        <button onclick="deleteRow(${index})">Delete</button>
+      </td>
+    `;
+    tbody.appendChild(tr);
+  });
+}
+
+// Add new data
 async function addData() {
-  const params = {
-    action: "add",
-    CompanyName: document.getElementById("CompanyName").value,
-    Product: document.getElementById("Product").value,
-    ProductType: document.getElementById("ProductType").value,
-    Rate: document.getElementById("Rate").value,
-    Description: document.getElementById("Description").value,
-    Contact: document.getElementById("Contact").value,
-    Mail: document.getElementById("Mail").value
+  const data = {
+    CompanyName: document.getElementById("companyName").value,
+    Product: document.getElementById("product").value,
+    ProductType: document.getElementById("productType").value,
+    Rate: document.getElementById("rate").value,
+    Description: document.getElementById("description").value,
+    Contact: document.getElementById("contact").value,
+    Mail: document.getElementById("mail").value
   };
   try {
-    const query = new URLSearchParams(params).toString();
-    await fetch(`${CORS_PROXY}${API_URL}?${query}`);
-    loadData();
-  } catch(e) { console.error("Add Error:", e); }
+    const res = await fetch(SCRIPT_URL, {
+      method: "POST",
+      body: JSON.stringify({ action: "add", data }),
+      headers: { "Content-Type": "application/json" }
+    });
+    const result = await res.json();
+    if (result.status === "success") loadData();
+    else console.error("Add Error:", result);
+  } catch (err) {
+    console.error("Add Error:", err);
+  }
 }
 
-async function saveRow(id, btn) {
-  const tr = btn.closest("tr");
-  const inputs = tr.querySelectorAll("input");
-  const params = {
-    action: "edit",
-    id: id,
-    CompanyName: inputs[0].value,
-    Product: inputs[1].value,
-    ProductType: inputs[2].value,
-    Rate: inputs[3].value,
-    Description: inputs[4].value,
-    Contact: inputs[5].value,
-    Mail: inputs[6].value
-  };
+// Save edited row
+async function saveRow(index) {
+  const rowInputs = document.querySelectorAll(`[data-index="${index}"]`);
+  const updatedData = {};
+  rowInputs.forEach(input => {
+    updatedData[input.dataset.field] = input.value;
+  });
   try {
-    const query = new URLSearchParams(params).toString();
-    await fetch(`${CORS_PROXY}${API_URL}?${query}`);
-    loadData();
-  } catch(e) { console.error("Save Error:", e); }
+    const res = await fetch(SCRIPT_URL, {
+      method: "POST",
+      body: JSON.stringify({ action: "edit", index, data: updatedData }),
+      headers: { "Content-Type": "application/json" }
+    });
+    const result = await res.json();
+    if (result.status === "success") loadData();
+    else console.error("Save Error:", result);
+  } catch (err) {
+    console.error("Save Error:", err);
+  }
 }
 
-async function deleteRow(id) {
-  if(!confirm("Delete this row?")) return;
+// Delete row
+async function deleteRow(index) {
+  if (!confirm("Are you sure to delete this row?")) return;
   try {
-    const query = new URLSearchParams({action:"delete", id:id}).toString();
-    await fetch(`${CORS_PROXY}${API_URL}?${query}`);
-    loadData();
-  } catch(e) { console.error("Delete Error:", e); }
+    const res = await fetch(SCRIPT_URL, {
+      method: "POST",
+      body: JSON.stringify({ action: "delete", index }),
+      headers: { "Content-Type": "application/json" }
+    });
+    const result = await res.json();
+    if (result.status === "success") loadData();
+    else console.error("Delete Error:", result);
+  } catch (err) {
+    console.error("Delete Error:", err);
+  }
 }
 
+// Initial load
 loadData();
 </script>
+
 </body>
 </html>
