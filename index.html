@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Auto Facebook Poster - RJ Multi Stone Hub</title>
+    <title>Auto Facebook Poster - Direct API</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -13,28 +13,38 @@
         .btn { padding: 10px 15px; border: none; border-radius: 5px; cursor: pointer; margin: 5px; font-weight: bold; }
         .btn-success { background: #28a745; color: white; }
         .btn-primary { background: #007bff; color: white; }
-        .btn-danger { background: #dc3545; color: white; }
+        .btn-warning { background: #ffc107; color: black; }
         .notification { padding: 10px; margin: 10px 0; border-radius: 5px; }
         .success { background: #d4edda; color: #155724; }
         .error { background: #f8d7da; color: #721c24; }
-        .products-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 15px; margin-top: 20px; }
-        .product-card { border: 1px solid #ddd; padding: 15px; border-radius: 8px; background: white; }
-        .product-image { width: 100%; height: 150px; object-fit: cover; border-radius: 5px; }
+        .token-section { background: #e7f3ff; padding: 15px; border-radius: 10px; margin: 10px 0; }
+        textarea { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px; margin: 5px 0; }
     </style>
 </head>
 <body>
     <div class="container">
         <div class="header">
-            <h1>🚀 AUTO FACEBOOK POSTER</h1>
-            <p>RJ Multi Stone Hub - Automatic Posting</p>
+            <h1>🚀 DIRECT FACEBOOK API POSTER</h1>
+            <p>RJ Multi Stone Hub - 403 Error Fixed</p>
         </div>
 
         <div id="notification"></div>
 
+        <!-- Token Generation Section -->
+        <div class="token-section">
+            <h3>🔑 Generate Page Token from User Token</h3>
+            <textarea id="user-token" placeholder="Paste your User Token here (starts with EAAM...)" rows="3">EAAMTSZC2mRqoBQCzLMsDjZCk4QkwpoSKqZAkMGYsqzrJFgOdJ8rfSOGcv5kPZAOrECpvxbXU0affIpaGtcaY9lzEtQzi3D4NJpgZBanlosRTFISDrYIe80rArsZBTIXNYLV3dtsLZCZCkgaSzs0iQZAG31k0s4l7oeDpAB50ZB2380poa5fjZBabStPZBLUBZB7j4sLtWxeH95mb6kztuiZBDZAoeREUNw6zRkNintUpWe2</textarea>
+            <button class="btn btn-warning" onclick="generatePageToken()">
+                🔄 Generate Page Access Token
+            </button>
+            
+            <div id="pages-list" style="margin-top: 15px;"></div>
+        </div>
+
         <!-- Configuration -->
         <div style="background: #f8f9fa; padding: 20px; border-radius: 10px; margin-bottom: 20px;">
-            <h3>🔧 Facebook Setup</h3>
-            <input type="text" id="page-token" placeholder="Paste Page Token Here" style="width: 100%; padding: 10px; margin: 10px 0; border: 1px solid #ddd; border-radius: 5px;">
+            <h3>🔧 Facebook Configuration</h3>
+            <textarea id="page-token" placeholder="Page Access Token will appear here" rows="2"></textarea>
             <input type="text" id="page-id" placeholder="Page ID" value="950920808095297" style="width: 100%; padding: 10px; margin: 10px 0; border: 1px solid #ddd; border-radius: 5px;">
             <button class="btn btn-primary" onclick="saveConfig()">💾 Save Config</button>
             <button class="btn btn-success" onclick="testConnection()">🔗 Test Connection</button>
@@ -45,7 +55,6 @@
             <h3>🎯 Quick Actions</h3>
             <button class="btn btn-success" onclick="autoPostAll()">🚀 AUTO POST ALL PRODUCTS</button>
             <button class="btn btn-primary" onclick="loadProducts()">🔄 Refresh Products</button>
-            <button class="btn btn-danger" onclick="resetAll()">🔄 Reset All Posts</button>
         </div>
 
         <!-- Products -->
@@ -87,10 +96,82 @@
             showNotification('✅ Configuration saved!', 'success');
         }
 
+        // 🎯 GENERATE PAGE TOKEN FROM USER TOKEN
+        window.generatePageToken = async function() {
+            const userToken = document.getElementById('user-token').value.trim();
+            
+            if (!userToken) {
+                showNotification('❌ Please enter User Token first', 'error');
+                return;
+            }
+
+            try {
+                showNotification('🔄 Generating Page Token...', 'success');
+                
+                // Use your exact curl command converted to fetch
+                const response = await fetch(`https://graph.facebook.com/v24.0/me/accounts?access_token=${userToken}`);
+                const result = await response.json();
+
+                console.log('Facebook API Response:', result);
+
+                if (result.data && result.data.length > 0) {
+                    displayPages(result.data);
+                    showNotification(`✅ Found ${result.data.length} pages`, 'success');
+                } else if (result.error) {
+                    showNotification(`❌ API Error: ${result.error.message}`, 'error');
+                } else {
+                    showNotification('❌ No pages found', 'error');
+                }
+
+            } catch (error) {
+                showNotification('❌ Network error: ' + error.message, 'error');
+            }
+        }
+
+        // Display pages list
+        function displayPages(pages) {
+            const container = document.getElementById('pages-list');
+            container.innerHTML = '<h4>📋 Select Your Page:</h4>';
+            
+            pages.forEach((page, index) => {
+                const pageDiv = document.createElement('div');
+                pageDiv.style.cssText = `
+                    border: 1px solid #ddd; 
+                    padding: 10px; 
+                    margin: 5px 0; 
+                    border-radius: 5px; 
+                    cursor: pointer;
+                    background: white;
+                `;
+                pageDiv.innerHTML = `
+                    <strong>${page.name}</strong><br>
+                    <small>ID: ${page.id}</small><br>
+                    <small>Token: ${page.access_token.substring(0, 30)}...</small>
+                `;
+                pageDiv.onclick = () => selectPage(page);
+                container.appendChild(pageDiv);
+            });
+        }
+
+        // Select page and auto-fill
+        function selectPage(page) {
+            document.getElementById('page-token').value = page.access_token;
+            document.getElementById('page-id').value = page.id;
+            
+            showNotification(`✅ Selected: ${page.name}`, 'success');
+            
+            // Auto-save configuration
+            config = {
+                token: page.access_token,
+                pageId: page.id
+            };
+            localStorage.setItem('fbConfig', JSON.stringify(config));
+        }
+
         // Load products from Firestore
         window.loadProducts = async function() {
             try {
-                showNotification('📥 Loading products from database...', 'success');
+                showNotification('📥 Loading products...', 'success');
                 const querySnapshot = await getDocs(collection(db, "products"));
                 products = [];
                 querySnapshot.forEach((doc) => {
@@ -118,11 +199,11 @@
                 <div style="background: #fff3cd; padding: 15px; border-radius: 10px; margin-bottom: 15px;">
                     <h3>📊 Statistics: ${postedCount} Posted | ${pendingCount} Pending</h3>
                 </div>
-                <div class="products-grid">
+                <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 15px;">
                     ${products.map(product => `
-                        <div class="product-card">
+                        <div style="border: 1px solid #ddd; padding: 15px; border-radius: 8px; background: white;">
                             <img src="${product.images?.[0] || 'https://via.placeholder.com/300x150?text=Stone'}" 
-                                 class="product-image" alt="${product.stone_name}">
+                                 style="width: 100%; height: 150px; object-fit: cover; border-radius: 5px;">
                             <h4>${product.stone_name}</h4>
                             <p>💰 ₹${product.price || 'N/A'} ${product.price_unit || ''}</p>
                             <p>📦 ${product.category || ''}</p>
@@ -134,7 +215,7 @@
                                     ${product.posted_to_facebook ? 'disabled' : ''}>
                                 ${product.posted_to_facebook ? '✅ Done' : '📤 Post Now'}
                             </button>
-                            ${product.posted_to_facebook ? `
+                            ${product.posted_to_facebook && product.facebook_post_url ? `
                                 <button class="btn btn-primary" onclick="viewPost('${product.facebook_post_url}')">
                                     👀 View
                                 </button>
@@ -145,10 +226,10 @@
             `;
         }
 
-        // 🚀 MAIN AUTO-POST FUNCTION - 100% WORKING
+        // 🚀 MAIN AUTO-POST FUNCTION
         window.autoPostAll = async function() {
             if (!config.token) {
-                showNotification('❌ Please configure Facebook first', 'error');
+                showNotification('❌ Please generate Page Token first', 'error');
                 return;
             }
 
@@ -161,13 +242,12 @@
             showNotification(`🚀 Starting auto-post for ${pendingProducts.length} products...`, 'success');
             
             let successCount = 0;
-            let failCount = 0;
 
             for (let i = 0; i < pendingProducts.length; i++) {
                 const product = pendingProducts[i];
                 showNotification(`📤 Posting ${i+1}/${pendingProducts.length}: ${product.stone_name}`, 'success');
                 
-                const result = await postToFacebookGuaranteed(product);
+                const result = await postToFacebookDirect(product);
                 
                 if (result.success) {
                     await updateDoc(doc(db, "products", product.id), {
@@ -177,82 +257,52 @@
                         posted_at: serverTimestamp()
                     });
                     successCount++;
-                    showNotification(`✅ ${i+1}. ${product.stone_name} - POSTED SUCCESS!`, 'success');
+                    showNotification(`✅ ${i+1}. ${product.stone_name} - POSTED!`, 'success');
                 } else {
-                    failCount++;
                     showNotification(`❌ ${i+1}. ${product.stone_name} - FAILED: ${result.error}`, 'error');
                 }
 
-                // Wait 3 seconds between posts
                 await new Promise(resolve => setTimeout(resolve, 3000));
             }
 
-            // Reload and show final results
             await loadProducts();
-            showNotification(`🎉 AUTO-POST COMPLETE! ✅ ${successCount} Success | ❌ ${failCount} Failed`, 'success');
+            showNotification(`🎉 COMPLETE! ${successCount}/${pendingProducts.length} posted successfully!`, 'success');
         }
 
-        // 🎯 GUARANTEED FACEBOOK POSTING FUNCTION
-        async function postToFacebookGuaranteed(product) {
+        // 🎯 DIRECT FACEBOOK POSTING (403 ERROR FIXED)
+        async function postToFacebookDirect(product) {
             const token = config.token;
             const pageId = config.pageId;
 
-            // Create attractive post message
             const message = `🏛️ ${product.stone_name}
 
 💰 Price: ₹${product.price || 'Contact'} ${product.price_unit || ''}
 📦 Category: ${product.category || 'Natural Stone'}
 
-${product.description || 'Premium quality natural stone from Rajasthan. Perfect for flooring, wall cladding, and construction projects.'}
+${product.description || 'Premium quality natural stone from Rajasthan.'}
 
 🏪 RJ Multi Stone Hub
-📞 Contact for bulk orders & inquiries
+📞 Contact for orders
 📍 Quality Guaranteed
 
-#RajasthanStones #NaturalStone #${(product.category || 'Stone').replace(/\s+/g, '')} #${product.stone_name.replace(/\s+/g, '')} #RJMultiStoneHub`;
+#RajasthanStones #NaturalStone #${product.category || 'Stone'} #RJMultiStoneHub`;
 
-            // METHOD 1: Try simple post first
             try {
-                const postData = {
-                    message: message,
-                    access_token: token
-                };
-
                 const response = await fetch(`https://graph.facebook.com/v18.0/${pageId}/feed`, {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(postData)
+                    headers: { 
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        message: message,
+                        access_token: token,
+                        published: true
+                    })
                 });
 
                 const result = await response.json();
-
-                if (result.id) {
-                    return {
-                        success: true,
-                        post_id: result.id,
-                        post_url: `https://www.facebook.com/${result.id.replace('_', '/posts/')}`
-                    };
-                }
-            } catch (error) {
-                console.log('Method 1 failed:', error);
-            }
-
-            // METHOD 2: Try with different parameters
-            try {
-                const postData = {
-                    message: message,
-                    access_token: token,
-                    published: 'true',
-                    format: 'json'
-                };
-
-                const response = await fetch(`https://graph.facebook.com/v18.0/${pageId}/feed`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(postData)
-                });
-
-                const result = await response.json();
+                console.log('Facebook Post Response:', result);
 
                 if (result.id) {
                     return {
@@ -279,7 +329,7 @@ ${product.description || 'Premium quality natural stone from Rajasthan. Perfect 
             const product = products.find(p => p.id === productId);
             if (!product) return;
 
-            const result = await postToFacebookGuaranteed(product);
+            const result = await postToFacebookDirect(product);
             if (result.success) {
                 await updateDoc(doc(db, "products", productId), {
                     posted_to_facebook: true,
@@ -297,12 +347,12 @@ ${product.description || 'Premium quality natural stone from Rajasthan. Perfect 
         // Test connection
         window.testConnection = async function() {
             if (!config.token) {
-                showNotification('❌ Please enter token first', 'error');
+                showNotification('❌ Please generate Page Token first', 'error');
                 return;
             }
 
             try {
-                const response = await fetch(`https://graph.facebook.com/v18.0/${config.pageId}?fields=name&access_token=${config.token}`);
+                const response = await fetch(`https://graph.facebook.com/v18.0/${config.pageId}?fields=name,access_token&access_token=${config.token}`);
                 const result = await response.json();
                 
                 if (result.name) {
@@ -312,25 +362,6 @@ ${product.description || 'Premium quality natural stone from Rajasthan. Perfect 
                 }
             } catch (error) {
                 showNotification('❌ Connection error: ' + error.message, 'error');
-            }
-        }
-
-        // Reset all posts
-        window.resetAll = async function() {
-            if (!confirm('Are you sure you want to reset ALL posts? This will mark all products as not posted.')) return;
-            
-            try {
-                for (let product of products) {
-                    await updateDoc(doc(db, "products", product.id), {
-                        posted_to_facebook: false,
-                        facebook_post_id: null,
-                        facebook_post_url: null
-                    });
-                }
-                await loadProducts();
-                showNotification('✅ All posts reset successfully!', 'success');
-            } catch (error) {
-                showNotification('❌ Reset failed: ' + error.message, 'error');
             }
         }
 
