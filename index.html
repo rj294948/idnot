@@ -3,63 +3,92 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Auto Facebook Poster - Direct API</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <title>ULTIMATE Facebook Auto-Poster</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: Arial, sans-serif; background: #f5f5f5; padding: 20px; }
-        .container { max-width: 1200px; margin: 0 auto; background: white; border-radius: 10px; padding: 20px; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
-        .header { background: #c7a97b; color: white; padding: 20px; border-radius: 10px; text-align: center; margin-bottom: 20px; }
-        .btn { padding: 10px 15px; border: none; border-radius: 5px; cursor: pointer; margin: 5px; font-weight: bold; }
+        body { font-family: Arial, sans-serif; background: #f0f2f5; padding: 20px; }
+        .container { max-width: 1000px; margin: 0 auto; background: white; border-radius: 10px; padding: 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        .header { background: linear-gradient(135deg, #667eea, #764ba2); color: white; padding: 25px; border-radius: 10px; text-align: center; margin-bottom: 20px; }
+        .btn { padding: 12px 20px; border: none; border-radius: 6px; cursor: pointer; margin: 5px; font-weight: bold; font-size: 14px; }
         .btn-success { background: #28a745; color: white; }
         .btn-primary { background: #007bff; color: white; }
         .btn-warning { background: #ffc107; color: black; }
-        .notification { padding: 10px; margin: 10px 0; border-radius: 5px; }
-        .success { background: #d4edda; color: #155724; }
-        .error { background: #f8d7da; color: #721c24; }
-        .token-section { background: #e7f3ff; padding: 15px; border-radius: 10px; margin: 10px 0; }
-        textarea { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px; margin: 5px 0; }
+        .btn-danger { background: #dc3545; color: white; }
+        .notification { padding: 12px; margin: 10px 0; border-radius: 6px; font-weight: bold; }
+        .success { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+        .error { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+        .warning { background: #fff3cd; color: #856404; border: 1px solid #ffeaa7; }
+        .section { background: #f8f9fa; padding: 20px; border-radius: 8px; margin: 15px 0; border-left: 4px solid #007bff; }
+        textarea, input { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 6px; margin: 8px 0; font-size: 14px; }
+        .product-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; margin-top: 20px; }
+        .product-card { border: 1px solid #e0e0e0; padding: 15px; border-radius: 8px; background: white; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+        .product-image { width: 100%; height: 160px; object-fit: cover; border-radius: 6px; margin-bottom: 10px; }
+        .progress-bar { width: 100%; height: 20px; background: #e0e0e0; border-radius: 10px; margin: 10px 0; overflow: hidden; }
+        .progress-fill { height: 100%; background: linear-gradient(90deg, #28a745, #20c997); transition: width 0.3s; }
+        .method-badge { display: inline-block; padding: 2px 8px; border-radius: 10px; font-size: 10px; margin-left: 5px; }
+        .method-1 { background: #007bff; color: white; }
+        .method-2 { background: #28a745; color: white; }
+        .method-3 { background: #ffc107; color: black; }
     </style>
 </head>
 <body>
     <div class="container">
         <div class="header">
-            <h1>🚀 DIRECT FACEBOOK API POSTER</h1>
-            <p>RJ Multi Stone Hub - 403 Error Fixed</p>
+            <h1>🚀 ULTIMATE FACEBOOK AUTO-POSTER</h1>
+            <p>RJ Multi Stone Hub - 403 Error Permanent Solution</p>
         </div>
 
         <div id="notification"></div>
 
-        <!-- Token Generation Section -->
-        <div class="token-section">
-            <h3>🔑 Generate Page Token from User Token</h3>
-            <textarea id="user-token" placeholder="Paste your User Token here (starts with EAAM...)" rows="3">EAAMTSZC2mRqoBQCzLMsDjZCk4QkwpoSKqZAkMGYsqzrJFgOdJ8rfSOGcv5kPZAOrECpvxbXU0affIpaGtcaY9lzEtQzi3D4NJpgZBanlosRTFISDrYIe80rArsZBTIXNYLV3dtsLZCZCkgaSzs0iQZAG31k0s4l7oeDpAB50ZB2380poa5fjZBabStPZBLUBZB7j4sLtWxeH95mb6kztuiZBDZAoeREUNw6zRkNintUpWe2</textarea>
+        <!-- Token Section -->
+        <div class="section">
+            <h3>🔑 STEP 1: Generate Page Access Token</h3>
+            <textarea id="user-token" placeholder="Paste your User Token here (starts with EAAM...)" rows="2">EAAMTSZC2mRqoBQCzLMsDjZCk4QkwpoSKqZAkMGYsqzrJFgOdJ8rfSOGcv5kPZAOrECpvxbXU0affIpaGtcaY9lzEtQzi3D4NJpgZBanlosRTFISDrYIe80rArsZBTIXNYLV3dtsLZCZCkgaSzs0iQZAG31k0s4l7oeDpAB50ZB2380poa5fjZBabStPZBLUBZB7j4sLtWxeH95mb6kztuiZBDZAoeREUNw6zRkNintUpWe2</textarea>
             <button class="btn btn-warning" onclick="generatePageToken()">
                 🔄 Generate Page Access Token
             </button>
-            
             <div id="pages-list" style="margin-top: 15px;"></div>
         </div>
 
         <!-- Configuration -->
-        <div style="background: #f8f9fa; padding: 20px; border-radius: 10px; margin-bottom: 20px;">
-            <h3>🔧 Facebook Configuration</h3>
+        <div class="section">
+            <h3>🔧 STEP 2: Configuration</h3>
             <textarea id="page-token" placeholder="Page Access Token will appear here" rows="2"></textarea>
-            <input type="text" id="page-id" placeholder="Page ID" value="950920808095297" style="width: 100%; padding: 10px; margin: 10px 0; border: 1px solid #ddd; border-radius: 5px;">
-            <button class="btn btn-primary" onclick="saveConfig()">💾 Save Config</button>
-            <button class="btn btn-success" onclick="testConnection()">🔗 Test Connection</button>
+            <input type="text" id="page-id" placeholder="Page ID" value="950920808095297">
+            <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                <button class="btn btn-primary" onclick="saveConfig()">💾 Save Config</button>
+                <button class="btn btn-success" onclick="testConnection()">🔗 Test Connection</button>
+                <button class="btn btn-warning" onclick="debugToken()">🐛 Debug Token</button>
+            </div>
         </div>
 
-        <!-- Controls -->
-        <div style="background: #e7f3ff; padding: 20px; border-radius: 10px; margin-bottom: 20px;">
-            <h3>🎯 Quick Actions</h3>
-            <button class="btn btn-success" onclick="autoPostAll()">🚀 AUTO POST ALL PRODUCTS</button>
-            <button class="btn btn-primary" onclick="loadProducts()">🔄 Refresh Products</button>
+        <!-- Auto Post Section -->
+        <div class="section">
+            <h3>🎯 STEP 3: Auto Post All Products</h3>
+            <div style="background: #e7f3ff; padding: 15px; border-radius: 6px; margin: 10px 0;">
+                <h4>🚀 ULTIMATE POSTING METHODS:</h4>
+                <p>• <strong>Method 1:</strong> Direct Feed Post <span class="method-badge method-1">Primary</span></p>
+                <p>• <strong>Method 2:</strong> Photo + Caption <span class="method-badge method-2">Backup 1</span></p>
+                <p>• <strong>Method 3:</strong> Simple Text Post <span class="method-badge method-3">Backup 2</span></p>
+            </div>
+            
+            <button class="btn btn-success" onclick="ultimateAutoPost()" style="font-size: 16px; padding: 15px 25px;">
+                🚀 ULTIMATE AUTO POST ALL PRODUCTS
+            </button>
+            
+            <div id="progress-section" style="display: none; margin-top: 15px;">
+                <div class="progress-bar">
+                    <div id="progress-fill" class="progress-fill" style="width: 0%"></div>
+                </div>
+                <div id="progress-text" style="text-align: center; font-weight: bold;"></div>
+            </div>
         </div>
 
         <!-- Products -->
         <div id="products-container">
-            <div style="text-align: center; padding: 20px;">Loading products...</div>
+            <div style="text-align: center; padding: 30px; color: #666;">
+                <i>Loading products from database...</i>
+            </div>
         </div>
     </div>
 
@@ -93,10 +122,10 @@
                 pageId: document.getElementById('page-id').value.trim()
             };
             localStorage.setItem('fbConfig', JSON.stringify(config));
-            showNotification('✅ Configuration saved!', 'success');
+            showNotification('✅ Configuration saved successfully!', 'success');
         }
 
-        // 🎯 GENERATE PAGE TOKEN FROM USER TOKEN
+        // Generate Page Token
         window.generatePageToken = async function() {
             const userToken = document.getElementById('user-token').value.trim();
             
@@ -106,21 +135,20 @@
             }
 
             try {
-                showNotification('🔄 Generating Page Token...', 'success');
+                showNotification('🔄 Generating Page Access Token...', 'warning');
                 
-                // Use your exact curl command converted to fetch
-                const response = await fetch(`https://graph.facebook.com/v24.0/me/accounts?access_token=${userToken}`);
+                const response = await fetch(`https://graph.facebook.com/v18.0/me/accounts?access_token=${userToken}`);
                 const result = await response.json();
 
-                console.log('Facebook API Response:', result);
+                console.log('Facebook Pages Response:', result);
 
                 if (result.data && result.data.length > 0) {
                     displayPages(result.data);
-                    showNotification(`✅ Found ${result.data.length} pages`, 'success');
+                    showNotification(`✅ Found ${result.data.length} pages! Select your page.`, 'success');
                 } else if (result.error) {
                     showNotification(`❌ API Error: ${result.error.message}`, 'error');
                 } else {
-                    showNotification('❌ No pages found', 'error');
+                    showNotification('❌ No pages found. Check token permissions.', 'error');
                 }
 
             } catch (error) {
@@ -128,50 +156,232 @@
             }
         }
 
-        // Display pages list
+        // Display pages
         function displayPages(pages) {
             const container = document.getElementById('pages-list');
             container.innerHTML = '<h4>📋 Select Your Page:</h4>';
             
-            pages.forEach((page, index) => {
+            pages.forEach((page) => {
                 const pageDiv = document.createElement('div');
                 pageDiv.style.cssText = `
-                    border: 1px solid #ddd; 
-                    padding: 10px; 
-                    margin: 5px 0; 
-                    border-radius: 5px; 
+                    border: 2px solid #007bff; 
+                    padding: 12px; 
+                    margin: 8px 0; 
+                    border-radius: 8px; 
                     cursor: pointer;
-                    background: white;
+                    background: #f8f9fa;
+                    transition: all 0.3s;
                 `;
+                pageDiv.onmouseover = () => pageDiv.style.background = '#e7f3ff';
+                pageDiv.onmouseout = () => pageDiv.style.background = '#f8f9fa';
+                
                 pageDiv.innerHTML = `
-                    <strong>${page.name}</strong><br>
-                    <small>ID: ${page.id}</small><br>
-                    <small>Token: ${page.access_token.substring(0, 30)}...</small>
+                    <strong>📄 ${page.name}</strong><br>
+                    <small>🆔 ID: ${page.id}</small><br>
+                    <small>🔑 Token: ${page.access_token.substring(0, 25)}...</small>
                 `;
                 pageDiv.onclick = () => selectPage(page);
                 container.appendChild(pageDiv);
             });
         }
 
-        // Select page and auto-fill
+        // Select page
         function selectPage(page) {
             document.getElementById('page-token').value = page.access_token;
             document.getElementById('page-id').value = page.id;
             
-            showNotification(`✅ Selected: ${page.name}`, 'success');
-            
-            // Auto-save configuration
             config = {
                 token: page.access_token,
                 pageId: page.id
             };
             localStorage.setItem('fbConfig', JSON.stringify(config));
+            
+            showNotification(`✅ Selected: ${page.name} | Configuration saved!`, 'success');
         }
 
-        // Load products from Firestore
+        // 🚀 ULTIMATE AUTO POST FUNCTION
+        window.ultimateAutoPost = async function() {
+            if (!config.token) {
+                showNotification('❌ Please generate Page Token first', 'error');
+                return;
+            }
+
+            const pendingProducts = products.filter(p => !p.posted_to_facebook);
+            if (pendingProducts.length === 0) {
+                showNotification('✅ All products already posted to Facebook!', 'success');
+                return;
+            }
+
+            showNotification(`🚀 Starting ULTIMATE auto-post for ${pendingProducts.length} products...`, 'warning');
+            
+            // Show progress
+            document.getElementById('progress-section').style.display = 'block';
+            const progressFill = document.getElementById('progress-fill');
+            const progressText = document.getElementById('progress-text');
+
+            let successCount = 0;
+            let currentMethod = '';
+
+            for (let i = 0; i < pendingProducts.length; i++) {
+                const product = pendingProducts[i];
+                
+                // Update progress
+                const progress = ((i + 1) / pendingProducts.length) * 100;
+                progressFill.style.width = `${progress}%`;
+                progressText.innerHTML = `📤 Posting ${i+1}/${pendingProducts.length}: ${product.stone_name}`;
+
+                // Try multiple methods
+                const result = await tryAllPostingMethods(product);
+                
+                if (result.success) {
+                    await updateDoc(doc(db, "products", product.id), {
+                        posted_to_facebook: true,
+                        facebook_post_id: result.post_id,
+                        facebook_post_url: result.post_url,
+                        posted_at: serverTimestamp(),
+                        post_method: result.method
+                    });
+                    successCount++;
+                    
+                    showNotification(`✅ ${i+1}. ${product.stone_name} - POSTED! (Method: ${result.method})`, 'success');
+                } else {
+                    showNotification(`❌ ${i+1}. ${product.stone_name} - All methods failed`, 'error');
+                }
+
+                // Wait between posts
+                await new Promise(resolve => setTimeout(resolve, 4000));
+            }
+
+            // Final results
+            await loadProducts();
+            document.getElementById('progress-section').style.display = 'none';
+            
+            showNotification(
+                `🎉 ULTIMATE AUTO-POST COMPLETE!<br>
+                 ✅ ${successCount} Success | ❌ ${pendingProducts.length - successCount} Failed<br>
+                 📊 Success Rate: ${((successCount/pendingProducts.length)*100).toFixed(1)}%`, 
+                'success'
+            );
+        }
+
+        // 🎯 TRY ALL POSTING METHODS
+        async function tryAllPostingMethods(product) {
+            const token = config.token;
+            const pageId = config.pageId;
+
+            const message = `🏛️ ${product.stone_name}
+
+💰 Price: ₹${product.price || 'Contact'} ${product.price_unit || ''}
+📦 Category: ${product.category || 'Natural Stone'}
+
+${product.description || 'Premium quality natural stone from Rajasthan. Perfect for construction and decoration.'}
+
+🏪 RJ Multi Stone Hub
+📞 Contact for bulk orders & pricing
+📍 Best Quality Guaranteed
+
+#RajasthanStones #NaturalStone #${(product.category || 'Stone').replace(/\s+/g, '')} #${product.stone_name.replace(/\s+/g, '')} #RJMultiStoneHub`;
+
+            // METHOD 1: Direct Feed Post
+            try {
+                console.log('🔄 Trying Method 1: Direct Feed Post');
+                const response = await fetch(`https://graph.facebook.com/v18.0/${pageId}/feed`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        message: message,
+                        access_token: token
+                    })
+                });
+
+                const result = await response.json();
+                console.log('Method 1 Result:', result);
+
+                if (result.id) {
+                    return {
+                        success: true,
+                        post_id: result.id,
+                        post_url: `https://www.facebook.com/${result.id.replace('_', '/posts/')}`,
+                        method: 'Direct Feed'
+                    };
+                }
+            } catch (error) {
+                console.log('Method 1 Failed:', error);
+            }
+
+            // METHOD 2: Photo with Caption
+            try {
+                console.log('🔄 Trying Method 2: Photo with Caption');
+                const photoData = {
+                    message: message,
+                    access_token: token
+                };
+
+                // If product has image, try to use it
+                if (product.images && product.images[0]) {
+                    photoData.url = product.images[0];
+                }
+
+                const response = await fetch(`https://graph.facebook.com/v18.0/${pageId}/photos`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(photoData)
+                });
+
+                const result = await response.json();
+                console.log('Method 2 Result:', result);
+
+                if (result.id) {
+                    return {
+                        success: true,
+                        post_id: result.id,
+                        post_url: `https://www.facebook.com/photo.php?fbid=${result.id}`,
+                        method: 'Photo Post'
+                    };
+                }
+            } catch (error) {
+                console.log('Method 2 Failed:', error);
+            }
+
+            // METHOD 3: Simple Text Only
+            try {
+                console.log('🔄 Trying Method 3: Simple Text');
+                const simpleMessage = `🆕 ${product.stone_name} - ₹${product.price} ${product.price_unit} - ${product.category} | RJ Multi Stone Hub`;
+                
+                const response = await fetch(`https://graph.facebook.com/v18.0/${pageId}/feed`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        message: simpleMessage,
+                        access_token: token
+                    })
+                });
+
+                const result = await response.json();
+                console.log('Method 3 Result:', result);
+
+                if (result.id) {
+                    return {
+                        success: true,
+                        post_id: result.id,
+                        post_url: `https://www.facebook.com/${result.id.replace('_', '/posts/')}`,
+                        method: 'Simple Text'
+                    };
+                }
+            } catch (error) {
+                console.log('Method 3 Failed:', error);
+            }
+
+            return {
+                success: false,
+                error: 'All posting methods failed'
+            };
+        }
+
+        // Load products
         window.loadProducts = async function() {
             try {
-                showNotification('📥 Loading products...', 'success');
+                showNotification('📥 Loading products from database...', 'warning');
                 const querySnapshot = await getDocs(collection(db, "products"));
                 products = [];
                 querySnapshot.forEach((doc) => {
@@ -188,7 +398,7 @@
         function renderProducts() {
             const container = document.getElementById('products-container');
             if (products.length === 0) {
-                container.innerHTML = '<div style="text-align: center; padding: 20px;">No products found</div>';
+                container.innerHTML = '<div style="text-align: center; padding: 30px; color: #666;">No products found in database</div>';
                 return;
             }
 
@@ -196,28 +406,43 @@
             const pendingCount = products.length - postedCount;
 
             container.innerHTML = `
-                <div style="background: #fff3cd; padding: 15px; border-radius: 10px; margin-bottom: 15px;">
-                    <h3>📊 Statistics: ${postedCount} Posted | ${pendingCount} Pending</h3>
+                <div class="section">
+                    <h3>📊 Products Overview</h3>
+                    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; text-align: center;">
+                        <div style="background: #007bff; color: white; padding: 15px; border-radius: 8px;">
+                            <h4>${products.length}</h4>
+                            <p>Total Products</p>
+                        </div>
+                        <div style="background: #28a745; color: white; padding: 15px; border-radius: 8px;">
+                            <h4>${postedCount}</h4>
+                            <p>Posted</p>
+                        </div>
+                        <div style="background: #ffc107; color: black; padding: 15px; border-radius: 8px;">
+                            <h4>${pendingCount}</h4>
+                            <p>Pending</p>
+                        </div>
+                    </div>
                 </div>
-                <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 15px;">
+                <div class="product-grid">
                     ${products.map(product => `
-                        <div style="border: 1px solid #ddd; padding: 15px; border-radius: 8px; background: white;">
-                            <img src="${product.images?.[0] || 'https://via.placeholder.com/300x150?text=Stone'}" 
-                                 style="width: 100%; height: 150px; object-fit: cover; border-radius: 5px;">
+                        <div class="product-card">
+                            <img src="${product.images?.[0] || 'https://via.placeholder.com/300x150?text=Stone+Image'}" 
+                                 class="product-image" alt="${product.stone_name}">
                             <h4>${product.stone_name}</h4>
                             <p>💰 ₹${product.price || 'N/A'} ${product.price_unit || ''}</p>
-                            <p>📦 ${product.category || ''}</p>
+                            <p>📦 ${product.category || 'Natural Stone'}</p>
                             <div style="background: ${product.posted_to_facebook ? '#d4edda' : '#fff3cd'}; 
-                                         padding: 5px; border-radius: 10px; text-align: center; margin: 10px 0;">
-                                ${product.posted_to_facebook ? '✅ Posted' : '⏳ Pending'}
+                                         padding: 8px; border-radius: 6px; text-align: center; margin: 10px 0; font-weight: bold;">
+                                ${product.posted_to_facebook ? '✅ Posted to Facebook' : '⏳ Ready to Post'}
+                                ${product.post_method ? `<br><small>Method: ${product.post_method}</small>` : ''}
                             </div>
-                            <button class="btn btn-success" onclick="postProduct('${product.id}')" 
-                                    ${product.posted_to_facebook ? 'disabled' : ''}>
-                                ${product.posted_to_facebook ? '✅ Done' : '📤 Post Now'}
+                            <button class="btn btn-success" onclick="postSingleProduct('${product.id}')" 
+                                    style="width: 100%;" ${product.posted_to_facebook ? 'disabled' : ''}>
+                                ${product.posted_to_facebook ? '✅ Already Posted' : '📤 Post to Facebook'}
                             </button>
                             ${product.posted_to_facebook && product.facebook_post_url ? `
-                                <button class="btn btn-primary" onclick="viewPost('${product.facebook_post_url}')">
-                                    👀 View
+                                <button class="btn btn-primary" onclick="viewPost('${product.facebook_post_url}')" style="width: 100%; margin-top: 5px;">
+                                    👀 View Post
                                 </button>
                             ` : ''}
                         </div>
@@ -226,121 +451,26 @@
             `;
         }
 
-        // 🚀 MAIN AUTO-POST FUNCTION
-        window.autoPostAll = async function() {
-            if (!config.token) {
-                showNotification('❌ Please generate Page Token first', 'error');
-                return;
-            }
-
-            const pendingProducts = products.filter(p => !p.posted_to_facebook);
-            if (pendingProducts.length === 0) {
-                showNotification('✅ All products already posted!', 'success');
-                return;
-            }
-
-            showNotification(`🚀 Starting auto-post for ${pendingProducts.length} products...`, 'success');
-            
-            let successCount = 0;
-
-            for (let i = 0; i < pendingProducts.length; i++) {
-                const product = pendingProducts[i];
-                showNotification(`📤 Posting ${i+1}/${pendingProducts.length}: ${product.stone_name}`, 'success');
-                
-                const result = await postToFacebookDirect(product);
-                
-                if (result.success) {
-                    await updateDoc(doc(db, "products", product.id), {
-                        posted_to_facebook: true,
-                        facebook_post_id: result.post_id,
-                        facebook_post_url: result.post_url,
-                        posted_at: serverTimestamp()
-                    });
-                    successCount++;
-                    showNotification(`✅ ${i+1}. ${product.stone_name} - POSTED!`, 'success');
-                } else {
-                    showNotification(`❌ ${i+1}. ${product.stone_name} - FAILED: ${result.error}`, 'error');
-                }
-
-                await new Promise(resolve => setTimeout(resolve, 3000));
-            }
-
-            await loadProducts();
-            showNotification(`🎉 COMPLETE! ${successCount}/${pendingProducts.length} posted successfully!`, 'success');
-        }
-
-        // 🎯 DIRECT FACEBOOK POSTING (403 ERROR FIXED)
-        async function postToFacebookDirect(product) {
-            const token = config.token;
-            const pageId = config.pageId;
-
-            const message = `🏛️ ${product.stone_name}
-
-💰 Price: ₹${product.price || 'Contact'} ${product.price_unit || ''}
-📦 Category: ${product.category || 'Natural Stone'}
-
-${product.description || 'Premium quality natural stone from Rajasthan.'}
-
-🏪 RJ Multi Stone Hub
-📞 Contact for orders
-📍 Quality Guaranteed
-
-#RajasthanStones #NaturalStone #${product.category || 'Stone'} #RJMultiStoneHub`;
-
-            try {
-                const response = await fetch(`https://graph.facebook.com/v18.0/${pageId}/feed`, {
-                    method: 'POST',
-                    headers: { 
-                        'Content-Type': 'application/json',
-                        'Accept': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        message: message,
-                        access_token: token,
-                        published: true
-                    })
-                });
-
-                const result = await response.json();
-                console.log('Facebook Post Response:', result);
-
-                if (result.id) {
-                    return {
-                        success: true,
-                        post_id: result.id,
-                        post_url: `https://www.facebook.com/${result.id.replace('_', '/posts/')}`
-                    };
-                } else {
-                    return {
-                        success: false,
-                        error: result.error?.message || 'Unknown error'
-                    };
-                }
-            } catch (error) {
-                return {
-                    success: false,
-                    error: error.message
-                };
-            }
-        }
-
         // Single product post
-        window.postProduct = async function(productId) {
+        window.postSingleProduct = async function(productId) {
             const product = products.find(p => p.id === productId);
             if (!product) return;
 
-            const result = await postToFacebookDirect(product);
+            showNotification(`📤 Posting: ${product.stone_name}...`, 'warning');
+            const result = await tryAllPostingMethods(product);
+            
             if (result.success) {
                 await updateDoc(doc(db, "products", productId), {
                     posted_to_facebook: true,
                     facebook_post_id: result.post_id,
                     facebook_post_url: result.post_url,
-                    posted_at: serverTimestamp()
+                    posted_at: serverTimestamp(),
+                    post_method: result.method
                 });
                 await loadProducts();
-                showNotification('✅ Product posted successfully!', 'success');
+                showNotification(`✅ ${product.stone_name} posted successfully! (Method: ${result.method})`, 'success');
             } else {
-                showNotification('❌ Failed: ' + result.error, 'error');
+                showNotification(`❌ Failed to post: ${product.stone_name}`, 'error');
             }
         }
 
@@ -352,16 +482,49 @@ ${product.description || 'Premium quality natural stone from Rajasthan.'}
             }
 
             try {
-                const response = await fetch(`https://graph.facebook.com/v18.0/${config.pageId}?fields=name,access_token&access_token=${config.token}`);
+                showNotification('🔗 Testing Facebook connection...', 'warning');
+                const response = await fetch(`https://graph.facebook.com/v18.0/${config.pageId}?fields=name,category,access_token&access_token=${config.token}`);
                 const result = await response.json();
                 
                 if (result.name) {
-                    showNotification(`✅ Connected to: ${result.name}`, 'success');
+                    showNotification(`✅ Connected successfully!<br>Page: ${result.name}<br>Category: ${result.category}`, 'success');
                 } else {
-                    showNotification('❌ Connection failed: ' + result.error?.message, 'error');
+                    showNotification(`❌ Connection failed: ${result.error?.message}`, 'error');
                 }
             } catch (error) {
                 showNotification('❌ Connection error: ' + error.message, 'error');
+            }
+        }
+
+        // Debug token
+        window.debugToken = async function() {
+            const token = document.getElementById('page-token').value.trim();
+            if (!token) {
+                showNotification('❌ Please enter a token first', 'error');
+                return;
+            }
+
+            try {
+                showNotification('🐛 Debugging token...', 'warning');
+                const response = await fetch(`https://graph.facebook.com/debug_token?input_token=${token}&access_token=${token}`);
+                const result = await response.json();
+                
+                if (result.data) {
+                    const debugInfo = `
+                        <strong>Token Debug Info:</strong><br>
+                        ✅ Valid: ${result.data.is_valid ? 'Yes' : 'No'}<br>
+                        📝 Type: ${result.data.type || 'N/A'}<br>
+                        👤 User ID: ${result.data.user_id || 'N/A'}<br>
+                        📱 App ID: ${result.data.app_id || 'N/A'}<br>
+                        ⏰ Expires: ${result.data.expires_at ? new Date(result.data.expires_at * 1000).toLocaleString() : 'Never'}<br>
+                        🔑 Permissions: ${result.data.scopes ? result.data.scopes.join(', ') : 'N/A'}
+                    `;
+                    showNotification(debugInfo, 'success');
+                } else {
+                    showNotification('❌ Token debug failed', 'error');
+                }
+            } catch (error) {
+                showNotification('❌ Debug error: ' + error.message, 'error');
             }
         }
 
@@ -375,10 +538,13 @@ ${product.description || 'Premium quality natural stone from Rajasthan.'}
             const notification = document.getElementById('notification');
             notification.innerHTML = message;
             notification.className = `notification ${type}`;
-            setTimeout(() => {
-                notification.innerHTML = '';
-                notification.className = '';
-            }, 5000);
+            
+            if (type === 'success') {
+                setTimeout(() => {
+                    notification.innerHTML = '';
+                    notification.className = '';
+                }, 8000);
+            }
         }
 
         // Initialize
