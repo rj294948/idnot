@@ -1144,16 +1144,6 @@
             cart: []
         };
 
-        // PREDEFINED USES + DYNAMIC USES COMBINATION
-        const PREDEFINED_USES = [
-            'Flooring', 'Wall Cladding', 'Countertops', 'Paving', 
-            'Staircase', 'Landscaping', 'Monuments', 'Sculptures',
-            'Interior Design', 'Exterior Design', 'Bathroom', 'Kitchen',
-            'Outdoor', 'Indoor', 'Wall', 'Floor', 'Roofing', 'Patio',
-            'Garden', 'Pathway', 'Driveway', 'Poolside', 'Facade',
-            'Fireplace', 'Tabletops', 'Vanity', 'Shower'
-        ];
-
         // Initialize the main application with Firestore
         async function initializeAppWithFirestore() {
             console.log('📊 Loading data from Firestore...');
@@ -1171,8 +1161,6 @@
                 
             } catch (error) {
                 console.error('❌ Error loading data from Firestore:', error);
-                // Fallback to sample data if Firestore fails
-                loadSampleData();
             }
             
             console.log('✅ StoneCraft Application initialized successfully');
@@ -1193,6 +1181,13 @@
                 });
                 
                 console.log('✅ Products loaded from Firestore: ', appState.products);
+                
+                // Debug: Check uses in products
+                const allUsesInProducts = [...new Set(appState.products
+                    .filter(product => product.uses)
+                    .map(product => product.uses)
+                )];
+                console.log('🔍 Uses found in products:', allUsesInProducts);
                 
                 // Real-time listener for product changes
                 onSnapshot(collection(db, "products"), (snapshot) => {
@@ -1216,38 +1211,54 @@
             }
         }
 
-        // Function to get ALL USES (Predefined + Dynamic from Firestore)
-        function getAllUses() {
-            // Get unique uses from Firestore products
-            const firestoreUses = [...new Set(appState.products
-                .filter(product => product.uses && product.uses.trim() !== '')
-                .map(product => product.uses)
-            )];
+        // Function to get UNIQUE USES (CASE INSENSITIVE + NO DUPLICATES)
+        function getUniqueUses() {
+            const usesMap = new Map();
             
-            // Combine predefined and dynamic uses
-            const allUses = [...new Set([...PREDEFINED_USES, ...firestoreUses])];
+            appState.products.forEach(product => {
+                if (product.uses && product.uses.trim() !== '') {
+                    const useKey = product.uses.toLowerCase().trim();
+                    const useValue = product.uses.trim();
+                    
+                    // Store the original case version
+                    if (!usesMap.has(useKey)) {
+                        usesMap.set(useKey, useValue);
+                    }
+                }
+            });
             
-            console.log('🎯 All Uses (Predefined + Dynamic):', allUses);
-            return allUses.sort();
+            const uniqueUses = Array.from(usesMap.values()).sort();
+            console.log('🎯 Unique Uses (No Duplicates):', uniqueUses);
+            return uniqueUses;
         }
 
-        // Function to generate uses navigation - COMBINED APPROACH
+        // Function to generate uses navigation - UNIQUE USES ONLY
         function generateUsesNavigation() {
             const usesContainer = document.getElementById('dynamicUsesContainer');
             if (!usesContainer) return;
             
             usesContainer.innerHTML = '';
             
-            const allUses = getAllUses();
-            console.log('🔄 Generating navigation for ALL uses:', allUses.length);
+            const uniqueUses = getUniqueUses();
+            console.log('🔄 Generating navigation for unique uses:', uniqueUses.length);
             
-            // SABHI USES KE LIYE NAVIGATION BANAO
-            allUses.forEach(usage => {
+            if (uniqueUses.length === 0) {
+                usesContainer.innerHTML = `
+                    <div class="loading-categories">
+                        <i class="fas fa-info-circle"></i>
+                        <p>No uses found. Add products to see navigation.</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            // UNIQUE USES KE LIYE NAVIGATION BANAO
+            uniqueUses.forEach(usage => {
                 const usageKey = usage.toLowerCase().replace(/\s+/g, '-');
                 const useItem = document.createElement('div');
                 useItem.className = 'use-item';
                 
-                // Get products for this usage
+                // Get products for this usage (CASE INSENSITIVE)
                 const usageProducts = appState.products.filter(product => 
                     product.uses && product.uses.toLowerCase() === usage.toLowerCase()
                 );
@@ -1286,9 +1297,9 @@
                         </div>
                     `;
                 } else {
-                    // Usage without products - simple link (still show it)
+                    // Usage with products but no stone names - simple link
                     useItem.innerHTML = `
-                        <a href="category-products.html?usage=${usageKey}" class="use-link">${usage} (0)</a>
+                        <a href="category-products.html?usage=${usageKey}" class="use-link">${usage} (${usageProducts.length})</a>
                     `;
                 }
                 
@@ -1301,22 +1312,32 @@
             }, 100);
         }
 
-        // Function to update categories section - COMBINED APPROACH
+        // Function to update categories section - UNIQUE USES ONLY
         function updateCategoriesSection() {
             const categoriesGrid = document.getElementById('dynamicCategories');
             if (!categoriesGrid) return;
             
             categoriesGrid.innerHTML = '';
             
-            const allUses = getAllUses();
-            console.log('🔄 Updating categories section with ALL uses:', allUses.length);
+            const uniqueUses = getUniqueUses();
+            console.log('🔄 Updating categories section with unique uses:', uniqueUses.length);
             
-            // SABHI USES KE LIYE CATEGORIES BANAO
-            allUses.forEach(usage => {
+            if (uniqueUses.length === 0) {
+                categoriesGrid.innerHTML = `
+                    <div class="loading-categories">
+                        <i class="fas fa-info-circle"></i>
+                        <p>No categories found. Add products to see categories.</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            // UNIQUE USES KE LIYE CATEGORIES BANAO
+            uniqueUses.forEach(usage => {
                 const categoryItem = document.createElement('div');
                 categoryItem.className = 'use-category-item';
                 
-                // Count products in this usage
+                // Count products in this usage (CASE INSENSITIVE)
                 const productCount = appState.products.filter(product => 
                     product.uses && product.uses.toLowerCase() === usage.toLowerCase()
                 ).length;
@@ -1586,53 +1607,6 @@
                     });
                 });
             }
-        }
-
-        // Fallback sample data if Firestore fails
-        function loadSampleData() {
-            console.log('📝 Loading sample data...');
-            
-            // Sample products with different uses
-            const sampleProducts = [
-                {
-                    id: '1',
-                    stone_name: 'Raj Green Sandstone',
-                    uses: 'Flooring',
-                    type: 'Natural',
-                    images: ['https://images.unsplash.com/photo-1586023492125-27b2c045efd7?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80'],
-                    price: 45
-                },
-                {
-                    id: '2', 
-                    stone_name: 'White Marble',
-                    uses: 'Countertops',
-                    type: 'Polished',
-                    images: ['https://images.unsplash.com/photo-1595428774223-ef52624120d2?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80'],
-                    price: 120
-                },
-                {
-                    id: '3',
-                    stone_name: 'Kota Brown',
-                    uses: 'Paving',
-                    type: 'Natural',
-                    images: ['https://images.unsplash.com/photo-1586023492125-27b2c045efd7?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80'],
-                    price: 35
-                },
-                {
-                    id: '4',
-                    stone_name: 'Black Granite',
-                    uses: 'Wall Cladding',
-                    type: 'Polished',
-                    images: ['https://images.unsplash.com/photo-1586023492125-27b2c045efd7?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80'],
-                    price: 85
-                }
-            ];
-            
-            appState.products = sampleProducts;
-            
-            // Generate navigation from sample data
-            generateUsesNavigation();
-            updateCategoriesSection();
         }
 
         // Demo: Show how new types are automatically added
