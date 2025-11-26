@@ -1,1287 +1,1925 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Add Product - Rajasthan SandStone Hub</title>
-<link rel="icon" href="stone.png" type="image/png">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-<style>
-/* ===== General Styles ===== */
-:root {
-  --primary: #c7a97b;
-  --primary-dark: #a58a62;
-  --secondary: #5a4a3a;
-  --light: #f8f5f0;
-  --dark: #333;
-  --gray: #e0e0e0;
-  --success: #28a745;
-  --danger: #dc3545;
-  --warning: #ffc107;
-  --info: #17a2b8;
-  --shadow: 0 4px 12px rgba(0,0,0,0.1);
-  --radius: 8px;
-  --transition: all 0.3s ease;
-}
-
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
-
-body {
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  line-height: 1.6;
-  color: var(--dark);
-  background: var(--light);
-  display: flex;
-  min-height: 100vh;
-}
-
-/* ===== Sidebar ===== */
-.sidebar {
-  width: 250px;
-  background: var(--primary);
-  color: white;
-  padding: 20px 0;
-  position: fixed;
-  height: 100vh;
-  overflow-y: auto;
-  box-shadow: 2px 0 10px rgba(0,0,0,0.1);
-  z-index: 1000;
-  transition: var(--transition);
-}
-
-.sidebar-header {
-  padding: 0 20px 20px;
-  border-bottom: 1px solid rgba(255,255,255,0.2);
-  margin-bottom: 15px;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
-.sidebar-logo {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  font-size: 1.3rem;
-  font-weight: 700;
-}
-
-.sidebar-logo img {
-  height: 40px;
-  border-radius: 5px;
-}
-
-.sidebar-nav {
-  list-style: none;
-}
-
-.sidebar-nav a {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 12px 20px;
-  color: white;
-  text-decoration: none;
-  transition: var(--transition);
-  border-left: 3px solid transparent;
-}
-
-.sidebar-nav a:hover, .sidebar-nav a.active {
-  background: rgba(255,255,255,0.1);
-  border-left-color: white;
-}
-
-.sidebar-nav i {
-  width: 20px;
-  text-align: center;
-}
-
-/* ===== Main Content ===== */
-.main-content {
-  flex: 1;
-  margin-left: 250px;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-}
-
-/* ===== Header ===== */
-.top-header {
-  background: white;
-  padding: 15px 30px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  box-shadow: var(--shadow);
-  position: sticky;
-  top: 0;
-  z-index: 999;
-}
-
-.user-profile {
-  display: flex;
-  align-items: center;
-  gap: 15px;
-}
-
-.user-info {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  background: var(--light);
-  padding: 8px 15px;
-  border-radius: var(--radius);
-}
-
-.user-avatar {
-  width: 35px;
-  height: 35px;
-  border-radius: 50%;
-  background: var(--primary);
-  color: white;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-weight: bold;
-}
-
-.header-actions {
-  display: flex;
-  gap: 10px;
-}
-
-.btn {
-  padding: 8px 16px;
-  border-radius: var(--radius);
-  font-weight: 600;
-  transition: var(--transition);
-  display: inline-flex;
-  align-items: center;
-  gap: 5px;
-  cursor: pointer;
-  border: none;
-  text-decoration: none;
-}
-
-.btn-primary {
-  background: var(--primary);
-  color: white;
-}
-
-.btn-primary:hover {
-  background: var(--primary-dark);
-}
-
-.btn-outline {
-  background: transparent;
-  border: 1px solid var(--primary);
-  color: var(--primary);
-}
-
-.btn-outline:hover {
-  background: var(--primary);
-  color: white;
-}
-
-/* ===== Container ===== */
-.container {
-  padding: 30px;
-  flex: 1;
-  max-width: 1200px;
-  margin: 0 auto;
-  width: 100%;
-}
-
-.page-title {
-  text-align: center;
-  margin-bottom: 30px;
-  position: relative;
-  padding-bottom: 15px;
-  color: var(--secondary);
-  font-size: 2rem;
-}
-
-.page-title:after {
-  content: '';
-  position: absolute;
-  bottom: 0;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 80px;
-  height: 4px;
-  background: var(--primary);
-}
-
-/* ===== Form Styles ===== */
-.form-container {
-  background: white;
-  padding: 40px;
-  border-radius: 15px;
-  box-shadow: var(--shadow);
-  border: 1px solid var(--gray);
-}
-
-.form-group {
-  margin-bottom: 25px;
-}
-
-.form-group label {
-  display: block;
-  margin-bottom: 10px;
-  color: var(--secondary);
-  font-weight: 600;
-  font-size: 1rem;
-}
-
-.form-group label.required:after {
-  content: " *";
-  color: var(--danger);
-}
-
-select, input, textarea {
-  width: 100%;
-  padding: 14px 16px;
-  border-radius: var(--radius);
-  border: 1px solid var(--gray);
-  font-size: 1rem;
-  transition: var(--transition);
-  background: #fafafa;
-}
-
-select:focus, input:focus, textarea:focus {
-  outline: none;
-  border-color: var(--primary);
-  box-shadow: 0 0 0 3px rgba(199,169,123,0.2);
-  background: white;
-}
-
-.phone-input-container {
-  position: relative;
-}
-
-.phone-prefix {
-  position: absolute;
-  left: 16px;
-  top: 50%;
-  transform: translateY(-50%);
-  color: var(--secondary);
-  font-weight: 600;
-}
-
-.country-code-input {
-  padding-left: 50px !important;
-}
-
-.country-code-prefix {
-  position: absolute;
-  left: 16px;
-  top: 50%;
-  transform: translateY(-50%);
-  color: var(--secondary);
-  font-weight: 600;
-  background: var(--light);
-  padding: 4px 8px;
-  border-radius: 4px;
-  border: 1px solid var(--gray);
-}
-
-.submit-btn {
-  background: var(--primary);
-  color: white;
-  font-weight: 600;
-  border: none;
-  padding: 16px 32px;
-  border-radius: var(--radius);
-  cursor: pointer;
-  font-size: 1.1rem;
-  transition: var(--transition);
-  width: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-}
-
-.submit-btn:hover {
-  background: var(--primary-dark);
-  transform: translateY(-2px);
-}
-
-.submit-btn:disabled {
-  background: var(--gray);
-  cursor: not-allowed;
-  transform: none;
-}
-
-/* ===== Form Sections ===== */
-.form-section {
-  margin-bottom: 40px;
-  padding-bottom: 30px;
-  border-bottom: 2px solid var(--light);
-}
-
-.section-title {
-  font-size: 1.4rem;
-  color: var(--primary);
-  margin-bottom: 20px;
-  padding-bottom: 10px;
-  border-bottom: 2px solid var(--primary);
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
-/* ===== Additional Fields ===== */
-.additional-fields-section {
-  background: var(--light);
-  padding: 25px;
-  border-radius: var(--radius);
-  margin-top: 30px;
-  border: 2px dashed var(--primary);
-}
-
-.add-field-btn {
-  background: var(--info);
-  color: white;
-  border: none;
-  padding: 12px 20px;
-  border-radius: var(--radius);
-  cursor: pointer;
-  font-weight: 600;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin-top: 15px;
-  transition: var(--transition);
-}
-
-.add-field-btn:hover {
-  background: #138496;
-}
-
-.additional-field {
-  display: flex;
-  gap: 15px;
-  margin-bottom: 15px;
-  align-items: flex-end;
-}
-
-.field-input {
-  flex: 1;
-}
-
-.remove-field-btn {
-  background: var(--danger);
-  color: white;
-  border: none;
-  padding: 12px 16px;
-  border-radius: var(--radius);
-  cursor: pointer;
-  transition: var(--transition);
-  height: fit-content;
-}
-
-.remove-field-btn:hover {
-  background: #c82333;
-}
-
-/* ===== Image Upload ===== */
-.image-upload-section {
-  margin: 20px 0;
-}
-
-.upload-options {
-  display: flex;
-  gap: 10px;
-  margin-bottom: 15px;
-  flex-wrap: wrap;
-}
-
-.upload-btn {
-  padding: 12px 20px;
-  border: 2px dashed var(--primary);
-  border-radius: var(--radius);
-  background: var(--light);
-  color: var(--primary);
-  font-weight: 600;
-  cursor: pointer;
-  transition: var(--transition);
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  flex: 1;
-  min-width: 200px;
-  justify-content: center;
-}
-
-.upload-btn:hover {
-  background: var(--primary);
-  color: white;
-  border-style: solid;
-}
-
-.preview {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 12px;
-  margin: 20px 0;
-  padding: 15px;
-  background: var(--light);
-  border-radius: var(--radius);
-  min-height: 100px;
-}
-
-.preview-item {
-  position: relative;
-  display: inline-block;
-}
-
-.preview img {
-  width: 150px;
-  height: 150px;
-  object-fit: cover;
-  border-radius: var(--radius);
-  border: 2px solid var(--gray);
-  transition: var(--transition);
-}
-
-.preview img:hover {
-  transform: scale(1.05);
-  border-color: var(--primary);
-}
-
-.remove-image {
-  position: absolute;
-  top: -8px;
-  right: -8px;
-  background: var(--danger);
-  color: white;
-  border: none;
-  border-radius: 50%;
-  width: 24px;
-  height: 24px;
-  font-size: 12px;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-/* ===== Processing Overlay ===== */
-.processing-overlay {
-  display: none;
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(0,0,0,0.7);
-  justify-content: center;
-  align-items: center;
-  z-index: 4000;
-  flex-direction: column;
-}
-
-.processing-overlay.active {
-  display: flex;
-}
-
-.processing-content {
-  background: white;
-  padding: 40px;
-  border-radius: 15px;
-  text-align: center;
-  max-width: 400px;
-  width: 90%;
-  box-shadow: 0 20px 40px rgba(0,0,0,0.3);
-}
-
-.processing-spinner {
-  width: 60px;
-  height: 60px;
-  border: 5px solid #f3f3f3;
-  border-top: 5px solid var(--primary);
-  border-radius: 50%;
-  animation: spin 1s linear infinite;
-  margin: 0 auto 20px;
-}
-
-@keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
-}
-
-/* ===== Footer ===== */
-footer {
-  background: var(--dark);
-  color: white;
-  text-align: center;
-  padding: 20px;
-  margin-top: auto;
-}
-
-/* ===== Utility Styles ===== */
-.field-hint {
-  color: #666;
-  font-size: 0.85rem;
-  margin-top: 5px;
-  display: block;
-}
-
-.compulsory-note {
-  text-align: center;
-  color: var(--danger);
-  font-size: 0.9rem;
-  margin-bottom: 20px;
-  font-weight: 600;
-}
-
-.error-message {
-  color: var(--danger);
-  font-size: 0.9rem;
-  margin-top: 5px;
-  display: none;
-}
-
-.error-message.show {
-  display: block;
-}
-
-/* ===== Responsive Design ===== */
-@media (max-width: 768px) {
-  .sidebar {
-    width: 100%;
-    transform: translateX(-100%);
-    position: fixed;
-  }
-  
-  .sidebar.active {
-    transform: translateX(0);
-  }
-  
-  .main-content {
-    margin-left: 0;
-  }
-  
-  .container {
-    padding: 20px;
-  }
-  
-  .form-container {
-    padding: 25px;
-  }
-  
-  .upload-options {
-    flex-direction: column;
-  }
-  
-  .upload-btn {
-    min-width: 100%;
-  }
-  
-  .additional-field {
-    flex-direction: column;
-  }
-}
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>StoneCraft UK - Premium Natural Stone & Marble Suppliers</title>
+    <meta name="description" content="UK's leading supplier of premium natural stone, marble, sandstone & limestone. Free UK delivery. Trusted by homeowners & professionals.">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Firebase SDK -->
+    <script type="module">
+        // Import Firebase modules
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.5.0/firebase-app.js";
+        import { 
+            getFirestore, 
+            collection, 
+            addDoc, 
+            getDocs, 
+            query, 
+            orderBy, 
+            doc, 
+            deleteDoc, 
+            updateDoc, 
+            where, 
+            serverTimestamp 
+        } from "https://www.gstatic.com/firebasejs/12.5.0/firebase-firestore.js";
+        import { 
+            getAuth, 
+            createUserWithEmailAndPassword, 
+            signInWithEmailAndPassword, 
+            signOut, 
+            GoogleAuthProvider, 
+            signInWithPopup, 
+            onAuthStateChanged, 
+            updateProfile 
+        } from "https://www.gstatic.com/firebasejs/12.5.0/firebase-auth.js";
+        import { 
+            getStorage, 
+            ref, 
+            uploadBytes, 
+            uploadBytesResumable, 
+            getDownloadURL 
+        } from "https://www.gstatic.com/firebasejs/12.5.0/firebase-storage.js";
+
+        // Firebase Configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyDxNMhU09mINvq_aDLtylBg3FucCK-MzYE",
+            authDomain: "sandstonebijoliya-293d2.firebaseapp.com",
+            projectId: "sandstonebijoliya-293d2",
+            storageBucket: "sandstonebijoliya-293d2.appspot.com",
+            messagingSenderId: "133756247845",
+            appId: "1:133756247845:web:8e769ce2af3db1765484cc",
+            measurementId: "G-H7JMX9VNYF"
+        };
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        const auth = getAuth(app);
+        const storage = getStorage(app);
+        const googleProvider = new GoogleAuthProvider();
+
+        // Make them globally available
+        window.firebaseApp = app;
+        window.firebaseDb = db;
+        window.firebaseAuth = auth;
+        window.firebaseStorage = storage;
+        window.firebaseGoogleProvider = googleProvider;
+        window.firebaseFunctions = {
+            collection, addDoc, getDocs, query, orderBy, doc, deleteDoc, updateDoc, where, serverTimestamp,
+            createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, signInWithPopup, onAuthStateChanged, updateProfile,
+            ref, uploadBytes, uploadBytesResumable, getDownloadURL
+        };
+
+        console.log("Firebase initialized successfully");
+    </script>
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: #ffffff;
+            color: #333;
+            line-height: 1.6;
+        }
+        
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 15px;
+        }
+        
+        /* Header Styles */
+        header {
+            background-color: #fff;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            z-index: 1000;
+        }
+        
+        /* Main Header */
+        .main-header {
+            padding: 15px 0;
+        }
+        
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+        }
+        
+        .logo h1 {
+            font-size: 28px;
+            color: #333;
+            font-weight: 700;
+        }
+        
+        .logo span {
+            color: #b8860b;
+        }
+        
+        .trust-info {
+            flex: 1;
+            text-align: center;
+            padding: 0 20px;
+        }
+        
+        .trust-info-content {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 30px;
+            font-size: 15px;
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            padding: 12px 25px;
+            border-radius: 12px;
+            border: 1px solid #e0e0e0;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+        }
+        
+        .trust-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            white-space: nowrap;
+            padding: 8px 15px;
+            background: rgba(255, 255, 255, 0.7);
+            border-radius: 8px;
+        }
+        
+        .trust-item i {
+            color: #b8860b;
+            font-size: 18px;
+        }
+
+        /* User Profile Styles */
+        .user-profile {
+            position: relative;
+        }
+
+        .profile-toggle {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 8px 12px;
+            border-radius: 6px;
+            transition: background-color 0.3s;
+        }
+
+        .profile-toggle:hover {
+            background: #f8f9fa;
+        }
+
+        .profile-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: #b8860b;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .profile-name {
+            font-size: 14px;
+            font-weight: 500;
+            color: #333;
+        }
+
+        .profile-dropdown {
+            position: absolute;
+            top: 100%;
+            right: 0;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.15);
+            min-width: 200px;
+            z-index: 1000;
+            display: none;
+            border: 1px solid #e0e0e0;
+        }
+
+        .profile-dropdown.active {
+            display: block;
+        }
+
+        .dropdown-header {
+            padding: 15px;
+            border-bottom: 1px solid #eee;
+            background: #f8f9fa;
+            border-radius: 8px 8px 0 0;
+        }
+
+        .dropdown-header .user-email {
+            font-size: 12px;
+            color: #666;
+            margin-top: 4px;
+        }
+
+        .dropdown-menu {
+            list-style: none;
+            padding: 8px 0;
+        }
+
+        .dropdown-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 15px;
+            color: #333;
+            text-decoration: none;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+
+        .dropdown-item:hover {
+            background: #f8f9fa;
+            color: #b8860b;
+        }
+
+        .dropdown-item i {
+            width: 16px;
+            text-align: center;
+            color: #666;
+        }
+
+        .dropdown-divider {
+            height: 1px;
+            background: #eee;
+            margin: 8px 0;
+        }
+
+        .user-actions {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .user-action {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-decoration: none;
+            color: #555;
+            font-size: 12px;
+            transition: color 0.3s;
+        }
+
+        .user-action:hover {
+            color: #b8860b;
+        }
+
+        .user-action i {
+            font-size: 20px;
+            margin-bottom: 3px;
+        }
+
+        /* Advanced Search Styles */
+        .search-container {
+            position: relative;
+            flex: 1;
+            max-width: 500px;
+            margin: 0 20px;
+        }
+
+        .search-input-container {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 12px 45px 12px 20px;
+            border: 2px solid #e1e5e9;
+            border-radius: 25px;
+            font-size: 14px;
+            background-color: #f8f9fa;
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: #b8860b;
+            background-color: white;
+        }
+
+        .search-button {
+            position: absolute;
+            right: 8px;
+            background: #b8860b;
+            color: white;
+            border: none;
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .search-results {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+            max-height: 400px;
+            overflow-y: auto;
+            z-index: 1001;
+            display: none;
+            margin-top: 5px;
+        }
+
+        .search-results.active {
+            display: block;
+        }
+
+        .search-result-item {
+            display: flex;
+            align-items: center;
+            padding: 12px 15px;
+            border-bottom: 1px solid #f0f0f0;
+            cursor: pointer;
+        }
+
+        .search-result-item:hover {
+            background: #f8f9fa;
+        }
+
+        .search-result-item:last-child {
+            border-bottom: none;
+        }
+
+        .search-result-image {
+            width: 50px;
+            height: 50px;
+            border-radius: 6px;
+            background-size: cover;
+            background-position: center;
+            margin-right: 15px;
+            flex-shrink: 0;
+        }
+
+        .search-result-content {
+            flex: 1;
+        }
+
+        .search-result-name {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 4px;
+        }
+
+        .search-result-category {
+            font-size: 12px;
+            color: #b8860b;
+            background: #fff9e6;
+            padding: 2px 8px;
+            border-radius: 12px;
+            display: inline-block;
+        }
+
+        .search-result-price {
+            font-weight: 700;
+            color: #b8860b;
+            font-size: 14px;
+        }
+
+        .no-results {
+            padding: 20px;
+            text-align: center;
+            color: #666;
+        }
+
+        .search-loading {
+            padding: 15px;
+            text-align: center;
+            color: #666;
+        }
+
+        .view-all-results {
+            padding: 12px 15px;
+            text-align: center;
+            background: #f8f9fa;
+            border-top: 1px solid #e9ecef;
+        }
+
+        .view-all-results a {
+            color: #b8860b;
+            text-decoration: none;
+            font-weight: 600;
+        }
+        
+        /* Banner Text */
+        .banner-text {
+            background: linear-gradient(135deg, #b8860b, #a3780a);
+            color: white;
+            padding: 12px 0;
+            text-align: center;
+            font-size: 16px;
+            font-weight: 500;
+        }
+        
+        /* Uses Top Bar with Mega Menu */
+        .uses-top-bar {
+            position: relative; 
+            background: #333;
+            padding: 0;
+        }
+        
+        .uses-container {
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap;
+        }
+        
+        .use-item {
+            flex: 1;
+            min-width: 120px;
+            position: relative; 
+        }
+        
+        .use-link {
+            display: block;
+            color: white;
+            text-decoration: none;
+            padding: 15px 10px;
+            font-size: 14px;
+            font-weight: 500;
+            text-align: center;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        
+        .use-link:hover {
+            background: #b8860b;
+        }
+        
+        /* Mega Menu Styles */
+        .mega-menu {
+            position: absolute;
+            top: 100%;
+            left: 0; 
+            width: 100%; 
+            background: white;
+            z-index: 1000;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.15);
+            display: none; 
+            padding: 30px 0;
+        }
+        
+        .use-item:hover .mega-menu {
+            display: block;
+        }
+        
+        .patterns-grid {
+            display: grid;
+            grid-template-columns: repeat(6, 1fr);
+            gap: 20px;
+            padding: 0 20px;
+        }
+        
+        .pattern-item {
+            text-align: center;
+            cursor: pointer;
+            text-decoration: none;
+            color: #333;
+        }
+        
+        .pattern-image {
+            width: 100%;
+            height: 180px;
+            background-size: cover;
+            background-position: center;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            transition: transform 0.3s ease;
+        }
+        
+        .pattern-item:hover .pattern-image {
+            transform: scale(1.05);
+        }
+        
+        .pattern-name {
+            font-size: 14px;
+            color: #333;
+            font-weight: 500;
+        }
+        
+        /* Main Content */
+        .main-content {
+            margin-top: 180px;
+        }
+        
+        /* Hero Section */
+        .hero {
+            background: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), url('https://images.unsplash.com/photo-1586023492125-27b2c045efd7?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1200&q=80');
+            background-size: cover;
+            background-position: center;
+            color: white;
+            padding: 80px 0;
+            text-align: center;
+        }
+        
+        .hero h1 {
+            font-size: 48px;
+            margin-bottom: 20px;
+            line-height: 1.2;
+        }
+        
+        .hero p {
+            font-size: 20px;
+            max-width: 600px;
+            margin: 0 auto 30px;
+            opacity: 0.9;
+        }
+        
+        .btn {
+            display: inline-block;
+            background: #b8860b;
+            color: white;
+            padding: 15px 35px;
+            border: none;
+            border-radius: 6px;
+            font-size: 16px;
+            cursor: pointer;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+        
+        .btn:hover {
+            background: #a3780a;
+            transform: translateY(-2px);
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 2px solid #b8860b;
+            color: #b8860b;
+        }
+
+        .btn-outline:hover {
+            background: #b8860b;
+            color: white;
+        }
+        
+        /* Products Banner */
+        .products-banner {
+            padding: 80px 0;
+            background: #f9f9f9;
+        }
+
+        .products-banner-content {
+            text-align: center;
+            margin-bottom: 50px;
+        }
+
+        .products-banner-content h2 {
+            font-size: 36px;
+            color: #333;
+            margin-bottom: 15px;
+        }
+
+        .products-banner-content p {
+            font-size: 18px;
+            color: #666;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .products-grid-banner {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 30px;
+        }
+
+        .product-banner-item {
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s;
+        }
+
+        .product-banner-item:hover {
+            transform: translateY(-5px);
+        }
+
+        .product-banner-image {
+            width: 100%;
+            height: 0;
+            padding-bottom: 60%;
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+        }
+
+        .product-banner-text {
+            padding: 30px;
+            text-align: center;
+            background: white;
+        }
+
+        .product-banner-text h3 {
+            font-size: 24px;
+            margin-bottom: 15px;
+            color: #333;
+            font-weight: 600;
+        }
+
+        .product-banner-text p {
+            font-size: 16px;
+            color: #666;
+            margin-bottom: 25px;
+            line-height: 1.6;
+        }
+        
+        /* Uses Categories Section */
+        .uses-categories {
+            padding: 80px 0;
+            background: white;
+        }
+
+        .section-title {
+            text-align: center;
+            margin: 0 0 50px;
+            font-size: 36px;
+            color: #333;
+            position: relative;
+            padding-bottom: 15px;
+        }
+
+        .section-title:after {
+            content: '';
+            position: absolute;
+            width: 80px;
+            height: 3px;
+            background: #b8860b;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        .uses-categories-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 30px;
+        }
+
+        .use-category-item {
+            text-align: center;
+        }
+
+        .use-category-link {
+            display: block;
+            text-decoration: none;
+            color: #333;
+        }
+
+        .use-category-image {
+            width: 100%;
+            height: 0;
+            padding-bottom: 75%;
+            background-size: cover;
+            background-position: center;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            transition: transform 0.3s;
+        }
+
+        .use-category-link:hover .use-category-image {
+            transform: scale(1.05);
+        }
+
+        .use-category-name {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .product-count {
+            font-size: 14px;
+            color: #b8860b;
+            font-weight: 500;
+        }
+
+        .loading-categories {
+            text-align: center;
+            padding: 40px;
+            color: #666;
+            grid-column: 1 / -1;
+        }
+
+        /* Features Section */
+        .features {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 40px;
+            margin: 80px 0;
+            padding: 80px 0;
+            background-color: #f9f9f9;
+        }
+        
+        .feature {
+            text-align: center;
+            padding: 30px 20px;
+        }
+        
+        .feature i {
+            font-size: 48px;
+            color: #b8860b;
+            margin-bottom: 20px;
+        }
+        
+        .feature h3 {
+            margin-bottom: 15px;
+            font-size: 22px;
+            color: #333;
+        }
+        
+        .feature p {
+            font-size: 16px;
+            color: #666;
+            line-height: 1.6;
+        }
+        
+        /* Footer */
+        footer {
+            background-color: #222;
+            color: #ddd;
+            padding: 60px 0 20px;
+        }
+        
+        .footer-content {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 40px;
+            margin-bottom: 40px;
+        }
+        
+        .footer-column h3 {
+            color: white;
+            margin-bottom: 25px;
+            font-size: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #b8860b;
+            display: inline-block;
+        }
+        
+        .footer-links {
+            list-style: none;
+        }
+        
+        .footer-links li {
+            margin-bottom: 12px;
+        }
+        
+        .footer-links a {
+            color: #ddd;
+            text-decoration: none;
+            font-size: 15px;
+            transition: color 0.3s;
+        }
+        
+        .footer-links a:hover {
+            color: #b8860b;
+        }
+        
+        .social-links {
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        .social-links a {
+            color: white;
+            background: #444;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.3s;
+        }
+        
+        .social-links a:hover {
+            background: #b8860b;
+        }
+        
+        .copyright {
+            text-align: center;
+            padding-top: 30px;
+            border-top: 1px solid #444;
+            font-size: 14px;
+            color: #999;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 1024px) {
+            .hero h1 {
+                font-size: 36px;
+            }
+            
+            .products-grid-banner {
+                grid-template-columns: 1fr;
+            }
+            
+            .uses-categories-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .features {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .footer-content {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .patterns-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .main-content {
+                margin-top: 220px;
+            }
+            
+            .header-content {
+                flex-wrap: wrap;
+            }
+            
+            .trust-info {
+                order: 3;
+                flex-basis: 100%;
+                margin-top: 15px;
+                padding: 0;
+            }
+            
+            .search-container {
+                order: 4;
+                flex-basis: 100%;
+                margin: 15px 0 0;
+                max-width: 100%;
+            }
+            
+            .hero {
+                padding: 60px 0;
+            }
+            
+            .hero h1 {
+                font-size: 32px;
+            }
+            
+            .hero p {
+                font-size: 18px;
+            }
+            
+            .features {
+                grid-template-columns: 1fr;
+                padding: 60px 0;
+            }
+            
+            .uses-top-bar {
+                display: none;
+            }
+            
+            .profile-name {
+                display: none;
+            }
+            
+            .patterns-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 480px) {
+            .uses-categories-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .footer-content {
+                grid-template-columns: 1fr;
+            }
+            
+            .hero h1 {
+                font-size: 28px;
+            }
+            
+            .patterns-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
 </head>
 <body>
-
-<!-- ===== Sidebar ===== -->
-<div class="sidebar" id="sidebar">
-  <div class="sidebar-header">
-    <div class="sidebar-logo">
-      <img src="stone.png" alt="Rajasthan Stones Logo">
-      <span>Rajasthan Stones</span>
-    </div>
-  </div>
-  <ul class="sidebar-nav">
-    <li><a href="index.html"><i class="fas fa-home"></i> <span>Home</span></a></li>
-    <li><a href="add-product.html" class="active"><i class="fas fa-plus-circle"></i> <span>Add Product</span></a></li>
-    <li><a href="products.html"><i class="fas fa-boxes"></i> <span>View Products</span></a></li>
-    <li><a href="history.html"><i class="fas fa-history"></i> <span>My History</span></a></li>
-  </ul>
-</div>
-
-<!-- ===== Main Content ===== -->
-<div class="main-content" id="main-content">
-  <!-- ===== Top Header ===== -->
-  <header class="top-header">
-    <div class="header-actions">
-      <button class="btn btn-outline" onclick="window.location='index.html'">
-        <i class="fas fa-home"></i> Home
-      </button>
-      <button id="btn-signout" class="btn btn-outline" style="display:none;">Sign Out</button>
-    </div>
-    <div class="user-profile">
-      <div class="user-info">
-        <div class="user-avatar" id="user-avatar">G</div>
-        <span class="user-name" id="user-name">Guest User</span>
-      </div>
-    </div>
-  </header>
-
-  <!-- ===== Main Container ===== -->
-  <div class="container">
-    <h1 class="page-title">Add Stone Product</h1>
-    
-    <div class="compulsory-note">
-      <i class="fas fa-exclamation-circle"></i> Fields marked with * are compulsory
-    </div>
-
-    <div class="form-container">
-      <form id="product-form">
-        <input type="hidden" id="product-id">
-
-        <!-- ===== Basic Information Section ===== -->
-        <div class="form-section">
-          <h3 class="section-title"><i class="fas fa-info-circle"></i> Basic Information</h3>
-          
-          <div class="form-group">
-            <label for="category" class="required">Category</label>
-            <select id="category" required>
-              <option value="">Select Category</option>
-              <option value="sandstone">Sand Stone</option>
-              <option value="kota">Kota Stone</option>
-              <option value="granite">Granite</option>
-              <option value="marble">Marble</option>
-              <option value="dholpur">Dholpur</option>
-              <option value="tiles">Tiles</option>
-              <option value="mandana">Mandana</option>
-              <option value="other">Other Stones</option>
-            </select>
-            <span class="field-hint">Select the main category of your stone product</span>
-          </div>
-
-          <div class="form-group">
-            <label for="stone_name" class="required">Stone Name</label>
-            <input type="text" id="stone_name" placeholder="Enter stone name" required>
-            <span class="field-hint">Name of the stone product (e.g., Raj Green Sandstone, White Marble, etc.)</span>
-          </div>
-
-          <div class="form-group">
-            <label for="sub_category">Sub-category</label>
-            <input type="text" id="sub_category" placeholder="Enter sub-category">
-            <span class="field-hint">Optional: Slabs, Tiles, Blocks, etc.</span>
-          </div>
-        </div>
-
-        <!-- ===== Product Details Section ===== -->
-        <div class="form-section">
-          <h3 class="section-title"><i class="fas fa-cube"></i> Product Details</h3>
-          
-          <div class="form-group">
-            <label for="type">Type</label>
-            <input type="text" id="type" placeholder="Enter type">
-            <span class="field-hint">Optional: Natural, Calibrated, Polished, Honed, etc.</span>
-          </div>
-
-          <div class="form-group">
-            <label for="color">Color</label>
-            <input type="text" id="color" placeholder="Enter color">
-            <span class="field-hint">Optional: Green, Brown, White, Black, etc.</span>
-          </div>
-
-          <div class="form-group">
-            <label for="thickness">Thickness</label>
-            <input type="text" id="thickness" placeholder="Enter thickness">
-            <span class="field-hint">Optional: 20-40 mm, 10-20 mm, etc.</span>
-          </div>
-
-          <div class="form-group">
-            <label for="size">Size</label>
-            <input type="text" id="size" placeholder="Enter size">
-            <span class="field-hint">Optional: Custom sizes, Standard tiles, Slabs dimensions</span>
-          </div>
-
-          <div class="form-group">
-            <label for="finish">Finish</label>
-            <input type="text" id="finish" placeholder="Enter finish">
-            <span class="field-hint">Optional: Natural, Polished, Honed, Calibrated, etc.</span>
-          </div>
-
-          <div class="form-group">
-            <label for="usage">Usage</label>
-            <input type="text" id="usage" placeholder="Enter usage">
-            <span class="field-hint">Optional: Flooring, Wall Cladding, Countertops, etc.</span>
-          </div>
-        </div>
-
-        <!-- ===== Technical Specifications Section ===== -->
-        <div class="form-section">
-          <h3 class="section-title"><i class="fas fa-flask"></i> Technical Specifications</h3>
-          
-          <div class="form-group">
-            <label for="water_absorption">Water Absorption</label>
-            <input type="text" id="water_absorption" placeholder="Enter water absorption">
-            <span class="field-hint">Optional: 2-3%, 0.5-1%, etc.</span>
-          </div>
-
-          <div class="form-group">
-            <label for="density">Density</label>
-            <input type="text" id="density" placeholder="Enter density">
-            <span class="field-hint">Optional: 2.4-2.6 g/cm³, 2.7-2.9 g/cm³, etc.</span>
-          </div>
-
-          <div class="form-group">
-            <label for="compressive_strength">Compressive Strength</label>
-            <input type="text" id="compressive_strength" placeholder="Enter compressive strength">
-            <span class="field-hint">Optional: 1800-2200 kg/cm², 2500-3000 kg/cm², etc.</span>
-          </div>
-
-          <div class="form-group">
-            <label for="description">Description</label>
-            <textarea id="description" placeholder="Enter product description" rows="4"></textarea>
-            <span class="field-hint">Optional: Detailed description about the stone product</span>
-          </div>
-        </div>
-
-        <!-- ===== Pricing Section ===== -->
-        <div class="form-section">
-          <h3 class="section-title"><i class="fas fa-tag"></i> Pricing</h3>
-          
-          <div class="form-group">
-            <label for="price">Price</label>
-            <input type="number" id="price" placeholder="Enter price">
-            <span class="field-hint">Optional: Price of the product</span>
-          </div>
-
-          <div class="form-group">
-            <label for="price_unit">Unit</label>
-            <input type="text" id="price_unit" placeholder="Enter unit (sqft/piece/kg)">
-            <span class="field-hint">Optional: sqft, piece, kg, ton, etc.</span>
-          </div>
-        </div>
-
-        <!-- ===== Contact Information Section ===== -->
-        <div class="form-section">
-          <h3 class="section-title"><i class="fas fa-address-card"></i> Contact Information</h3>
-          
-          <div class="form-group">
-            <label for="contact_country_code" class="required">Country Code</label>
-            <div class="phone-input-container">
-              <span class="country-code-prefix">+</span>
-              <input type="text" id="contact_country_code" class="country-code-input" placeholder="91" value="91" required maxlength="4">
-            </div>
-            <span class="field-hint">Enter country code without + (e.g., 91 for India)</span>
-          </div>
-
-          <div class="form-group">
-            <label for="contact_number" class="required">Mobile Number</label>
-            <div class="phone-input-container">
-              <span class="phone-prefix">+<span id="country-code-display">91</span></span>
-              <input type="text" id="contact_number" class="phone-input" placeholder="Mobile Number" required maxlength="10">
-            </div>
-            <span class="field-hint">Enter 10-digit mobile number without country code</span>
-          </div>
-
-          <div class="form-group">
-            <label for="email" class="required">Email Address</label>
-            <input type="email" id="email" placeholder="Enter email address" required>
-            <span class="field-hint">Your business email address</span>
-          </div>
-
-          <div class="form-group">
-            <label for="factory_name" class="required">Company / Factory Name</label>
-            <input type="text" id="factory_name" placeholder="Enter company/factory name" required>
-            <span class="field-hint">Name of your business or factory</span>
-          </div>
-
-          <div class="form-group">
-            <label for="address" class="required">Address</label>
-            <input type="text" id="address" placeholder="Enter complete address" required>
-            <span class="field-hint">Complete business address</span>
-          </div>
-
-          <div class="form-group">
-            <label for="gst_number">GST Number</label>
-            <input type="text" id="gst_number" placeholder="Enter GST number">
-            <span class="field-hint">Optional: Your business GST number</span>
-          </div>
-        </div>
-
-        <!-- ===== Additional Fields Section ===== -->
-        <div class="additional-fields-section">
-          <h3 class="section-title"><i class="fas fa-plus-circle"></i> Additional Information</h3>
-          <span class="field-hint">Add any extra fields you want to include in your product listing</span>
-          
-          <div id="additional-fields-container">
-            <!-- Additional fields will be added here dynamically -->
-          </div>
-          
-          <button type="button" class="add-field-btn" id="add-field-btn">
-            <i class="fas fa-plus"></i> Add Custom Field
-          </button>
-        </div>
-
-        <!-- ===== Image Upload Section ===== -->
-        <div class="form-section">
-          <h3 class="section-title"><i class="fas fa-images"></i> Product Images</h3>
-          
-          <div class="form-group">
-            <label class="required">Upload Product Images</label>
-            <div class="image-upload-section">
-              <div class="upload-options">
-                <div class="upload-btn" onclick="document.getElementById('imageInput').click()">
-                  <i class="fas fa-folder-open"></i> Choose from Gallery
+    <!-- Header Section -->
+    <header id="mainHeader">
+        <div class="trust-info">
+            <div class="trust-info-content">
+                <div class="trust-item">
+                    <i class="fas fa-truck"></i>
+                    <span>Free UK Delivery</span>
                 </div>
-                <div class="upload-btn" id="cancel-upload">
-                  <i class="fas fa-times"></i> Clear All Images
+                <div class="trust-item">
+                    <i class="fas fa-star"></i>
+                    <span>Rated 4.8/5</span>
                 </div>
-              </div>
-              <input type="file" id="imageInput" accept="image/*" multiple style="display: none;">
-              <small class="field-hint">Select multiple images (max 10) - At least one image is required.</small>
-              <div class="preview" id="preview"></div>
+                <div class="trust-item">
+                    <i class="fas fa-award"></i>
+                    <span>BSF Member</span>
+                </div>
             </div>
-          </div>
         </div>
 
-        <button type="submit" class="submit-btn" id="submit-btn">
-          <i class="fas fa-save"></i> Save Product
-        </button>
-      </form>
+        <!-- Main Header -->
+        <div class="main-header">
+            <div class="container header-content">
+                <div class="logo">
+                    <a href="index.html" style="text-decoration: none; color: inherit;">
+                        <h1>Stone<span>Craft</span></h1>
+                    </a>
+                </div>
+                
+                <!-- Advanced Search -->
+                <div class="search-container">
+                    <div class="search-input-container">
+                        <input type="text" class="search-input" id="searchInput" placeholder="Search for stones, products, categories...">
+                        <button class="search-button" id="searchButton">
+                            <i class="fas fa-search"></i>
+                        </button>
+                    </div>
+                    <div class="search-results" id="searchResults">
+                        <!-- Search results will be dynamically loaded here -->
+                    </div>
+                </div>
+                
+                <div class="user-actions">
+                    <!-- Dynamic User Profile -->
+                    <div class="user-profile" id="userProfile" style="display: none;">
+                        <button class="profile-toggle" id="profileToggle">
+                            <div class="profile-avatar" id="profileAvatar">U</div>
+                            <span class="profile-name" id="profileName">User</span>
+                            <i class="fas fa-chevron-down" style="font-size: 12px;"></i>
+                        </button>
+                        <div class="profile-dropdown" id="profileDropdown">
+                            <div class="dropdown-header">
+                                <div class="profile-name" id="dropdownUserName">User Name</div>
+                                <div class="user-email" id="dropdownUserEmail">user@example.com</div>
+                            </div>
+                            <ul class="dropdown-menu">
+                                <li><a href="dashboard.html" class="dropdown-item"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
+                                <li><a href="add.html" class="dropdown-item"><i class="fas fa-plus-circle"></i> Add Product</a></li>
+                                <li><a href="edit-profile.html" class="dropdown-item"><i class="fas fa-user-edit"></i> Edit Profile</a></li>
+                                <li><a href="wishlist.html" class="dropdown-item"><i class="fas fa-heart"></i> My Wishlist</a></li>
+                                <li><a href="billing.html" class="dropdown-item"><i class="fas fa-address-card"></i> Billing/Shipping</a></li>
+                                <li><a href="orders.html" class="dropdown-item"><i class="fas fa-history"></i> Order History</a></li>
+                                <li class="dropdown-divider"></li>
+                                <li><a href="#" class="dropdown-item" id="logoutBtn"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                    
+                    <!-- Add Product Button (Visible when logged in) -->
+                    <a href="add.html" class="user-action" id="addProductButton" style="display: none;">
+                        <i class="fas fa-plus-circle"></i>
+                        <span>Add Product</span>
+                    </a>
+                    
+                    <!-- Login Button -->
+                    <a href="login.html" class="user-action" id="loginButton">
+                        <i class="fas fa-user"></i>
+                        <span>Sign In</span>
+                    </a>
+                    
+                    <a href="#" class="user-action">
+                        <i class="fas fa-shopping-cart"></i>
+                        <span>Cart (0)</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Banner Text -->
+        <div class="banner-text">
+            <div class="container">
+                Trending Stone Collections - Premium Sandstone, Marble & Limestone for UK Homes
+            </div>
+        </div>
+
+        <!-- Desktop Uses Top Bar with Mega Menu -->
+        <div class="uses-top-bar">
+            <div class="container uses-container">
+                <div class="use-item">
+                    <div class="use-link">Flooring</div>
+                    <div class="mega-menu">
+                        <div class="patterns-grid">
+                            <a href="category-products.html?category=flooring&type=herringbone" class="pattern-item">
+                                <div class="pattern-image" style="background-image: url('https://images.unsplash.com/photo-1586023492125-27b2c045efd7?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=400&q=80')"></div>
+                                <div class="pattern-name">Herringbone</div>
+                            </a>
+                            <a href="category-products.html?category=flooring&type=checkerboard" class="pattern-item">
+                                <div class="pattern-image" style="background-image: url('https://images.unsplash.com/photo-1628745277897-d8e04e11c0af?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=400&q=80')"></div>
+                                <div class="pattern-name">Checkerboard</div>
+                            </a>
+                            <a href="category-products.html?category=flooring&type=random" class="pattern-item">
+                                <div class="pattern-image" style="background-image: url('https://images.unsplash.com/photo-1595428774223-ef52624120d2?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=400&q=80')"></div>
+                                <div class="pattern-name">Random Layout</div>
+                            </a>
+                            <a href="category-products.html?category=flooring&type=brick" class="pattern-item">
+                                <div class="pattern-image" style="background-image: url('https://images.unsplash.com/photo-1600585154340-2e5db6e509e9?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=400&q=80')"></div>
+                                <div class="pattern-name">Brick Pattern</div>
+                            </a>
+                            <a href="category-products.html?category=flooring&type=diagonal" class="pattern-item">
+                                <div class="pattern-image" style="background-image: url('https://images.unsplash.com/photo-1586023492125-27b2c045efd7?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=400&q=80')"></div>
+                                <div class="pattern-name">Diagonal</div>
+                            </a>
+                            <a href="category-products.html?category=flooring&type=hexagon" class="pattern-item">
+                                <div class="pattern-image" style="background-image: url('https://images.unsplash.com/photo-1628745277897-d8e04e11c0af?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=400&q=80')"></div>
+                                <div class="pattern-name">Hexagon</div>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="use-item">
+                    <div class="use-link">Wall Decoration</div>
+                    <div class="mega-menu">
+                        <div class="patterns-grid">
+                            <a href="category-products.html?category=wall&type=cladding" class="pattern-item">
+                                <div class="pattern-image" style="background-image: url('https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=400&q=80')"></div>
+                                <div class="pattern-name">Stone Cladding</div>
+                            </a>
+                            <a href="category-products.html?category=wall&type=feature" class="pattern-item">
+                                <div class="pattern-image" style="background-image: url('https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=400&q=80')"></div>
+                                <div class="pattern-name">Feature Walls</div>
+                            </a>
+                            <a href="category-products.html?category=wall&type=mosaic" class="pattern-item">
+                                <div class="pattern-image" style="background-image: url('https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=400&q=80')"></div>
+                                <div class="pattern-name">Stone Mosaic</div>
+                            </a>
+                            <a href="category-products.html?category=wall&type=panels" class="pattern-item">
+                                <div class="pattern-image" style="background-image: url('https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=400&q=80')"></div>
+                                <div class="pattern-name">Wall Panels</div>
+                            </a>
+                            <a href="category-products.html?category=wall&type=veneer" class="pattern-item">
+                                <div class="pattern-image" style="background-image: url('https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=400&q=80')"></div>
+                                <div class="pattern-name">Stone Veneer</div>
+                            </a>
+                            <a href="category-products.html?category=wall&type=accent" class="pattern-item">
+                                <div class="pattern-image" style="background-image: url('https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=400&q=80')"></div>
+                                <div class="pattern-name">Accent Walls</div>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="use-item">
+                    <a href="category-products.html?category=bathroom" class="use-link">Bathroom</a>
+                </div>
+                
+                <div class="use-item">
+                    <a href="category-products.html?category=outdoor" class="use-link">Outdoor</a>
+                </div>
+                
+                <div class="use-item">
+                    <a href="category-products.html?category=kitchen" class="use-link">Kitchen</a>
+                </div>
+                
+                <div class="use-item">
+                    <a href="category-products.html?category=commercial" class="use-link">Commercial</a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <!-- Hero Section -->
+        <section class="hero">
+            <div class="container">
+                <h1>Premium Natural Stone & Marble</h1>
+                <p>UK's leading supplier of premium natural stone, marble, sandstone & limestone. Trusted by homeowners & professionals.</p>
+                <a href="#products" class="btn">Explore Collections</a>
+                <a href="add.html" class="btn btn-outline" style="margin-left: 15px;" id="heroAddProductBtn" style="display: none;">
+                    <i class="fas fa-plus-circle"></i> Add Your Product
+                </a>
+            </div>
+        </section>
+
+        <!-- Products Banner -->
+        <section class="products-banner" id="products">
+            <div class="container">
+                <div class="products-banner-content">
+                    <h2>Featured Stone Collections</h2>
+                    <p>Discover our premium range of natural stones perfect for all your construction and decoration needs</p>
+                </div>
+                <div class="products-grid-banner">
+                    <div class="product-banner-item">
+                        <div class="product-banner-image" style="background-image: url('https://images.unsplash.com/photo-1586023492125-27b2c045efd7?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1200&q=80')"></div>
+                        <div class="product-banner-text">
+                            <h3>Premium Sandstone Collection</h3>
+                            <p>Durable and elegant sandstone for flooring and wall cladding with natural texture and color variations. Perfect for both indoor and outdoor applications.</p>
+                            <a href="category-products.html?category=flooring" class="btn">View Collection</a>
+                        </div>
+                    </div>
+                    <div class="product-banner-item">
+                        <div class="product-banner-image" style="background-image: url('https://images.unsplash.com/photo-1595428774223-ef52624120d2?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1200&q=80')"></div>
+                        <div class="product-banner-text">
+                            <h3>Kota Stone & Marble</h3>
+                            <p>Natural kota stone and premium marble known for exceptional strength, durability and beautiful natural patterns. Ideal for luxury projects.</p>
+                            <a href="category-products.html?category=flooring" class="btn">Explore Stones</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Uses Categories Section -->
+        <section class="uses-categories">
+            <div class="container">
+                <h2 class="section-title">Stone Applications</h2>
+                <div class="uses-categories-grid" id="dynamicCategories">
+                    <div class="loading-categories">
+                        <i class="fas fa-spinner fa-spin"></i>
+                        <p>Loading categories...</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Features Section -->
+        <section class="features">
+            <div class="container">
+                <div class="feature">
+                    <i class="fas fa-shipping-fast"></i>
+                    <h3>Free UK Delivery</h3>
+                    <p>Free delivery on all orders across the United Kingdom with no minimum spend required. Fast and reliable shipping.</p>
+                </div>
+                <div class="feature">
+                    <i class="fas fa-award"></i>
+                    <h3>Quality Guaranteed</h3>
+                    <p>All our stones are sourced from trusted quarries and come with quality certification and warranty.</p>
+                </div>
+                <div class="feature">
+                    <i class="fas fa-headset"></i>
+                    <h3>Expert Support</h3>
+                    <p>Get expert advice from our stone specialists for your project requirements. We're here to help you choose the perfect stone.</p>
+                </div>
+            </div>
+        </section>
     </div>
-  </div>
 
-  <!-- ===== Footer ===== -->
-  <footer>
-    &copy; 2025 Rajasthan SandStone Hub | Designed by RJ Services
-  </footer>
-</div>
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-column">
+                    <h3>StoneCraft</h3>
+                    <ul class="footer-links">
+                        <li><a href="index.html">Home</a></li>
+                        <li><a href="add.html">Add Product</a></li>
+                        <li><a href="#">About Us</a></li>
+                        <li><a href="#">Our Story</a></li>
+                        <li><a href="#">Sustainability</a></li>
+                    </ul>
+                </div>
+                <div class="footer-column">
+                    <h3>Products</h3>
+                    <ul class="footer-links">
+                        <li><a href="category-products.html?category=flooring">Flooring Stones</a></li>
+                        <li><a href="category-products.html?category=wall">Wall Stones</a></li>
+                        <li><a href="category-products.html?category=bathroom">Bathroom Stones</a></li>
+                        <li><a href="category-products.html?category=outdoor">Outdoor Stones</a></li>
+                        <li><a href="category-products.html?category=kitchen">Kitchen Stones</a></li>
+                    </ul>
+                </div>
+                <div class="footer-column">
+                    <h3>Support</h3>
+                    <ul class="footer-links">
+                        <li><a href="#">Contact Us</a></li>
+                        <li><a href="#">Delivery Info</a></li>
+                        <li><a href="#">Returns Policy</a></li>
+                        <li><a href="#">Installation Guide</a></li>
+                        <li><a href="#">FAQ</a></li>
+                    </ul>
+                </div>
+                <div class="footer-column">
+                    <h3>Legal</h3>
+                    <ul class="footer-links">
+                        <li><a href="#">Privacy Policy</a></li>
+                        <li><a href="#">Terms of Service</a></li>
+                        <li><a href="#">Cookie Policy</a></li>
+                        <li><a href="#">Disclaimer</a></li>
+                        <li><a href="#">Sitemap</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="copyright">
+                <p>&copy; 2024 StoneCraft UK. All rights reserved. | Registered in England No: 12345678</p>
+            </div>
+        </div>
+    </footer>
 
-<!-- ===== Processing Overlay ===== -->
-<div class="processing-overlay" id="processing-overlay">
-  <div class="processing-content">
-    <div class="processing-spinner"></div>
-    <div class="processing-text">Processing Your Product</div>
-    <div class="processing-subtext">Please wait while we save your product details...</div>
-  </div>
-</div>
+    <script>
+        // Mega Menu Functionality
+        document.addEventListener('DOMContentLoaded', () => {
+            const usesTopBar = document.querySelector('.uses-top-bar');
+            const useItems = document.querySelectorAll('.use-item');
+            const container = document.querySelector('.uses-top-bar .container');
+            
+            if (container) {
+                const containerRect = container.getBoundingClientRect();
+                
+                useItems.forEach(item => {
+                    const megaMenu = item.querySelector('.mega-menu');
 
-<script type="module">
-// Firebase imports
-import { 
-  db, 
-  auth,
-  collection, 
-  addDoc, 
-  doc, 
-  updateDoc, 
-  serverTimestamp,
-  signOut,
-  onAuthStateChanged
-} from './firebase-config.js';
+                    if (megaMenu) {
+                        megaMenu.style.width = containerRect.width + 'px';
+                        megaMenu.style.left = -(item.getBoundingClientRect().left - containerRect.left) + 'px';
 
-/* ===== Global Variables ===== */
-let imagesBase64 = [];
-let additionalFieldsCount = 0;
+                        item.addEventListener('mouseenter', () => {
+                            document.querySelectorAll('.mega-menu').forEach(menu => {
+                                if (menu !== megaMenu) {
+                                    menu.style.display = 'none';
+                                }
+                            });
+                            megaMenu.style.display = 'block';
+                        });
+                        
+                        item.addEventListener('mouseleave', () => {
+                            setTimeout(() => {
+                                if (!item.matches(':hover')) {
+                                    megaMenu.style.display = 'none';
+                                }
+                            }, 50);
+                        });
+                    }
+                });
+                
+                document.addEventListener('click', (event) => {
+                    if (!usesTopBar.contains(event.target)) {
+                        document.querySelectorAll('.mega-menu').forEach(menu => {
+                            menu.style.display = 'none';
+                        });
+                    }
+                });
+            }
+        });
+    </script>
 
-/* ===== Additional Fields Functionality ===== */
-document.getElementById('add-field-btn').addEventListener('click', addAdditionalField);
+    <script type="module">
+        // Wait for Firebase to be available
+        const initializeApp = async () => {
+            // Wait a bit for Firebase to load
+            await new Promise(resolve => setTimeout(resolve, 500));
+            
+            if (!window.firebaseAuth) {
+                console.error("Firebase not initialized properly");
+                return;
+            }
 
-function addAdditionalField() {
-  additionalFieldsCount++;
-  const container = document.getElementById('additional-fields-container');
-  const fieldId = 'additional_field_' + additionalFieldsCount;
-  
-  const fieldHTML = `
-    <div class="additional-field" id="${fieldId}">
-      <div class="field-input">
-        <label>Field Name</label>
-        <input type="text" placeholder="Enter field name" class="additional-field-name">
-      </div>
-      <div class="field-input">
-        <label>Field Value</label>
-        <input type="text" placeholder="Enter field value" class="additional-field-value">
-      </div>
-      <button type="button" class="remove-field-btn" onclick="removeAdditionalField('${fieldId}')">
-        <i class="fas fa-times"></i>
-      </button>
-    </div>
-  `;
-  
-  container.insertAdjacentHTML('beforeend', fieldHTML);
-}
+            console.log("Initializing application with Firebase...");
 
-function removeAdditionalField(fieldId) {
-  const field = document.getElementById(fieldId);
-  if (field) {
-    field.remove();
-  }
-}
+            // Simple Auth Manager
+            class AuthManager {
+                constructor() {
+                    this.currentUser = null;
+                    this.initAuthListener();
+                    this.setupEventListeners();
+                }
 
-// Get additional fields data
-function getAdditionalFieldsData() {
-  const fields = [];
-  const fieldElements = document.querySelectorAll('.additional-field');
-  
-  fieldElements.forEach(field => {
-    const nameInput = field.querySelector('.additional-field-name');
-    const valueInput = field.querySelector('.additional-field-value');
-    
-    if (nameInput.value.trim() && valueInput.value.trim()) {
-      fields.push({
-        name: nameInput.value.trim(),
-        value: valueInput.value.trim()
-      });
-    }
-  });
-  
-  return fields;
-}
+                initAuthListener() {
+                    window.firebaseFunctions.onAuthStateChanged(window.firebaseAuth, (user) => {
+                        console.log("Auth state changed:", user);
+                        this.currentUser = user;
+                        this.updateUI(user);
+                        
+                        // Store user state in localStorage for persistence
+                        if (user) {
+                            localStorage.setItem('userLoggedIn', 'true');
+                            localStorage.setItem('userEmail', user.email || '');
+                            localStorage.setItem('userDisplayName', user.displayName || 'User');
+                        } else {
+                            localStorage.removeItem('userLoggedIn');
+                            localStorage.removeItem('userEmail');
+                            localStorage.removeItem('userDisplayName');
+                        }
+                    });
+                }
 
-/* ===== Image Upload Functionality ===== */
-// Add image to preview
-function addImageToPreview(imageDataUrl) {
-  const preview = document.getElementById('preview');
-  const imageId = 'img_' + Date.now();
-  
-  const previewItem = document.createElement('div');
-  previewItem.className = 'preview-item';
-  previewItem.id = imageId;
-  previewItem.innerHTML = `
-    <img src="${imageDataUrl}" alt="Product Image">
-    <button type="button" class="remove-image" onclick="removeImage('${imageId}')">
-      <i class="fas fa-times"></i>
-    </button>
-  `;
-  
-  preview.appendChild(previewItem);
-  imagesBase64.push(imageDataUrl);
-  updateFileInput();
-}
+                setupEventListeners() {
+                    const logoutBtn = document.getElementById('logoutBtn');
+                    if (logoutBtn) {
+                        logoutBtn.addEventListener('click', (e) => {
+                            e.preventDefault();
+                            this.handleLogout();
+                        });
+                    }
 
-// Remove image from preview
-function removeImage(imageId) {
-  const previewItem = document.getElementById(imageId);
-  if (previewItem) {
-    const img = previewItem.querySelector('img');
-    const imgSrc = img.src;
-    
-    const index = imagesBase64.findIndex(image => image === imgSrc);
-    if (index > -1) {
-      imagesBase64.splice(index, 1);
-    }
-    
-    previewItem.remove();
-    
-    if (imagesBase64.length === 0) {
-      document.getElementById('imageInput').value = '';
-    }
-  }
-}
+                    const profileToggle = document.getElementById('profileToggle');
+                    const profileDropdown = document.getElementById('profileDropdown');
 
-// Cancel Upload Button Functionality
-document.getElementById('cancel-upload').addEventListener('click', function() {
-  document.getElementById('imageInput').value = '';
-  document.getElementById('preview').innerHTML = '';
-  imagesBase64 = [];
-  updateFileInput();
-});
+                    if (profileToggle && profileDropdown) {
+                        profileToggle.addEventListener('click', (e) => {
+                            e.stopPropagation();
+                            profileDropdown.classList.toggle('active');
+                        });
 
-// Update file input for validation
-function updateFileInput() {
-  const fileInput = document.getElementById('imageInput');
-  if (imagesBase64.length > 0) {
-    fileInput.setCustomValidity('');
-  } else {
-    fileInput.setCustomValidity('Please select at least one image');
-  }
-}
+                        document.addEventListener('click', (e) => {
+                            if (!profileToggle.contains(e.target) && !profileDropdown.contains(e.target)) {
+                                profileDropdown.classList.remove('active');
+                            }
+                        });
+                    }
+                    
+                    // Check localStorage on page load
+                    this.checkLocalStorage();
+                }
+                
+                checkLocalStorage() {
+                    const isLoggedIn = localStorage.getItem('userLoggedIn');
+                    if (isLoggedIn === 'true') {
+                        const userEmail = localStorage.getItem('userEmail') || '';
+                        const userDisplayName = localStorage.getItem('userDisplayName') || 'User';
+                        this.updateUIFromStorage(userEmail, userDisplayName);
+                    }
+                }
+                
+                updateUIFromStorage(email, displayName) {
+                    const loginBtn = document.getElementById('loginButton');
+                    const userProfile = document.getElementById('userProfile');
+                    const addProductBtn = document.getElementById('addProductButton');
+                    const heroAddProductBtn = document.getElementById('heroAddProductBtn');
+                    
+                    if (userProfile && loginBtn) {
+                        userProfile.style.display = 'block';
+                        loginBtn.style.display = 'none';
+                        if (addProductBtn) addProductBtn.style.display = 'flex';
+                        if (heroAddProductBtn) heroAddProductBtn.style.display = 'inline-block';
+                        
+                        const profileAvatar = document.getElementById('profileAvatar');
+                        const profileName = document.getElementById('profileName');
+                        const dropdownUserName = document.getElementById('dropdownUserName');
+                        const dropdownUserEmail = document.getElementById('dropdownUserEmail');
+                        
+                        if (profileAvatar) profileAvatar.textContent = displayName.charAt(0).toUpperCase();
+                        if (profileName) profileName.textContent = displayName;
+                        if (dropdownUserName) dropdownUserName.textContent = displayName;
+                        if (dropdownUserEmail) dropdownUserEmail.textContent = email;
+                    }
+                }
 
-/* ===== Validation Functions ===== */
-function validatePhoneNumber(input) {
-  input.value = input.value.replace(/\D/g, '');
-  if (input.value.length > 10) {
-    input.value = input.value.slice(0, 10);
-  }
-}
+                async handleLogout() {
+                    try {
+                        await window.firebaseFunctions.signOut(window.firebaseAuth);
+                        console.log('User logged out successfully');
+                        // Force reload to ensure clean state
+                        setTimeout(() => {
+                            window.location.reload();
+                        }, 500);
+                    } catch (error) {
+                        console.error('Error logging out:', error);
+                    }
+                }
 
-function validateCountryCode(input) {
-  input.value = input.value.replace(/\D/g, '');
-  if (input.value.length > 4) {
-    input.value = input.value.slice(0, 4);
-  }
-  // Update displayed country code
-  document.getElementById('country-code-display').textContent = input.value || '91';
-}
+                updateUI(user) {
+                    const loginBtn = document.getElementById('loginButton');
+                    const userProfile = document.getElementById('userProfile');
+                    const addProductBtn = document.getElementById('addProductButton');
+                    const heroAddProductBtn = document.getElementById('heroAddProductBtn');
+                    const profileAvatar = document.getElementById('profileAvatar');
+                    const profileName = document.getElementById('profileName');
+                    const dropdownUserName = document.getElementById('dropdownUserName');
+                    const dropdownUserEmail = document.getElementById('dropdownUserEmail');
 
-// Update country code display when input changes
-document.getElementById('contact_country_code').addEventListener('input', function() {
-  document.getElementById('country-code-display').textContent = this.value || '91';
-});
+                    console.log("Updating UI for user:", user);
+                    
+                    if (user) {
+                        // User is signed in
+                        if (userProfile) userProfile.style.display = 'block';
+                        if (loginBtn) loginBtn.style.display = 'none';
+                        if (addProductBtn) addProductBtn.style.display = 'flex';
+                        if (heroAddProductBtn) heroAddProductBtn.style.display = 'inline-block';
+                        
+                        const displayName = user.displayName || 'User';
+                        const email = user.email || '';
+                        const initials = displayName.charAt(0).toUpperCase();
+                        
+                        if (profileAvatar) profileAvatar.textContent = initials;
+                        if (profileName) profileName.textContent = displayName;
+                        if (dropdownUserName) dropdownUserName.textContent = displayName;
+                        if (dropdownUserEmail) dropdownUserEmail.textContent = email;
+                        
+                        console.log("Profile updated for:", displayName);
+                    } else {
+                        // User is signed out
+                        if (userProfile) userProfile.style.display = 'none';
+                        if (loginBtn) loginBtn.style.display = 'flex';
+                        if (addProductBtn) addProductBtn.style.display = 'none';
+                        if (heroAddProductBtn) heroAddProductBtn.style.display = 'none';
+                        console.log("User logged out, showing login button");
+                    }
+                }
 
-/* ===== Auth Functions ===== */
-const btnSignOut = document.getElementById('btn-signout');
-const userAvatar = document.getElementById('user-avatar');
-const userName = document.getElementById('user-name');
+                getCurrentUser() {
+                    return this.currentUser;
+                }
 
-// Sign Out
-btnSignOut.addEventListener('click', async () => { 
-  await signOut(auth); 
-  alert('Signed out successfully'); 
-});
+                isAuthenticated() {
+                    return this.currentUser !== null;
+                }
+            }
 
-// Auth state listener
-onAuthStateChanged(auth, (user) => {
-  if (user) {
-    btnSignOut.style.display = 'inline-block';
-    
-    const displayName = user.displayName || 'User';
-    userName.textContent = displayName;
-    userAvatar.textContent = displayName.charAt(0).toUpperCase();
-  } else {
-    btnSignOut.style.display = 'none';
-    userName.textContent = 'Guest User';
-    userAvatar.textContent = 'G';
-    // Redirect to login if not authenticated
-    window.location.href = 'index.html';
-  }
-});
+            // Advanced Search System
+            class AdvancedSearch {
+                constructor() {
+                    this.searchInput = document.getElementById('searchInput');
+                    this.searchResults = document.getElementById('searchResults');
+                    this.searchButton = document.getElementById('searchButton');
+                    this.products = [];
+                    this.categories = [];
+                    this.init();
+                }
 
-/* ===== Image Upload to Worker ===== */
-async function uploadImages() {
-  let urls = [];
+                async init() {
+                    await this.loadDataFromFirestore();
+                    this.setupEventListeners();
+                }
 
-  for (let img of imagesBase64) {
-    try {
-      const res = await fetch("https://mute-frost-eefa.ravijain236129.workers.dev", {
-        method: "POST",
-        headers: {"Content-Type":"application/json"},
-        body: JSON.stringify({ base64: img })
-      });
+                async loadDataFromFirestore() {
+                    try {
+                        console.log("Loading search data from Firestore...");
+                        
+                        // Firestore se products fetch karein
+                        const productsQuery = window.firebaseFunctions.collection(
+                            window.firebaseDb, 
+                            'products'
+                        );
+                        const productsSnapshot = await window.firebaseFunctions.getDocs(productsQuery);
+                        
+                        this.products = [];
+                        productsSnapshot.forEach((doc) => {
+                            this.products.push({
+                                id: doc.id,
+                                ...doc.data()
+                            });
+                        });
 
-      const out = await res.json();
-      if (out.status === "success") urls.push(out.url);
+                        // Firestore se categories fetch karein
+                        const categoriesQuery = window.firebaseFunctions.collection(
+                            window.firebaseDb, 
+                            'categories'
+                        );
+                        const categoriesSnapshot = await window.firebaseFunctions.getDocs(categoriesQuery);
+                        
+                        this.categories = [];
+                        categoriesSnapshot.forEach((doc) => {
+                            this.categories.push({
+                                id: doc.id,
+                                ...doc.data()
+                            });
+                        });
 
-    } catch (e) {
-      console.error("Upload Error:", e);
-    }
-  }
-  return urls;
-}
+                        console.log("Search data loaded from Firestore:", {
+                            products: this.products.length,
+                            categories: this.categories.length
+                        });
 
-/* ===== Product Form Logic ===== */
-const form = document.getElementById("product-form");
-const productIdInput = document.getElementById("product-id");
-const preview = document.getElementById("preview");
-const imageInput = document.getElementById("imageInput");
-const submitBtn = document.getElementById("submit-btn");
-const processingOverlay = document.getElementById("processing-overlay");
+                    } catch (error) {
+                        console.error("Error loading search data from Firestore:", error);
+                        // Fallback to mock data
+                        await this.loadMockData();
+                    }
+                }
 
-// Handle file input changes
-imageInput.addEventListener("change", () => {
-  const files = Array.from(imageInput.files).slice(0, 10 - imagesBase64.length);
+                async loadMockData() {
+                    // Mock data as fallback
+                    this.products = [
+                        {
+                            id: '1',
+                            name: 'Kota Blue Stone',
+                            category: 'flooring',
+                            price: '£45.00',
+                            image: 'https://images.unsplash.com/photo-1586023492125-27b2c045efd7?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=400&q=80',
+                            description: 'Premium quality kota stone for flooring',
+                            stone_name: 'Kota Blue',
+                            type: 'Natural Stone'
+                        },
+                        {
+                            id: '2',
+                            name: 'Sandstone Pavers',
+                            category: 'outdoor',
+                            price: '£35.00',
+                            image: 'https://images.unsplash.com/photo-1600585154340-2e5db6e509e9?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=400&q=80',
+                            description: 'Natural sandstone for outdoor paving',
+                            stone_name: 'Raj Green Sandstone',
+                            type: 'Calibrated'
+                        },
+                        {
+                            id: '3',
+                            name: 'Marble Tiles',
+                            category: 'bathroom',
+                            price: '£75.00',
+                            image: 'https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=400&q=80',
+                            description: 'Luxury marble tiles for bathrooms',
+                            stone_name: 'White Marble',
+                            type: 'Polished'
+                        }
+                    ];
 
-  files.forEach(file => {
-    const reader = new FileReader();
-    reader.onload = (event) => {
-      addImageToPreview(event.target.result);
-    };
-    reader.readAsDataURL(file);
-  });
-});
+                    this.categories = [
+                        { name: 'Flooring', type: 'flooring' },
+                        { name: 'Wall Decoration', type: 'wall' },
+                        { name: 'Bathroom', type: 'bathroom' },
+                        { name: 'Outdoor', type: 'outdoor' }
+                    ];
+                }
 
-/* EDIT MODE - FOR MY HISTORY PAGE */
-window.addEventListener("DOMContentLoaded", () => {
-  const editId = localStorage.getItem("editProductId");
-  const editData = localStorage.getItem("editProductData");
+                setupEventListeners() {
+                    this.searchInput.addEventListener('input', (e) => {
+                        this.handleSearch(e.target.value);
+                    });
 
-  if (editId && editData) {
-    const p = JSON.parse(decodeURIComponent(editData));
+                    this.searchInput.addEventListener('focus', () => {
+                        if (this.searchInput.value.length > 0) {
+                            this.searchResults.classList.add('active');
+                        }
+                    });
 
-    productIdInput.value = editId;
-    form.category.value = p.category || "";
-    form.stone_name.value = p.stone_name || "";
-    form.sub_category.value = p.sub_category || "";
-    form.type.value = p.type || "";
-    form.color.value = p.color || "";
-    form.thickness.value = p.thickness || "";
-    form.size.value = p.size || "";
-    form.finish.value = p.finish || "";
-    form.usage.value = p.usage || "";
-    form.water_absorption.value = p.water_absorption || "";
-    form.density.value = p.density || "";
-    form.compressive_strength.value = p.compressive_strength || "";
-    form.description.value = p.description || "";
-    form.price.value = p.price || "";
-    form.price_unit.value = p.price_unit || "";
-    
-    // Handle phone number and country code
-    let phoneNumber = p.contact_number || "";
-    let countryCode = "91"; // default
-    
-    if (phoneNumber.startsWith('+')) {
-      const parts = phoneNumber.split(' ');
-      if (parts.length > 1) {
-        countryCode = parts[0].substring(1); // Remove +
-        phoneNumber = parts[1];
-      }
-    }
-    
-    form.contact_country_code.value = countryCode;
-    document.getElementById('country-code-display').textContent = countryCode;
-    form.contact_number.value = phoneNumber;
-    
-    form.email.value = p.email || "";
-    form.factory_name.value = p.factory_name || "";
-    form.address.value = p.address || "";
-    form.gst_number.value = p.gst_number || "";
+                    document.addEventListener('click', (e) => {
+                        if (!e.target.closest('.search-container')) {
+                            this.searchResults.classList.remove('active');
+                        }
+                    });
 
-    // Load additional fields
-    if (p.additional_fields && p.additional_fields.length) {
-      p.additional_fields.forEach(field => {
-        addAdditionalField();
-        const lastField = document.querySelector('.additional-field:last-child');
-        if (lastField) {
-          lastField.querySelector('.additional-field-name').value = field.name;
-          lastField.querySelector('.additional-field-value').value = field.value;
-        }
-      });
-    }
+                    this.searchButton.addEventListener('click', () => {
+                        this.performSearch(this.searchInput.value);
+                    });
 
-    // Show existing images
-    if (p.images && p.images.length) {
-      imagesBase64 = [];
-      p.images.forEach(img => {
-        addImageToPreview(img);
-      });
-    }
-  }
-});
+                    this.searchInput.addEventListener('keypress', (e) => {
+                        if (e.key === 'Enter') {
+                            this.performSearch(this.searchInput.value);
+                        }
+                    });
+                }
 
-/* AUTH CHECK */
-onAuthStateChanged(auth, user => {
-  if (!user) {
-    window.location = "index.html";
-  }
-});
+                handleSearch(query) {
+                    if (query.length === 0) {
+                        this.searchResults.classList.remove('active');
+                        return;
+                    }
 
-/* SAVE / UPDATE PRODUCT */
-form.onsubmit = async (e) => {
-  e.preventDefault();
+                    this.searchResults.classList.add('active');
+                    
+                    this.searchResults.innerHTML = `
+                        <div class="search-loading">
+                            <i class="fas fa-spinner fa-spin"></i>
+                            <p>Searching...</p>
+                        </div>
+                    `;
 
-  const user = auth.currentUser;
-  if (!user) return alert("Login required");
+                    setTimeout(() => {
+                        this.displaySearchResults(query);
+                    }, 300);
+                }
 
-  // Validate images
-  if (imagesBase64.length === 0) {
-    alert("Please add at least one product image");
-    return;
-  }
+                displaySearchResults(query) {
+                    const searchTerm = query.toLowerCase().trim();
+                    
+                    if (searchTerm.length === 0) {
+                        this.searchResults.innerHTML = '';
+                        return;
+                    }
 
-  // Validate phone number
-  const phoneNumber = form.contact_number.value.trim();
-  if (phoneNumber.length !== 10) {
-    alert("Please enter a valid 10-digit mobile number");
-    return;
-  }
+                    const productResults = this.products.filter(product => 
+                        product.name.toLowerCase().includes(searchTerm) ||
+                        product.description.toLowerCase().includes(searchTerm) ||
+                        product.category.toLowerCase().includes(searchTerm) ||
+                        (product.stone_name && product.stone_name.toLowerCase().includes(searchTerm)) ||
+                        (product.type && product.type.toLowerCase().includes(searchTerm))
+                    );
 
-  // Validate country code
-  const countryCode = form.contact_country_code.value.trim();
-  if (!countryCode) {
-    alert("Please enter a valid country code");
-    return;
-  }
+                    const categoryResults = this.categories.filter(category =>
+                        category.name.toLowerCase().includes(searchTerm) ||
+                        category.type.toLowerCase().includes(searchTerm)
+                    );
 
-  // Show processing overlay
-  processingOverlay.classList.add('active');
-  submitBtn.disabled = true;
-  submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
+                    if (productResults.length === 0 && categoryResults.length === 0) {
+                        this.searchResults.innerHTML = `
+                            <div class="no-results">
+                                <i class="fas fa-search" style="font-size: 24px; margin-bottom: 10px;"></i>
+                                <p>No results found for "${query}"</p>
+                                <p style="font-size: 12px; margin-top: 5px;">Try different keywords or browse categories</p>
+                            </div>
+                        `;
+                        return;
+                    }
 
-  try {
-    // Upload images
-    let imageUrls = await uploadImages();
+                    let resultsHTML = '';
 
-    const data = {
-      // Basic Information
-      category: form.category.value,
-      stone_name: form.stone_name.value,
-      sub_category: form.sub_category.value,
-      
-      // Product Details
-      type: form.type.value,
-      color: form.color.value,
-      thickness: form.thickness.value,
-      size: form.size.value,
-      finish: form.finish.value,
-      usage: form.usage.value,
-      
-      // Technical Specifications
-      water_absorption: form.water_absorption.value,
-      density: form.density.value,
-      compressive_strength: form.compressive_strength.value,
-      description: form.description.value,
-      
-      // Pricing
-      price: form.price.value ? parseFloat(form.price.value) : "",
-      price_unit: form.price_unit.value,
-      
-      // Contact Information
-      contact_number: "+" + countryCode + " " + phoneNumber,
-      email: form.email.value,
-      factory_name: form.factory_name.value,
-      address: form.address.value,
-      gst_number: form.gst_number.value,
-      
-      // Additional Fields
-      additional_fields: getAdditionalFieldsData(),
-      
-      // System Fields
-      images: imageUrls,
-      status: "active", // Product active status for your website
-      created_at: serverTimestamp(),
-      userId: user.uid
-    };
+                    categoryResults.forEach(category => {
+                        resultsHTML += `
+                            <div class="search-result-item" onclick="window.location.href='category-products.html?category=${category.type}'">
+                                <div class="search-result-image" style="background-image: url('https://images.unsplash.com/photo-1586023492125-27b2c045efd7?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=100&q=80')"></div>
+                                <div class="search-result-content">
+                                    <div class="search-result-name">${category.name}</div>
+                                    <div class="search-result-category">Category</div>
+                                </div>
+                            </div>
+                        `;
+                    });
 
-    const id = productIdInput.value;
+                    productResults.forEach(product => {
+                        resultsHTML += `
+                            <div class="search-result-item" onclick="window.location.href='product-details.html?id=${product.id}'">
+                                <div class="search-result-image" style="background-image: url('${product.image}')"></div>
+                                <div class="search-result-content">
+                                    <div class="search-result-name">${product.name}</div>
+                                    <div class="search-result-category">${this.formatCategory(product.category)}</div>
+                                    ${product.type ? `<div style="font-size: 12px; color: #666; margin: 2px 0;">${product.type}</div>` : ''}
+                                    <div class="search-result-price">${product.price}</div>
+                                </div>
+                            </div>
+                        `;
+                    });
 
-    if (id) {
-      await updateDoc(doc(db, "products", id), data);
-    } else {
-      await addDoc(collection(db, "products"), data);
-    }
+                    resultsHTML += `
+                        <div class="view-all-results">
+                            <a href="search-results.html?q=${encodeURIComponent(query)}">View all results for "${query}"</a>
+                        </div>
+                    `;
 
-    // Hide processing overlay
-    processingOverlay.classList.remove('active');
-    
-    // Show success message
-    alert(id ? "Product updated successfully!" : "Product added successfully!");
+                    this.searchResults.innerHTML = resultsHTML;
+                }
 
-    // Reset form
-    form.reset();
-    preview.innerHTML = "";
-    imageInput.value = "";
-    imagesBase64 = [];
-    productIdInput.value = "";
-    document.getElementById('additional-fields-container').innerHTML = "";
-    additionalFieldsCount = 0;
-    
-    // Reset country code to default
-    form.contact_country_code.value = "91";
-    document.getElementById('country-code-display').textContent = "91";
+                formatCategory(category) {
+                    const categoryMap = {
+                        'flooring': 'Flooring',
+                        'wall': 'Wall Decoration',
+                        'bathroom': 'Bathroom',
+                        'outdoor': 'Outdoor',
+                        'kitchen': 'Kitchen',
+                        'commercial': 'Commercial'
+                    };
+                    return categoryMap[category] || category;
+                }
 
-  } catch (err) {
-    // Hide processing overlay on error
-    processingOverlay.classList.remove('active');
-    alert("Error: " + err.message);
-  } finally {
-    // Reset submit button
-    submitBtn.disabled = false;
-    submitBtn.innerHTML = '<i class="fas fa-save"></i> Save Product';
-  }
-};
+                performSearch(query) {
+                    if (query.trim().length > 0) {
+                        window.location.href = `search-results.html?q=${encodeURIComponent(query)}`;
+                    }
+                }
+            }
 
-// Make functions available globally for onclick events
-window.removeImage = removeImage;
-window.removeAdditionalField = removeAdditionalField;
-window.validatePhoneNumber = validatePhoneNumber;
-window.validateCountryCode = validateCountryCode;
-</script>
+            // Dynamic Categories System
+            class DynamicCategories {
+                constructor() {
+                    this.categories = [];
+                    this.products = [];
+                    this.init();
+                }
 
+                async init() {
+                    await this.loadDataFromFirestore();
+                    this.renderCategories();
+                }
+
+                async loadDataFromFirestore() {
+                    try {
+                        console.log("Loading categories from Firestore...");
+                        
+                        // Firestore se categories fetch karein
+                        const categoriesQuery = window.firebaseFunctions.collection(
+                            window.firebaseDb, 
+                            'categories'
+                        );
+                        const categoriesSnapshot = await window.firebaseFunctions.getDocs(categoriesQuery);
+                        
+                        this.categories = [];
+                        categoriesSnapshot.forEach((doc) => {
+                            this.categories.push({
+                                id: doc.id,
+                                ...doc.data()
+                            });
+                        });
+                        
+                        console.log("Categories loaded from Firestore:", this.categories);
+
+                        // Firestore se products fetch karein
+                        const productsQuery = window.firebaseFunctions.collection(
+                            window.firebaseDb, 
+                            'products'
+                        );
+                        const productsSnapshot = await window.firebaseFunctions.getDocs(productsQuery);
+                        
+                        this.products = [];
+                        productsSnapshot.forEach((doc) => {
+                            this.products.push({
+                                id: doc.id,
+                                ...doc.data()
+                            });
+                        });
+                        
+                        console.log("Products loaded from Firestore:", this.products);
+
+                    } catch (error) {
+                        console.error("Error loading data from Firestore:", error);
+                        // Fallback to mock data
+                        await this.loadMockData();
+                    }
+                }
+
+                async loadMockData() {
+                    // Mock data as fallback
+                    this.categories = [
+                        {
+                            id: '1',
+                            name: 'Flooring',
+                            type: 'flooring',
+                            image: 'https://images.unsplash.com/photo-1586023492125-27b2c045efd7?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=600&q=80',
+                            description: 'Stone flooring solutions for homes and commercial spaces'
+                        },
+                        {
+                            id: '2', 
+                            name: 'Wall Decoration',
+                            type: 'wall',
+                            image: 'https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=600&q=80',
+                            description: 'Wall cladding and decorative stone solutions'
+                        },
+                        {
+                            id: '3',
+                            name: 'Bathroom',
+                            type: 'bathroom', 
+                            image: 'https://images.unsplash.com/photo-1600607687920-26eb2c5fab6a?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=600&q=80',
+                            description: 'Bathroom stone tiles and solutions'
+                        },
+                        {
+                            id: '4',
+                            name: 'Outdoor',
+                            type: 'outdoor',
+                            image: 'https://images.unsplash.com/photo-1600585154340-2e5db6e509e9?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=600&q=80',
+                            description: 'Outdoor stone paving and landscaping'
+                        },
+                        {
+                            id: '5',
+                            name: 'Kitchen',
+                            type: 'kitchen',
+                            image: 'https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=600&q=80',
+                            description: 'Kitchen countertops and stone surfaces'
+                        },
+                        {
+                            id: '6',
+                            name: 'Commercial',
+                            type: 'commercial', 
+                            image: 'https://images.unsplash.com/photo-1497366754035-f200968a6e72?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=600&q=80',
+                            description: 'Commercial stone projects and installations'
+                        }
+                    ];
+
+                    this.products = [
+                        { 
+                            id: 'p1', 
+                            name: 'Kota Blue Stone', 
+                            category: 'flooring',
+                            stone_name: 'Kota Blue',
+                            type: 'Natural Stone',
+                            price: '£45.00'
+                        },
+                        { 
+                            id: 'p2', 
+                            name: 'Sandstone Pavers', 
+                            category: 'outdoor',
+                            stone_name: 'Raj Green Sandstone', 
+                            type: 'Calibrated',
+                            price: '£35.00'
+                        },
+                        { 
+                            id: 'p3', 
+                            name: 'Marble Tiles', 
+                            category: 'bathroom',
+                            stone_name: 'White Marble',
+                            type: 'Polished', 
+                            price: '£75.00'
+                        },
+                        { 
+                            id: 'p4', 
+                            name: 'Granite Countertops', 
+                            category: 'kitchen',
+                            stone_name: 'Black Galaxy Granite',
+                            type: 'Polished',
+                            price: '£120.00'
+                        },
+                        { 
+                            id: 'p5', 
+                            name: 'Limestone Cladding', 
+                            category: 'wall',
+                            stone_name: 'Kota Brown Limestone',
+                            type: 'Natural',
+                            price: '£55.00'
+                        },
+                        { 
+                            id: 'p6', 
+                            name: 'Commercial Flooring', 
+                            category: 'commercial',
+                            stone_name: 'Dholpur Stone',
+                            type: 'Calibrated',
+                            price: '£40.00'
+                        }
+                    ];
+                }
+
+                renderCategories() {
+                    const categoriesGrid = document.getElementById('dynamicCategories');
+                    if (!categoriesGrid) return;
+
+                    // Loading remove karein
+                    categoriesGrid.innerHTML = '';
+
+                    if (this.categories.length === 0) {
+                        categoriesGrid.innerHTML = `
+                            <div class="loading-categories">
+                                <i class="fas fa-exclamation-triangle"></i>
+                                <p>No categories found</p>
+                            </div>
+                        `;
+                        return;
+                    }
+
+                    this.categories.forEach(category => {
+                        const categoryProducts = this.products.filter(product => 
+                            product.category === category.type
+                        );
+                        
+                        const categoryElement = this.createCategoryElement(category, categoryProducts);
+                        categoriesGrid.appendChild(categoryElement);
+                    });
+                }
+
+                createCategoryElement(category, products) {
+                    const categoryItem = document.createElement('div');
+                    categoryItem.className = 'use-category-item';
+                    
+                    categoryItem.innerHTML = `
+                        <a href="category-products.html?category=${category.type}" class="use-category-link">
+                            <div class="use-category-image" style="background-image: url('${category.image || 'https://images.unsplash.com/photo-1586023492125-27b2c045efd7?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=600&q=80'}')"></div>
+                            <div class="use-category-name">${category.name}</div>
+                            ${products.length > 0 ? 
+                                `<div class="product-count">${products.length} products</div>` : 
+                                '<div class="product-count">0 products</div>'
+                            }
+                        </a>
+                    `;
+
+                    return categoryItem;
+                }
+            }
+
+            // Initialize all managers
+            try {
+                const authManager = new AuthManager();
+                const searchManager = new AdvancedSearch();
+                const categoriesManager = new DynamicCategories();
+                
+                console.log("✅ All managers initialized successfully");
+                console.log("📊 Categories:", categoriesManager.categories);
+                console.log("📦 Products:", categoriesManager.products);
+                
+            } catch (error) {
+                console.error("❌ Error initializing managers:", error);
+            }
+        };
+
+        // Start the application
+        initializeApp();
+    </script>
 </body>
 </html>
