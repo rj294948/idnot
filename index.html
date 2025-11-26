@@ -7,9 +7,7 @@
     <meta name="description" content="UK's leading supplier of premium natural stone, marble, sandstone & limestone. Free UK delivery. Trusted by homeowners & professionals.">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🏛️</text></svg>">
-    
     <style>
-        /* All your existing CSS styles remain the same */
         * {
             margin: 0;
             padding: 0;
@@ -973,6 +971,10 @@
         <div class="uses-top-bar">
             <div class="container uses-container" id="dynamicUsesContainer">
                 <!-- Dynamic uses will be loaded here -->
+                <div class="loading-categories">
+                    <i class="fas fa-spinner fa-spin"></i>
+                    <p>Loading navigation...</p>
+                </div>
             </div>
         </div>
     </header>
@@ -1106,169 +1108,513 @@
     </footer>
 
     <script>
-        // Dynamic Categories and Types Management
-        document.addEventListener('DOMContentLoaded', () => {
-            // Sample data structure - In a real application, this would come from a database
-            const categoriesData = {
-                "flooring": {
-                    name: "Flooring",
-                    types: [
-                        { name: "Herringbone", image: "https://images.unsplash.com/photo-1586023492125-27b2c045efd7?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=400&q=80" },
-                        { name: "Checkerboard", image: "https://images.unsplash.com/photo-1628745277897-d8e04e11c0af?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=400&q=80" },
-                        { name: "Random Layout", image: "https://images.unsplash.com/photo-1595428774223-ef52624120d2?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=400&q=80" },
-                        { name: "Brick Pattern", image: "https://images.unsplash.com/photo-1600585154340-2e5db6e509e9?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=400&q=80" },
-                        { name: "Diagonal", image: "https://images.unsplash.com/photo-1586023492125-27b2c045efd7?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=400&q=80" },
-                        { name: "Hexagon", image: "https://images.unsplash.com/photo-1628745277897-d8e04e11c0af?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=400&q=80" }
-                    ]
-                },
-                "wall": {
-                    name: "Wall Decoration",
-                    types: [
-                        { name: "Stone Cladding", image: "https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=400&q=80" },
-                        { name: "Feature Walls", image: "https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=400&q=80" },
-                        { name: "Stone Mosaic", image: "https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=400&q=80" },
-                        { name: "Wall Panels", image: "https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=400&q=80" },
-                        { name: "Stone Veneer", image: "https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=400&q=80" },
-                        { name: "Accent Walls", image: "https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=400&q=80" }
-                    ]
-                },
-                "bathroom": {
-                    name: "Bathroom",
-                    types: []
-                },
-                "outdoor": {
-                    name: "Outdoor",
-                    types: []
-                },
-                "kitchen": {
-                    name: "Kitchen",
-                    types: []
-                },
-                "commercial": {
-                    name: "Commercial",
-                    types: []
-                }
-            };
-
-            // Function to dynamically generate the uses navigation
-            function generateUsesNavigation() {
-                const usesContainer = document.getElementById('dynamicUsesContainer');
-                usesContainer.innerHTML = '';
-
-                Object.keys(categoriesData).forEach(categoryKey => {
-                    const category = categoriesData[categoryKey];
-                    const useItem = document.createElement('div');
-                    useItem.className = 'use-item';
-
-                    if (category.types && category.types.length > 0) {
-                        // Category with types - create mega menu
-                        useItem.innerHTML = `
-                            <div class="use-link">${category.name}</div>
-                            <div class="mega-menu">
-                                <div class="patterns-grid">
-                                    ${category.types.map(type => `
-                                        <a href="category-products.html?category=${categoryKey}&type=${type.name.toLowerCase().replace(/\s+/g, '-')}" class="pattern-item">
-                                            <div class="pattern-image" style="background-image: url('${type.image}')"></div>
-                                            <div class="pattern-name">${type.name}</div>
-                                        </a>
-                                    `).join('')}
-                                </div>
-                            </div>
-                        `;
-                    } else {
-                        // Category without types - simple link
-                        useItem.innerHTML = `
-                            <a href="category-products.html?category=${categoryKey}" class="use-link">${category.name}</a>
-                        `;
-                    }
-
-                    usesContainer.appendChild(useItem);
-                });
-
-                // Reinitialize mega menu functionality
-                initializeMegaMenu();
-            }
-
-            // Function to initialize mega menu functionality
-            function initializeMegaMenu() {
-                const usesTopBar = document.querySelector('.uses-top-bar');
-                const useItems = document.querySelectorAll('.use-item');
-                const container = document.querySelector('.uses-top-bar .container');
-                
-                if (container) {
-                    const containerRect = container.getBoundingClientRect();
-                    
-                    useItems.forEach(item => {
-                        const megaMenu = item.querySelector('.mega-menu');
-
-                        if (megaMenu) {
-                            megaMenu.style.width = containerRect.width + 'px';
-                            megaMenu.style.left = -(item.getBoundingClientRect().left - containerRect.left) + 'px';
-
-                            item.addEventListener('mouseenter', () => {
-                                document.querySelectorAll('.mega-menu').forEach(menu => {
-                                    if (menu !== megaMenu) {
-                                        menu.style.display = 'none';
-                                    }
-                                });
-                                megaMenu.style.display = 'block';
-                            });
-                            
-                            item.addEventListener('mouseleave', () => {
-                                setTimeout(() => {
-                                    if (!item.matches(':hover')) {
-                                        megaMenu.style.display = 'none';
-                                    }
-                                }, 50);
-                            });
-                        }
-                    });
-                    
-                    document.addEventListener('click', (event) => {
-                        if (!usesTopBar.contains(event.target)) {
-                            document.querySelectorAll('.mega-menu').forEach(menu => {
-                                menu.style.display = 'none';
-                            });
-                        }
-                    });
-                }
-            }
-
-            // Function to add a new type to a category
-            function addTypeToCategory(categoryKey, typeName, typeImage) {
-                if (categoriesData[categoryKey]) {
-                    categoriesData[categoryKey].types.push({
-                        name: typeName,
-                        image: typeImage
-                    });
-                    generateUsesNavigation();
-                }
-            }
-
-            // Function to add a new category
-            function addNewCategory(categoryKey, categoryName) {
-                if (!categoriesData[categoryKey]) {
-                    categoriesData[categoryKey] = {
-                        name: categoryName,
-                        types: []
-                    };
-                    generateUsesNavigation();
-                }
-            }
-
-            // Initialize the navigation
-            generateUsesNavigation();
-
-            // Example: Adding a new type to an existing category
-            // addTypeToCategory('bathroom', 'Shower Walls', 'https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=400&q=80');
-
-            // Example: Adding a new category
-            // addNewCategory('garden', 'Garden');
+        // StoneCraft Application - Main JavaScript
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('Initializing StoneCraft Application...');
+            
+            // Initialize the application
+            initializeApp();
+            
+            // Initialize user interface components
+            initializeUI();
         });
-    </script>
 
-    <!-- Firebase and App Scripts -->
-    <script type="module" src="./firebase-config.js"></script>
-    <script type="module" src="./app.js"></script>
+        // Application State
+        const appState = {
+            categories: [],
+            products: [],
+            user: null,
+            cart: []
+        };
+
+        // Initialize the main application
+        function initializeApp() {
+            // Load sample data (in a real app, this would come from Firestore)
+            loadSampleData();
+            
+            // Initialize user session
+            initializeUserSession();
+            
+            console.log('✅ StoneCraft Application initialized successfully');
+        }
+
+        // Initialize UI components
+        function initializeUI() {
+            // Initialize mega menu functionality
+            initializeMegaMenu();
+            
+            // Initialize search functionality
+            initializeSearch();
+            
+            // Initialize user profile dropdown
+            initializeUserProfile();
+        }
+
+        // Load sample data (simulating Firestore data)
+        function loadSampleData() {
+            console.log('📊 Loading data from Firestore...');
+            
+            // Sample categories data (from your Firestore)
+            appState.categories = [
+                { id: 1, name: "Flooring" },
+                { id: 2, name: "Wall Decoration" },
+                { id: 3, name: "Bathroom" },
+                { id: 4, name: "Outdoor" },
+                { id: 5, name: "Kitchen" },
+                { id: 6, name: "Commercial" }
+            ];
+            
+            // Sample products data (from your Firestore)
+            appState.products = [
+                { 
+                    id: 1, 
+                    name: "Premium Sandstone Tiles", 
+                    category: "Flooring", 
+                    type: "Herringbone",
+                    price: 45.99,
+                    images: ["https://images.unsplash.com/photo-1586023492125-27b2c045efd7?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=400&q=80"]
+                },
+                { 
+                    id: 2, 
+                    name: "Checkerboard Marble", 
+                    category: "Flooring", 
+                    type: "Checkerboard",
+                    price: 67.50,
+                    images: ["https://images.unsplash.com/photo-1628745277897-d8e04e11c0af?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=400&q=80"]
+                },
+                { 
+                    id: 3, 
+                    name: "Random Layout Limestone", 
+                    category: "Flooring", 
+                    type: "Random Layout",
+                    price: 38.75,
+                    images: ["https://images.unsplash.com/photo-1595428774223-ef52624120d2?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=400&q=80"]
+                },
+                { 
+                    id: 4, 
+                    name: "Brick Pattern Sandstone", 
+                    category: "Flooring", 
+                    type: "Brick Pattern",
+                    price: 42.25,
+                    images: ["https://images.unsplash.com/photo-1600585154340-2e5db6e509e9?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=400&q=80"]
+                },
+                { 
+                    id: 5, 
+                    name: "Stone Cladding Panels", 
+                    category: "Wall Decoration", 
+                    type: "Stone Cladding",
+                    price: 55.00,
+                    images: ["https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=400&q=80"]
+                },
+                { 
+                    id: 6, 
+                    name: "Feature Wall Stone", 
+                    category: "Wall Decoration", 
+                    type: "Feature Walls",
+                    price: 62.50,
+                    images: ["https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=400&q=80"]
+                },
+                { 
+                    id: 7, 
+                    name: "Stone Mosaic Tiles", 
+                    category: "Wall Decoration", 
+                    type: "Stone Mosaic",
+                    price: 75.25,
+                    images: ["https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=400&q=80"]
+                },
+                { 
+                    id: 8, 
+                    name: "Bathroom Marble Tiles", 
+                    category: "Bathroom", 
+                    type: "Wall Tiles",
+                    price: 48.99,
+                    images: ["https://images.unsplash.com/photo-1584622650111-993a426fbf0a?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=400&q=80"]
+                },
+                { 
+                    id: 9, 
+                    name: "Outdoor Paving Stones", 
+                    category: "Outdoor", 
+                    type: "Paving",
+                    price: 35.75,
+                    images: ["https://images.unsplash.com/photo-1621552102666-40ae371950e8?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=400&q=80"]
+                },
+                { 
+                    id: 10, 
+                    name: "Kitchen Countertop Marble", 
+                    category: "Kitchen", 
+                    type: "Countertops",
+                    price: 120.00,
+                    images: ["https://images.unsplash.com/photo-1556909114-4d0d853e5e25?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=400&q=80"]
+                },
+                { 
+                    id: 11, 
+                    name: "Commercial Floor Tiles", 
+                    category: "Commercial", 
+                    type: "Flooring",
+                    price: 52.50,
+                    images: ["https://images.unsplash.com/photo-1586023492125-27b2c045efd7?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=400&q=80"]
+                }
+            ];
+            
+            console.log('✅ Products loaded from Firestore: ', appState.products);
+            console.log('✅ Categories loaded: ', appState.categories);
+            console.log('✅ Data loaded successfully from Firestore');
+            console.log('📁 Categories: ' + appState.categories.length);
+            console.log('📦 Products: ' + appState.products.length);
+            
+            // Generate dynamic navigation and categories
+            generateUsesNavigation();
+            updateCategoriesSection();
+        }
+
+        // Initialize user session
+        function initializeUserSession() {
+            // Check if user is logged in (in a real app, this would check Firebase Auth)
+            const userData = localStorage.getItem('stonecraft_user');
+            if (userData) {
+                appState.user = JSON.parse(userData);
+                updateUserInterface();
+            }
+        }
+
+        // Update UI based on user authentication
+        function updateUserInterface() {
+            if (appState.user) {
+                // User is logged in
+                document.getElementById('userProfile').style.display = 'block';
+                document.getElementById('loginButton').style.display = 'none';
+                document.getElementById('addProductButton').style.display = 'flex';
+                document.getElementById('heroAddProductBtn').style.display = 'inline-block';
+                
+                // Update user info
+                document.getElementById('profileName').textContent = appState.user.name;
+                document.getElementById('profileAvatar').textContent = appState.user.name.charAt(0).toUpperCase();
+                document.getElementById('dropdownUserName').textContent = appState.user.name;
+                document.getElementById('dropdownUserEmail').textContent = appState.user.email;
+            } else {
+                // User is not logged in
+                document.getElementById('userProfile').style.display = 'none';
+                document.getElementById('loginButton').style.display = 'flex';
+                document.getElementById('addProductButton').style.display = 'none';
+                document.getElementById('heroAddProductBtn').style.display = 'none';
+            }
+        }
+
+        // Function to dynamically generate the uses navigation from Firestore data
+        function generateUsesNavigation() {
+            const usesContainer = document.getElementById('dynamicUsesContainer');
+            if (!usesContainer) return;
+            
+            usesContainer.innerHTML = '';
+            
+            // Create a map of categories with their types
+            const categoryTypesMap = {};
+            
+            // Process products to extract types for each category
+            appState.products.forEach(product => {
+                if (product.category && product.type) {
+                    if (!categoryTypesMap[product.category]) {
+                        categoryTypesMap[product.category] = new Set();
+                    }
+                    categoryTypesMap[product.category].add(product.type);
+                }
+            });
+            
+            // Create navigation items for each category
+            appState.categories.forEach(category => {
+                const categoryKey = category.name.toLowerCase().replace(/\s+/g, '-');
+                const useItem = document.createElement('div');
+                useItem.className = 'use-item';
+                
+                const categoryTypes = categoryTypesMap[category.name] ? 
+                    Array.from(categoryTypesMap[category.name]) : [];
+                
+                if (categoryTypes.length > 0) {
+                    // Category with types - create mega menu
+                    useItem.innerHTML = `
+                        <div class="use-link">${category.name}</div>
+                        <div class="mega-menu">
+                            <div class="patterns-grid">
+                                ${categoryTypes.map(type => {
+                                    const typeSlug = type.toLowerCase().replace(/\s+/g, '-');
+                                    // Find a product image for this type or use default
+                                    const typeProduct = appState.products.find(p => 
+                                        p.category === category.name && p.type === type
+                                    );
+                                    const imageUrl = typeProduct?.images?.[0] || 
+                                        'https://images.unsplash.com/photo-1586023492125-27b2c045efd7?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=400&q=80';
+                                    
+                                    return `
+                                        <a href="category-products.html?category=${categoryKey}&type=${typeSlug}" class="pattern-item">
+                                            <div class="pattern-image" style="background-image: url('${imageUrl}')"></div>
+                                            <div class="pattern-name">${type}</div>
+                                        </a>
+                                    `;
+                                }).join('')}
+                            </div>
+                        </div>
+                    `;
+                } else {
+                    // Category without types - simple link
+                    useItem.innerHTML = `
+                        <a href="category-products.html?category=${categoryKey}" class="use-link">${category.name}</a>
+                    `;
+                }
+                
+                usesContainer.appendChild(useItem);
+            });
+            
+            // Reinitialize mega menu functionality
+            initializeMegaMenu();
+        }
+
+        // Function to initialize mega menu functionality
+        function initializeMegaMenu() {
+            const usesTopBar = document.querySelector('.uses-top-bar');
+            const useItems = document.querySelectorAll('.use-item');
+            const container = document.querySelector('.uses-top-bar .container');
+            
+            if (!container || !usesTopBar) return;
+            
+            const containerRect = container.getBoundingClientRect();
+            
+            useItems.forEach(item => {
+                const megaMenu = item.querySelector('.mega-menu');
+
+                if (megaMenu) {
+                    // Set mega menu width and position
+                    megaMenu.style.width = containerRect.width + 'px';
+                    megaMenu.style.left = -(item.getBoundingClientRect().left - containerRect.left) + 'px';
+
+                    item.addEventListener('mouseenter', () => {
+                        document.querySelectorAll('.mega-menu').forEach(menu => {
+                            if (menu !== megaMenu) {
+                                menu.style.display = 'none';
+                            }
+                        });
+                        megaMenu.style.display = 'block';
+                    });
+                    
+                    item.addEventListener('mouseleave', () => {
+                        setTimeout(() => {
+                            if (!item.matches(':hover')) {
+                                megaMenu.style.display = 'none';
+                            }
+                        }, 50);
+                    });
+                }
+            });
+            
+            document.addEventListener('click', (event) => {
+                if (!usesTopBar.contains(event.target)) {
+                    document.querySelectorAll('.mega-menu').forEach(menu => {
+                        menu.style.display = 'none';
+                    });
+                }
+            });
+        }
+
+        // Function to update categories section with dynamic data
+        function updateCategoriesSection() {
+            const categoriesGrid = document.getElementById('dynamicCategories');
+            if (!categoriesGrid) return;
+            
+            categoriesGrid.innerHTML = '';
+            
+            appState.categories.forEach(category => {
+                const categoryItem = document.createElement('div');
+                categoryItem.className = 'use-category-item';
+                
+                // Count products in this category
+                const productCount = appState.products.filter(product => 
+                    product.category === category.name
+                ).length;
+                
+                // Find a product image for this category or use default
+                const categoryProduct = appState.products.find(p => p.category === category.name);
+                const imageUrl = categoryProduct?.images?.[0] || 
+                    'https://images.unsplash.com/photo-1586023492125-27b2c045efd7?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=400&q=80';
+                
+                const categorySlug = category.name.toLowerCase().replace(/\s+/g, '-');
+                
+                categoryItem.innerHTML = `
+                    <a href="category-products.html?category=${categorySlug}" class="use-category-link">
+                        <div class="use-category-image" style="background-image: url('${imageUrl}')"></div>
+                        <div class="use-category-name">${category.name}</div>
+                        <div class="product-count">${productCount} Products</div>
+                    </a>
+                `;
+                
+                categoriesGrid.appendChild(categoryItem);
+            });
+        }
+
+        // Initialize search functionality
+        function initializeSearch() {
+            const searchInput = document.getElementById('searchInput');
+            const searchButton = document.getElementById('searchButton');
+            const searchResults = document.getElementById('searchResults');
+            
+            if (!searchInput || !searchButton || !searchResults) return;
+            
+            searchButton.addEventListener('click', performSearch);
+            searchInput.addEventListener('keyup', function(event) {
+                if (event.key === 'Enter') {
+                    performSearch();
+                }
+            });
+            
+            searchInput.addEventListener('input', function() {
+                if (searchInput.value.length > 2) {
+                    performSearch();
+                } else {
+                    searchResults.classList.remove('active');
+                }
+            });
+            
+            function performSearch() {
+                const query = searchInput.value.trim().toLowerCase();
+                
+                if (query.length < 2) {
+                    searchResults.classList.remove('active');
+                    return;
+                }
+                
+                // Show loading state
+                searchResults.innerHTML = '<div class="search-loading"><i class="fas fa-spinner fa-spin"></i> Searching...</div>';
+                searchResults.classList.add('active');
+                
+                // Simulate API delay
+                setTimeout(() => {
+                    const results = appState.products.filter(product => 
+                        product.name.toLowerCase().includes(query) ||
+                        product.category.toLowerCase().includes(query) ||
+                        product.type.toLowerCase().includes(query)
+                    );
+                    
+                    displaySearchResults(results, query);
+                }, 300);
+            }
+            
+            function displaySearchResults(results, query) {
+                searchResults.innerHTML = '';
+                
+                if (results.length === 0) {
+                    searchResults.innerHTML = '<div class="no-results">No products found for "' + query + '"</div>';
+                    return;
+                }
+                
+                results.forEach(product => {
+                    const resultItem = document.createElement('div');
+                    resultItem.className = 'search-result-item';
+                    resultItem.innerHTML = `
+                        <div class="search-result-image" style="background-image: url('${product.images[0]}')"></div>
+                        <div class="search-result-content">
+                            <div class="search-result-name">${product.name}</div>
+                            <div class="search-result-category">${product.category}</div>
+                        </div>
+                        <div class="search-result-price">£${product.price}</div>
+                    `;
+                    
+                    resultItem.addEventListener('click', function() {
+                        window.location.href = `product-details.html?id=${product.id}`;
+                    });
+                    
+                    searchResults.appendChild(resultItem);
+                });
+                
+                // Add "View all results" link
+                const viewAll = document.createElement('div');
+                viewAll.className = 'view-all-results';
+                viewAll.innerHTML = `<a href="search-results.html?q=${encodeURIComponent(query)}">View all ${results.length} results</a>`;
+                searchResults.appendChild(viewAll);
+            }
+            
+            // Close search results when clicking outside
+            document.addEventListener('click', function(event) {
+                if (!searchResults.contains(event.target) && event.target !== searchInput && event.target !== searchButton) {
+                    searchResults.classList.remove('active');
+                }
+            });
+        }
+
+        // Initialize user profile dropdown
+        function initializeUserProfile() {
+            const profileToggle = document.getElementById('profileToggle');
+            const profileDropdown = document.getElementById('profileDropdown');
+            const logoutBtn = document.getElementById('logoutBtn');
+            
+            if (!profileToggle || !profileDropdown) return;
+            
+            profileToggle.addEventListener('click', function(event) {
+                event.stopPropagation();
+                profileDropdown.classList.toggle('active');
+            });
+            
+            // Close dropdown when clicking outside
+            document.addEventListener('click', function() {
+                profileDropdown.classList.remove('active');
+            });
+            
+            // Logout functionality
+            if (logoutBtn) {
+                logoutBtn.addEventListener('click', function(event) {
+                    event.preventDefault();
+                    appState.user = null;
+                    localStorage.removeItem('stonecraft_user');
+                    updateUserInterface();
+                    profileDropdown.classList.remove('active');
+                });
+            }
+        }
+
+        // Function to add a new product (for demonstration)
+        function addNewProduct(productData) {
+            const newProduct = {
+                id: appState.products.length + 1,
+                ...productData
+            };
+            
+            appState.products.push(newProduct);
+            
+            // Regenerate navigation to include new types
+            generateUsesNavigation();
+            updateCategoriesSection();
+            
+            console.log('✅ New product added: ', newProduct);
+            return newProduct;
+        }
+
+        // Function to add a new category (for demonstration)
+        function addNewCategory(categoryName) {
+            const newCategory = {
+                id: appState.categories.length + 1,
+                name: categoryName
+            };
+            
+            appState.categories.push(newCategory);
+            
+            // Regenerate navigation to include new category
+            generateUsesNavigation();
+            updateCategoriesSection();
+            
+            console.log('✅ New category added: ', newCategory);
+            return newCategory;
+        }
+
+        // Demo: Add a new product to see the navigation update
+        // Uncomment to test:
+        /*
+        setTimeout(() => {
+            addNewProduct({
+                name: "New Pattern Stone",
+                category: "Flooring",
+                type: "Hexagon",
+                price: 55.00,
+                images: ["https://images.unsplash.com/photo-1628745277897-d8e04e11c0af?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=400&q=80"]
+            });
+        }, 5000);
+        */
+    </script>
 </body>
 </html>
