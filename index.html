@@ -8,6 +8,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🏛️</text></svg>">
     <style>
+        /* All your existing CSS styles remain exactly the same */
         * {
             margin: 0;
             padding: 0;
@@ -1111,12 +1112,15 @@
     <script type="module" src="./firebase-config.js"></script>
     
     <script type="module">
-        // Import from your existing firebase-config.js
+        // Import from your existing firebase-config.js - ONLY the exports that are available
         import { 
             db, auth, 
-            collection, getDocs, onSnapshot,
+            collection, getDocs,
             onAuthStateChanged, signOut
         } from './firebase-config.js';
+
+        // Import onSnapshot separately since it's not in your firebase-config.js
+        import { onSnapshot } from "https://www.gstatic.com/firebasejs/12.5.0/firebase-firestore.js";
 
         // StoneCraft Application - Main JavaScript
         document.addEventListener('DOMContentLoaded', function() {
