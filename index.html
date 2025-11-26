@@ -1107,16 +1107,29 @@
         </div>
     </footer>
 
-    <script>
+    <!-- Your existing Firebase config -->
+    <script type="module" src="./firebase-config.js"></script>
+    
+    <script type="module">
+        // Import from your existing firebase-config.js
+        import { 
+            db, auth, 
+            collection, getDocs, onSnapshot,
+            onAuthStateChanged, signOut
+        } from './firebase-config.js';
+
         // StoneCraft Application - Main JavaScript
         document.addEventListener('DOMContentLoaded', function() {
             console.log('Initializing StoneCraft Application...');
             
-            // Initialize the application
-            initializeApp();
+            // Initialize the application with Firestore
+            initializeAppWithFirestore();
             
             // Initialize user interface components
             initializeUI();
+            
+            // Initialize authentication
+            initializeAuth();
         });
 
         // Application State
@@ -1127,190 +1140,176 @@
             cart: []
         };
 
-        // Initialize the main application
-        function initializeApp() {
-            // Load sample data (in a real app, this would come from Firestore)
-            loadSampleData();
+        // Initialize the main application with Firestore
+        async function initializeAppWithFirestore() {
+            console.log('📊 Loading data from Firestore...');
             
-            // Initialize user session
-            initializeUserSession();
+            try {
+                // Load Categories and Products from Firestore
+                await loadCategoriesFromFirestore();
+                await loadProductsFromFirestore();
+                
+                console.log('✅ Data loaded successfully from Firestore');
+                console.log('📁 Categories: ' + appState.categories.length);
+                console.log('📦 Products: ' + appState.products.length);
+                
+                // Generate dynamic navigation and categories
+                generateUsesNavigationFromCategories();
+                updateCategoriesSection();
+                
+            } catch (error) {
+                console.error('❌ Error loading data from Firestore:', error);
+                // Fallback to sample data if Firestore fails
+                loadSampleData();
+            }
             
             console.log('✅ StoneCraft Application initialized successfully');
         }
 
-        // Initialize UI components
-        function initializeUI() {
-            // Initialize mega menu functionality
-            initializeMegaMenu();
-            
-            // Initialize search functionality
-            initializeSearch();
-            
-            // Initialize user profile dropdown
-            initializeUserProfile();
+        // Load Categories from Firestore
+        async function loadCategoriesFromFirestore() {
+            try {
+                const querySnapshot = await getDocs(collection(db, "categories"));
+                appState.categories = [];
+                
+                querySnapshot.forEach((doc) => {
+                    const data = doc.data();
+                    appState.categories.push({
+                        id: doc.id,
+                        ...data
+                    });
+                });
+                
+                console.log('✅ Categories loaded from Firestore: ', appState.categories);
+                
+            } catch (error) {
+                console.error('Error loading categories:', error);
+                throw error;
+            }
         }
 
-        // Load sample data (simulating Firestore data)
+        // Load Products from Firestore
+        async function loadProductsFromFirestore() {
+            try {
+                const querySnapshot = await getDocs(collection(db, "products"));
+                appState.products = [];
+                
+                querySnapshot.forEach((doc) => {
+                    const data = doc.data();
+                    appState.products.push({
+                        id: doc.id,
+                        ...data
+                    });
+                });
+                
+                console.log('✅ Products loaded from Firestore: ', appState.products.length);
+                
+                // Real-time listener for product changes
+                onSnapshot(collection(db, "products"), (snapshot) => {
+                    const updatedProducts = [];
+                    snapshot.forEach((doc) => {
+                        const data = doc.data();
+                        updatedProducts.push({
+                            id: doc.id,
+                            ...data
+                        });
+                    });
+                    appState.products = updatedProducts;
+                    console.log('🔄 Products updated in real-time');
+                    generateUsesNavigationFromCategories();
+                    updateCategoriesSection();
+                });
+                
+            } catch (error) {
+                console.error('Error loading products:', error);
+                throw error;
+            }
+        }
+
+        // Sample data as fallback
         function loadSampleData() {
-            console.log('📊 Loading data from Firestore...');
+            console.log('📝 Loading sample data...');
             
-            // Sample categories data (from your Firestore)
+            // Sample Categories data
             appState.categories = [
-                { id: 1, name: "Flooring" },
-                { id: 2, name: "Wall Decoration" },
-                { id: 3, name: "Bathroom" },
-                { id: 4, name: "Outdoor" },
-                { id: 5, name: "Kitchen" },
-                { id: 6, name: "Commercial" }
+                { id: "1", name: "Flooring", description: "Premium stone flooring solutions" },
+                { id: "2", name: "Wall Decoration", description: "Beautiful wall decoration stones" },
+                { id: "3", name: "Bathroom", description: "Luxury bathroom stone solutions" },
+                { id: "4", name: "Outdoor", description: "Durable outdoor stone applications" },
+                { id: "5", name: "Kitchen", description: "Elegant kitchen stone solutions" },
+                { id: "6", name: "Commercial", description: "Commercial grade stone applications" }
             ];
-            
-            // Sample products data (from your Firestore)
+
+            // Sample Products data with types
             appState.products = [
                 { 
-                    id: 1, 
+                    id: "1", 
                     name: "Premium Sandstone Tiles", 
                     category: "Flooring", 
                     type: "Herringbone",
                     price: 45.99,
-                    images: ["https://images.unsplash.com/photo-1586023492125-27b2c045efd7?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=400&q=80"]
+                    images: ["https://images.unsplash.com/photo-1586023492125-27b2c045efd7?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=400&q=80"],
+                    description: "Premium sandstone tiles in herringbone pattern"
                 },
                 { 
-                    id: 2, 
+                    id: "2", 
                     name: "Checkerboard Marble", 
                     category: "Flooring", 
                     type: "Checkerboard",
                     price: 67.50,
-                    images: ["https://images.unsplash.com/photo-1628745277897-d8e04e11c0af?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=400&q=80"]
+                    images: ["https://images.unsplash.com/photo-1628745277897-d8e04e11c0af?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=400&q=80"],
+                    description: "Elegant checkerboard marble flooring"
                 },
                 { 
-                    id: 3, 
-                    name: "Random Layout Limestone", 
-                    category: "Flooring", 
-                    type: "Random Layout",
-                    price: 38.75,
-                    images: ["https://images.unsplash.com/photo-1595428774223-ef52624120d2?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=400&q=80"]
-                },
-                { 
-                    id: 4, 
-                    name: "Brick Pattern Sandstone", 
-                    category: "Flooring", 
-                    type: "Brick Pattern",
-                    price: 42.25,
-                    images: ["https://images.unsplash.com/photo-1600585154340-2e5db6e509e9?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=400&q=80"]
-                },
-                { 
-                    id: 5, 
+                    id: "3", 
                     name: "Stone Cladding Panels", 
                     category: "Wall Decoration", 
                     type: "Stone Cladding",
                     price: 55.00,
-                    images: ["https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=400&q=80"]
+                    images: ["https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=400&q=80"],
+                    description: "Natural stone cladding panels for walls"
                 },
                 { 
-                    id: 6, 
-                    name: "Feature Wall Stone", 
-                    category: "Wall Decoration", 
-                    type: "Feature Walls",
-                    price: 62.50,
-                    images: ["https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=400&q=80"]
-                },
-                { 
-                    id: 7, 
-                    name: "Stone Mosaic Tiles", 
-                    category: "Wall Decoration", 
-                    type: "Stone Mosaic",
-                    price: 75.25,
-                    images: ["https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=400&q=80"]
-                },
-                { 
-                    id: 8, 
+                    id: "4", 
                     name: "Bathroom Marble Tiles", 
                     category: "Bathroom", 
                     type: "Wall Tiles",
                     price: 48.99,
-                    images: ["https://images.unsplash.com/photo-1584622650111-993a426fbf0a?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=400&q=80"]
+                    images: ["https://images.unsplash.com/photo-1584622650111-993a426fbf0a?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=400&q=80"],
+                    description: "Luxury marble tiles for bathroom walls"
                 },
                 { 
-                    id: 9, 
+                    id: "5", 
                     name: "Outdoor Paving Stones", 
                     category: "Outdoor", 
                     type: "Paving",
                     price: 35.75,
-                    images: ["https://images.unsplash.com/photo-1621552102666-40ae371950e8?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=400&q=80"]
+                    images: ["https://images.unsplash.com/photo-1621552102666-40ae371950e8?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=400&q=80"],
+                    description: "Durable outdoor paving stones"
                 },
                 { 
-                    id: 10, 
+                    id: "6", 
                     name: "Kitchen Countertop Marble", 
                     category: "Kitchen", 
                     type: "Countertops",
                     price: 120.00,
-                    images: ["https://images.unsplash.com/photo-1556909114-4d0d853e5e25?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=400&q=80"]
-                },
-                { 
-                    id: 11, 
-                    name: "Commercial Floor Tiles", 
-                    category: "Commercial", 
-                    type: "Flooring",
-                    price: 52.50,
-                    images: ["https://images.unsplash.com/photo-1586023492125-27b2c045efd7?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=400&q=80"]
+                    images: ["https://images.unsplash.com/photo-1556909114-4d0d853e5e25?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=400&q=80"],
+                    description: "Premium marble for kitchen countertops"
                 }
             ];
-            
-            console.log('✅ Products loaded from Firestore: ', appState.products);
-            console.log('✅ Categories loaded: ', appState.categories);
-            console.log('✅ Data loaded successfully from Firestore');
-            console.log('📁 Categories: ' + appState.categories.length);
-            console.log('📦 Products: ' + appState.products.length);
-            
-            // Generate dynamic navigation and categories
-            generateUsesNavigation();
-            updateCategoriesSection();
         }
 
-        // Initialize user session
-        function initializeUserSession() {
-            // Check if user is logged in (in a real app, this would check Firebase Auth)
-            const userData = localStorage.getItem('stonecraft_user');
-            if (userData) {
-                appState.user = JSON.parse(userData);
-                updateUserInterface();
-            }
-        }
-
-        // Update UI based on user authentication
-        function updateUserInterface() {
-            if (appState.user) {
-                // User is logged in
-                document.getElementById('userProfile').style.display = 'block';
-                document.getElementById('loginButton').style.display = 'none';
-                document.getElementById('addProductButton').style.display = 'flex';
-                document.getElementById('heroAddProductBtn').style.display = 'inline-block';
-                
-                // Update user info
-                document.getElementById('profileName').textContent = appState.user.name;
-                document.getElementById('profileAvatar').textContent = appState.user.name.charAt(0).toUpperCase();
-                document.getElementById('dropdownUserName').textContent = appState.user.name;
-                document.getElementById('dropdownUserEmail').textContent = appState.user.email;
-            } else {
-                // User is not logged in
-                document.getElementById('userProfile').style.display = 'none';
-                document.getElementById('loginButton').style.display = 'flex';
-                document.getElementById('addProductButton').style.display = 'none';
-                document.getElementById('heroAddProductBtn').style.display = 'none';
-            }
-        }
-
-        // Function to dynamically generate the uses navigation from Firestore data
-        function generateUsesNavigation() {
+        // Function to generate uses navigation from Categories and Products data
+        function generateUsesNavigationFromCategories() {
             const usesContainer = document.getElementById('dynamicUsesContainer');
             if (!usesContainer) return;
             
             usesContainer.innerHTML = '';
             
-            // Create a map of categories with their types
+            // Create a map of categories with their unique types from products
             const categoryTypesMap = {};
             
-            // Process products to extract types for each category
+            // Process products to extract unique types for each category
             appState.products.forEach(product => {
                 if (product.category && product.type) {
                     if (!categoryTypesMap[product.category]) {
@@ -1345,7 +1344,7 @@
                                         'https://images.unsplash.com/photo-1586023492125-27b2c045efd7?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=400&q=80';
                                     
                                     return `
-                                        <a href="category-products.html?category=${categoryKey}&type=${typeSlug}" class="pattern-item">
+                                        <a href="category-products.html?category=${categoryKey}&type=${typeSlug}" class="pattern-item" data-category="${category.name}" data-type="${type}">
                                             <div class="pattern-image" style="background-image: url('${imageUrl}')"></div>
                                             <div class="pattern-name">${type}</div>
                                         </a>
@@ -1368,7 +1367,7 @@
             initializeMegaMenu();
         }
 
-        // Function to initialize mega menu functionality
+        // Initialize mega menu functionality
         function initializeMegaMenu() {
             const usesTopBar = document.querySelector('.uses-top-bar');
             const useItems = document.querySelectorAll('.use-item');
@@ -1449,6 +1448,62 @@
             });
         }
 
+        // Initialize authentication
+        function initializeAuth() {
+            onAuthStateChanged(auth, (user) => {
+                if (user) {
+                    // User is signed in
+                    appState.user = {
+                        uid: user.uid,
+                        email: user.email,
+                        name: user.displayName || user.email.split('@')[0]
+                    };
+                    localStorage.setItem('stonecraft_user', JSON.stringify(appState.user));
+                    updateUserInterface();
+                } else {
+                    // User is signed out
+                    appState.user = null;
+                    localStorage.removeItem('stonecraft_user');
+                    updateUserInterface();
+                }
+            });
+        }
+
+        // Update UI based on user authentication
+        function updateUserInterface() {
+            if (appState.user) {
+                // User is logged in
+                document.getElementById('userProfile').style.display = 'block';
+                document.getElementById('loginButton').style.display = 'none';
+                document.getElementById('addProductButton').style.display = 'flex';
+                document.getElementById('heroAddProductBtn').style.display = 'inline-block';
+                
+                // Update user info
+                document.getElementById('profileName').textContent = appState.user.name;
+                document.getElementById('profileAvatar').textContent = appState.user.name.charAt(0).toUpperCase();
+                document.getElementById('dropdownUserName').textContent = appState.user.name;
+                document.getElementById('dropdownUserEmail').textContent = appState.user.email;
+            } else {
+                // User is not logged in
+                document.getElementById('userProfile').style.display = 'none';
+                document.getElementById('loginButton').style.display = 'flex';
+                document.getElementById('addProductButton').style.display = 'none';
+                document.getElementById('heroAddProductBtn').style.display = 'none';
+            }
+        }
+
+        // Initialize UI components
+        function initializeUI() {
+            // Initialize mega menu functionality
+            initializeMegaMenu();
+            
+            // Initialize search functionality
+            initializeSearch();
+            
+            // Initialize user profile dropdown
+            initializeUserProfile();
+        }
+
         // Initialize search functionality
         function initializeSearch() {
             const searchInput = document.getElementById('searchInput');
@@ -1511,7 +1566,7 @@
                         <div class="search-result-image" style="background-image: url('${product.images[0]}')"></div>
                         <div class="search-result-content">
                             <div class="search-result-name">${product.name}</div>
-                            <div class="search-result-category">${product.category}</div>
+                            <div class="search-result-category">${product.category} • ${product.type}</div>
                         </div>
                         <div class="search-result-price">£${product.price}</div>
                     `;
@@ -1560,61 +1615,17 @@
             if (logoutBtn) {
                 logoutBtn.addEventListener('click', function(event) {
                     event.preventDefault();
-                    appState.user = null;
-                    localStorage.removeItem('stonecraft_user');
-                    updateUserInterface();
-                    profileDropdown.classList.remove('active');
+                    signOut(auth).then(() => {
+                        console.log('User signed out');
+                    }).catch((error) => {
+                        console.error('Sign out error:', error);
+                    });
                 });
             }
         }
 
-        // Function to add a new product (for demonstration)
-        function addNewProduct(productData) {
-            const newProduct = {
-                id: appState.products.length + 1,
-                ...productData
-            };
-            
-            appState.products.push(newProduct);
-            
-            // Regenerate navigation to include new types
-            generateUsesNavigation();
-            updateCategoriesSection();
-            
-            console.log('✅ New product added: ', newProduct);
-            return newProduct;
-        }
-
-        // Function to add a new category (for demonstration)
-        function addNewCategory(categoryName) {
-            const newCategory = {
-                id: appState.categories.length + 1,
-                name: categoryName
-            };
-            
-            appState.categories.push(newCategory);
-            
-            // Regenerate navigation to include new category
-            generateUsesNavigation();
-            updateCategoriesSection();
-            
-            console.log('✅ New category added: ', newCategory);
-            return newCategory;
-        }
-
-        // Demo: Add a new product to see the navigation update
-        // Uncomment to test:
-        /*
-        setTimeout(() => {
-            addNewProduct({
-                name: "New Pattern Stone",
-                category: "Flooring",
-                type: "Hexagon",
-                price: 55.00,
-                images: ["https://images.unsplash.com/photo-1628745277897-d8e04e11c0af?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=400&q=80"]
-            });
-        }, 5000);
-        */
+        // Demo: Show how new types are automatically added
+        console.log('🔄 Navigation will automatically update when new products with types are added to Firestore');
     </script>
 </body>
 </html>
