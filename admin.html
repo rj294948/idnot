@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel - StoneCraft</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .container { max-width: 1200px; margin: 0 auto; }
+        .btn { background: #b8860b; color: white; padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer; margin: 10px 0; }
+        .products-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin: 20px 0; }
+        .product-card { border: 1px solid #ddd; padding: 15px; border-radius: 8px; }
+        .product-image { width: 100%; height: 200px; object-fit: cover; border-radius: 5px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>StoneCraft Admin Panel</h1>
+        
+        <button class="btn" onclick="initializeData()">Initialize Firestore Data</button>
+        <button class="btn" onclick="loadProducts()">Load Products</button>
+        
+        <div id="productsContainer" class="products-grid"></div>
+        <div id="status"></div>
+    </div>
+
+    <script type="module">
+        import { initializeFirestoreData, getAllProducts } from './firestore-data.js';
+        
+        window.initializeData = async function() {
+            const status = document.getElementById('status');
+            status.innerHTML = '🔄 Initializing Firestore data...';
+            
+            const success = await initializeFirestoreData();
+            if (success) {
+                status.innerHTML = '✅ Firestore data initialized successfully!';
+            } else {
+                status.innerHTML = '❌ Failed to initialize Firestore data';
+            }
+        };
+        
+        window.loadProducts = async function() {
+            const products = await getAllProducts();
+            const container = document.getElementById('productsContainer');
+            
+            if (products.length === 0) {
+                container.innerHTML = '<p>No products found. Click "Initialize Firestore Data" first.</p>';
+                return;
+            }
+            
+            let html = '';
+            products.forEach(product => {
+                html += `
+                    <div class="product-card">
+                        <img src="${product.image}" alt="${product.name}" class="product-image">
+                        <h3>${product.name}</h3>
+                        <p><strong>Category:</strong> ${product.category}</p>
+                        <p><strong>Type:</strong> ${product.type}</p>
+                        <p><strong>Price:</strong> ${product.price}</p>
+                    </div>
+                `;
+            });
+            
+            container.innerHTML = html;
+        };
+    </script>
+</body>
+</html>
