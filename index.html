@@ -1206,7 +1206,7 @@
                     });
                 });
                 
-                console.log('✅ Products loaded from Firestore: ', appState.products.length);
+                console.log('✅ Products loaded from Firestore: ', appState.products);
                 
                 // Real-time listener for product changes
                 onSnapshot(collection(db, "products"), (snapshot) => {
@@ -1230,7 +1230,7 @@
             }
         }
 
-        // Sample data as fallback
+        // Sample data as fallback - WITH PROPER TYPES DATA
         function loadSampleData() {
             console.log('📝 Loading sample data...');
             
@@ -1244,7 +1244,7 @@
                 { id: "6", name: "Commercial", description: "Commercial grade stone applications" }
             ];
 
-            // Sample Products data with types
+            // Sample Products data with PROPER TYPES and IMAGES
             appState.products = [
                 { 
                     id: "1", 
@@ -1266,6 +1266,24 @@
                 },
                 { 
                     id: "3", 
+                    name: "Random Layout Limestone", 
+                    category: "Flooring", 
+                    type: "Random Layout",
+                    price: 38.75,
+                    images: ["https://images.unsplash.com/photo-1595428774223-ef52624120d2?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=400&q=80"],
+                    description: "Beautiful random layout limestone flooring"
+                },
+                { 
+                    id: "4", 
+                    name: "Brick Pattern Sandstone", 
+                    category: "Flooring", 
+                    type: "Brick Pattern",
+                    price: 42.25,
+                    images: ["https://images.unsplash.com/photo-1600585154340-2e5db6e509e9?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=400&q=80"],
+                    description: "Classic brick pattern sandstone flooring"
+                },
+                { 
+                    id: "5", 
                     name: "Stone Cladding Panels", 
                     category: "Wall Decoration", 
                     type: "Stone Cladding",
@@ -1274,7 +1292,25 @@
                     description: "Natural stone cladding panels for walls"
                 },
                 { 
-                    id: "4", 
+                    id: "6", 
+                    name: "Feature Wall Stone", 
+                    category: "Wall Decoration", 
+                    type: "Feature Walls",
+                    price: 62.50,
+                    images: ["https://images.unsplash.com/photo-1600607687644-c7f6d5c5b6f9?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=400&q=80"],
+                    description: "Premium stone for feature walls"
+                },
+                { 
+                    id: "7", 
+                    name: "Stone Mosaic Tiles", 
+                    category: "Wall Decoration", 
+                    type: "Stone Mosaic",
+                    price: 75.25,
+                    images: ["https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=400&q=80"],
+                    description: "Beautiful stone mosaic tiles"
+                },
+                { 
+                    id: "8", 
                     name: "Bathroom Marble Tiles", 
                     category: "Bathroom", 
                     type: "Wall Tiles",
@@ -1283,7 +1319,7 @@
                     description: "Luxury marble tiles for bathroom walls"
                 },
                 { 
-                    id: "5", 
+                    id: "9", 
                     name: "Outdoor Paving Stones", 
                     category: "Outdoor", 
                     type: "Paving",
@@ -1292,13 +1328,22 @@
                     description: "Durable outdoor paving stones"
                 },
                 { 
-                    id: "6", 
+                    id: "10", 
                     name: "Kitchen Countertop Marble", 
                     category: "Kitchen", 
                     type: "Countertops",
                     price: 120.00,
                     images: ["https://images.unsplash.com/photo-1556909114-4d0d853e5e25?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=400&q=80"],
                     description: "Premium marble for kitchen countertops"
+                },
+                { 
+                    id: "11", 
+                    name: "Commercial Floor Tiles", 
+                    category: "Commercial", 
+                    type: "Flooring",
+                    price: 52.50,
+                    images: ["https://images.unsplash.com/photo-1586023492125-27b2c045efd7?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=400&q=80"],
+                    description: "Durable commercial floor tiles"
                 }
             ];
         }
@@ -1323,6 +1368,8 @@
                 }
             });
             
+            console.log('📊 Category Types Map:', categoryTypesMap);
+            
             // Create navigation items for each category
             appState.categories.forEach(category => {
                 const categoryKey = category.name.toLowerCase().replace(/\s+/g, '-');
@@ -1331,6 +1378,8 @@
                 
                 const categoryTypes = categoryTypesMap[category.name] ? 
                     Array.from(categoryTypesMap[category.name]) : [];
+                
+                console.log(`📁 ${category.name} Types:`, categoryTypes);
                 
                 if (categoryTypes.length > 0) {
                     // Category with types - create mega menu
@@ -1346,6 +1395,8 @@
                                     );
                                     const imageUrl = typeProduct?.images?.[0] || 
                                         'https://images.unsplash.com/photo-1586023492125-27b2c045efd7?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=400&q=80';
+                                    
+                                    console.log(`🖼️ ${category.name} - ${type}:`, imageUrl);
                                     
                                     return `
                                         <a href="category-products.html?category=${categoryKey}&type=${typeSlug}" class="pattern-item" data-category="${category.name}" data-type="${type}">
