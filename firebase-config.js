@@ -1,4 +1,4 @@
-// firebase-config.js - Only Firebase configuration
+// firebase-config.js - Full and Correct Export Setup
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.5.0/firebase-app.js";
 import { 
     getFirestore, 
@@ -11,7 +11,8 @@ import {
     deleteDoc, 
     updateDoc, 
     where, 
-    serverTimestamp 
+    serverTimestamp,
+    onSnapshot // <--- FIX: onSnapshot is now correctly imported
 } from "https://www.gstatic.com/firebasejs/12.5.0/firebase-firestore.js";
 import { 
     getAuth, 
@@ -41,17 +42,24 @@ const firebaseConfig = {
     measurementId: "G-H7JMX9VNYF"
 };
 
-// Initialize Firebase
+// Initialize Firebase services
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 const auth = getAuth(app);
 const storage = getStorage(app);
 const googleProvider = new GoogleAuthProvider();
 
-// Export everything
+// Export everything for use in other modules
 export { 
     app, db, auth, storage, googleProvider,
+    
+    // Firestore exports (includes the fix: onSnapshot)
     collection, addDoc, getDocs, query, orderBy, doc, deleteDoc, updateDoc, where, serverTimestamp,
+    onSnapshot, // <--- FIX: onSnapshot is now correctly exported
+    
+    // Auth exports
     createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, signInWithPopup, onAuthStateChanged, updateProfile,
+    
+    // Storage exports
     ref, uploadBytes, getDownloadURL
 };
