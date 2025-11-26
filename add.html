@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Admin Panel - Rajasthan SandStone Hub</title>
+<title>Add Stone Product - Rajasthan SandStone Hub</title>
 <link rel="icon" href="stone.png" type="image/png">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <style>
@@ -35,279 +35,39 @@ body {
   line-height: 1.6;
   color: var(--dark);
   background: var(--light);
-  display: flex;
   min-height: 100vh;
-}
-
-/* ===== Sidebar ===== */
-.sidebar {
-  width: 250px;
-  background: var(--primary);
-  color: white;
-  padding: 20px 0;
-  position: fixed;
-  height: 100vh;
-  overflow-y: auto;
-  box-shadow: 2px 0 10px rgba(0,0,0,0.1);
-  z-index: 1000;
-  transition: var(--transition);
-  transform: translateX(0);
-}
-
-.sidebar.collapsed {
-  width: 70px;
-}
-
-.sidebar.hidden {
-  transform: translateX(-100%);
-}
-
-.sidebar-header {
-  padding: 0 20px 20px;
-  border-bottom: 1px solid rgba(255,255,255,0.2);
-  margin-bottom: 15px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-
-.sidebar.collapsed .sidebar-header {
-  justify-content: center;
-  padding: 0 10px 20px;
-}
-
-.sidebar-logo {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  font-size: 1.3rem;
-  font-weight: 700;
-}
-
-.sidebar.collapsed .sidebar-logo span {
-  display: none;
-}
-
-.sidebar-logo img {
-  height: 40px;
-  border-radius: 5px;
-}
-
-.sidebar-toggle {
-  background: none;
-  border: none;
-  color: white;
-  font-size: 1.2rem;
-  cursor: pointer;
-  padding: 5px;
-  border-radius: 50%;
-  transition: var(--transition);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.sidebar-toggle:hover {
-  background: rgba(255,255,255,0.1);
-}
-
-.sidebar.collapsed .sidebar-toggle {
-  transform: rotate(180deg);
-}
-
-.sidebar-nav {
-  list-style: none;
-}
-
-.sidebar.collapsed .sidebar-nav span {
-  display: none;
-}
-
-.sidebar-nav a {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 12px 20px;
-  color: white;
-  text-decoration: none;
-  transition: var(--transition);
-  border-left: 3px solid transparent;
-  white-space: nowrap;
-}
-
-.sidebar.collapsed .sidebar-nav a {
-  padding: 12px;
-  justify-content: center;
-}
-
-.sidebar-nav a:hover, .sidebar-nav a.active {
-  background: rgba(255,255,255,0.1);
-  border-left-color: white;
-}
-
-.sidebar-nav i {
-  width: 20px;
-  text-align: center;
-  flex-shrink: 0;
-}
-
-/* ===== Main Content ===== */
-.main-content {
-  flex: 1;
-  margin-left: 250px;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  transition: var(--transition);
-}
-
-.main-content.expanded {
-  margin-left: 70px;
-}
-
-.main-content.full-width {
-  margin-left: 0;
+  padding: 20px;
 }
 
 /* ===== Header ===== */
 .top-header {
   background: white;
-  padding: 10px 30px;
+  padding: 15px 30px;
   display: flex;
   justify-content: space-between;
   align-items: center;
   box-shadow: var(--shadow);
-  position: sticky;
-  top: 0;
-  z-index: 999;
-  gap: 15px;
-  min-height: 60px;
+  border-radius: var(--radius);
+  margin-bottom: 30px;
 }
 
-.user-profile {
-  display: flex;
-  align-items: center;
-  gap: 15px;
-  margin-left: auto;
-}
-
-.user-info {
+.header-logo {
   display: flex;
   align-items: center;
   gap: 10px;
-  background: var(--light);
-  padding: 6px 12px;
-  border-radius: var(--radius);
-}
-
-.user-avatar {
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  background: var(--primary);
-  color: white;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-weight: bold;
-  font-size: 0.8rem;
-}
-
-.user-name {
-  font-weight: 600;
+  font-size: 1.5rem;
+  font-weight: 700;
   color: var(--secondary);
-  white-space: nowrap;
-  font-size: 0.9rem;
 }
 
-.header-actions {
-  display: flex;
-  gap: 8px;
-  align-items: center;
-  flex-wrap: nowrap;
-}
-
-.btn {
-  padding: 6px 12px;
-  border-radius: var(--radius);
-  font-weight: 600;
-  transition: var(--transition);
-  display: inline-flex;
-  align-items: center;
-  gap: 5px;
-  cursor: pointer;
-  border: none;
-  font-size: 13px;
-  text-decoration: none;
-  white-space: nowrap;
-}
-
-.btn-primary {
-  background: var(--primary);
-  color: white;
-}
-
-.btn-primary:hover {
-  background: var(--primary-dark);
-  transform: translateY(-2px);
-}
-
-.btn-outline {
-  background: transparent;
-  border: 1px solid var(--primary);
-  color: var(--primary);
-}
-
-.btn-outline:hover {
-  background: var(--primary);
-  color: white;
-}
-
-.btn-danger {
-  background: var(--danger);
-  color: white;
-}
-
-.btn-danger:hover {
-  background: #c82333;
-  transform: translateY(-2px);
-}
-
-.btn-camera {
-  background: #4CAF50;
-  color: white;
-}
-
-.btn-camera:hover {
-  background: #45a049;
-  transform: translateY(-2px);
-}
-
-.btn-warning {
-  background: var(--warning);
-  color: var(--dark);
-}
-
-.btn-warning:hover {
-  background: #e0a800;
-  transform: translateY(-2px);
-}
-
-.btn-info {
-  background: var(--info);
-  color: white;
-}
-
-.btn-info:hover {
-  background: #138496;
-  transform: translateY(-2px);
+.header-logo img {
+  height: 40px;
+  border-radius: 5px;
 }
 
 /* ===== Container ===== */
 .container {
-  padding: 30px;
-  flex: 1;
-  max-width: 1200px;
+  max-width: 1000px;
   margin: 0 auto;
   width: 100%;
 }
@@ -810,7 +570,8 @@ footer {
   color: white;
   text-align: center;
   padding: 20px;
-  margin-top: auto;
+  margin-top: 40px;
+  border-radius: var(--radius);
   font-size: 0.95rem;
 }
 
@@ -824,233 +585,8 @@ footer a:hover {
   color: var(--primary);
 }
 
-/* ===== Auth Modals ===== */
-.modal {
-  display: none;
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(0,0,0,0.6);
-  justify-content: center;
-  align-items: center;
-  z-index: 2000;
-  backdrop-filter: blur(5px);
-}
-
-.modal.active {
-  display: flex;
-}
-
-.modal-content {
-  background: white;
-  padding: 35px;
-  border-radius: 15px;
-  width: 420px;
-  max-width: 90vw;
-  max-height: 90vh;
-  overflow-y: auto;
-  position: relative;
-  box-shadow: 0 20px 40px rgba(0,0,0,0.3);
-  transform: translateY(-30px);
-  opacity: 0;
-  transition: all 0.4s ease;
-  margin: 20px;
-}
-
-.modal.active .modal-content {
-  transform: translateY(0);
-  opacity: 1;
-}
-
-.modal-content h2 {
-  text-align: center;
-  color: var(--primary);
-  margin-bottom: 25px;
-  font-size: 1.8rem;
-  font-weight: 700;
-}
-
-.modal .form-group {
-  margin-bottom: 20px;
-  position: relative;
-}
-
-.modal .form-group input {
-  width: 100%;
-  padding: 14px 16px;
-  border-radius: var(--radius);
-  border: 1px solid var(--gray);
-  font-size: 1rem;
-  transition: var(--transition);
-  background: #fafafa;
-}
-
-.modal .form-group input:focus {
-  outline: none;
-  border-color: var(--primary);
-  box-shadow: 0 0 0 3px rgba(199,169,123,0.2);
-  background: white;
-}
-
-.modal-close {
-  position: absolute;
-  top: 20px;
-  right: 20px;
-  font-size: 28px;
-  cursor: pointer;
-  color: var(--dark);
-  background: none;
-  border: none;
-  width: 45px;
-  height: 45px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 50%;
-  transition: var(--transition);
-  z-index: 2001;
-  font-weight: bold;
-}
-
-.modal-close:hover {
-  color: var(--primary);
-  transform: rotate(90deg);
-}
-
-.modal-divider {
-  text-align: center;
-  margin: 20px 0;
-  color: #666;
-  position: relative;
-}
-
-.modal-divider:before {
-  content: '';
-  position: absolute;
-  top: 50%;
-  left: 0;
-  right: 0;
-  height: 1px;
-  background: var(--gray);
-}
-
-.modal-divider span {
-  background: white;
-  padding: 0 15px;
-  position: relative;
-  z-index: 1;
-  font-size: 1rem;
-}
-
-.modal a {
-  text-decoration: none;
-  color: var(--primary);
-  display: block;
-  text-align: center;
-  margin-top: 15px;
-  font-weight: 600;
-  transition: var(--transition);
-  font-size: 1rem;
-}
-
-.modal a:hover {
-  color: var(--primary-dark);
-  text-decoration: underline;
-}
-
-.feedback {
-  text-align: center;
-  margin-top: 15px;
-  font-weight: 600;
-  font-size: 0.9rem;
-  min-height: 20px;
-  padding: 8px;
-  border-radius: var(--radius);
-}
-
-/* ===== Mobile Menu Button ===== */
-.mobile-menu-btn {
-  display: none;
-  background: none;
-  border: none;
-  font-size: 1.3rem;
-  color: var(--secondary);
-  cursor: pointer;
-  padding: 5px;
-  z-index: 1001;
-}
-
-/* Mobile Sidebar Close Button */
-.mobile-sidebar-close {
-  display: none;
-  position: absolute;
-  top: 12px;
-  right: 12px;
-  background: none;
-  border: none;
-  color: white;
-  font-size: 1.3rem;
-  cursor: pointer;
-  z-index: 1002;
-  width: 30px;
-  height: 30px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.mobile-sidebar-close:hover {
-  background: rgba(255,255,255,0.1);
-}
-
-/* Mobile sidebar overlay */
-.sidebar-overlay {
-  display: none;
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(0,0,0,0.5);
-  z-index: 999;
-}
-
-.sidebar-overlay.active {
-  display: block;
-}
-
-/* Desktop View - Hide Mobile Close Button */
-@media (min-width: 769px) {
-  .mobile-sidebar-close {
-    display: none !important;
-  }
-}
-
-/* Mobile View - Hide Desktop Toggle Button */
-@media (max-width: 768px) {
-  .sidebar-toggle {
-    display: none !important;
-  }
-  
-  .mobile-sidebar-close {
-    display: flex !important;
-  }
-}
-
 /* ===== Responsive Design ===== */
 @media (max-width: 1024px) {
-  .header-actions {
-    gap: 6px;
-  }
-  
-  .btn {
-    padding: 6px 10px;
-    font-size: 12px;
-  }
-  
   .upload-options {
     flex-direction: column;
   }
@@ -1071,74 +607,20 @@ footer a:hover {
 }
 
 @media (max-width: 768px) {
-  .sidebar {
-    width: 280px;
-    transform: translateX(-100%);
-  }
-  
-  .sidebar.active {
-    transform: translateX(0);
-  }
-  
-  .main-content {
-    margin-left: 0 !important;
-  }
-  
-  .main-content.full-width {
-    margin-left: 0;
-  }
-  
-  .mobile-menu-btn {
-    display: block;
-  }
-  
-  .mobile-sidebar-close {
-    display: flex;
+  body {
+    padding: 10px;
   }
   
   .top-header {
-    padding: 8px 15px;
-    flex-wrap: wrap;
-    gap: 8px;
-    min-height: 50px;
+    padding: 12px 20px;
   }
   
-  .header-actions {
-    order: 2;
-    width: 100%;
-    justify-content: center;
-    flex-wrap: wrap;
-    gap: 6px;
-  }
-  
-  .user-profile {
-    order: 1;
-    margin-left: 0;
-    flex: 1;
-    justify-content: flex-end;
-  }
-  
-  .user-info {
-    padding: 5px 10px;
-  }
-  
-  .user-name {
-    font-size: 0.8rem;
-  }
-  
-  .user-avatar {
-    width: 28px;
-    height: 28px;
-    font-size: 0.7rem;
-  }
-  
-  .btn {
-    padding: 5px 8px;
-    font-size: 11px;
+  .header-logo {
+    font-size: 1.3rem;
   }
   
   .container {
-    padding: 20px 15px;
+    padding: 0;
   }
   
   .page-title {
@@ -1154,72 +636,15 @@ footer a:hover {
     width: 120px;
     height: 120px;
   }
-  
-  .modal-content {
-    width: 95%;
-    margin: 10px;
-    padding: 25px 20px;
-  }
-  
-  .modal-content h2 {
-    font-size: 1.5rem;
-    margin-bottom: 20px;
-  }
-  
-  .camera-content {
-    width: 100%;
-    padding: 0;
-  }
-  
-  .camera-preview {
-    height: 100%;
-  }
-  
-  .camera-controls {
-    bottom: 20px;
-  }
-  
-  .camera-close {
-    top: 15px;
-    right: 15px;
-    width: 45px;
-    height: 45px;
-    font-size: 1.8rem;
-  }
 }
 
 @media (max-width: 480px) {
   .top-header {
-    padding: 6px 12px;
-    gap: 6px;
-    min-height: 45px;
+    padding: 10px 15px;
   }
   
-  .header-actions {
-    gap: 4px;
-  }
-  
-  .btn {
-    padding: 4px 6px;
-    font-size: 10px;
-  }
-  
-  .user-info {
-    padding: 4px 8px;
-  }
-  
-  .user-name {
-    font-size: 0.75rem;
-  }
-  
-  .user-avatar {
-    width: 24px;
-    height: 24px;
-    font-size: 0.65rem;
-  }
-  
-  .container {
-    padding: 15px 12px;
+  .header-logo {
+    font-size: 1.2rem;
   }
   
   .page-title {
@@ -1248,56 +673,9 @@ footer a:hover {
     padding: 14px 24px;
     font-size: 1rem;
   }
-  
-  .modal-content {
-    padding: 20px 15px;
-  }
-  
-  .modal-content h2 {
-    font-size: 1.3rem;
-  }
-  
-  .modal .form-group input {
-    padding: 12px 14px;
-    font-size: 0.9rem;
-  }
-  
-  .camera-controls {
-    bottom: 15px;
-  }
-  
-  .camera-btn {
-    padding: 12px 20px;
-    font-size: 1rem;
-  }
-  
-  .capture-btn {
-    width: 60px;
-    height: 60px;
-  }
 }
 
 /* Loading and Utility Styles */
-.loading {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 12px;
-  padding: 40px;
-  color: var(--secondary);
-  font-size: 1.1rem;
-}
-
-.loading::after {
-  content: '';
-  width: 24px;
-  height: 24px;
-  border: 3px solid #f3f3f3;
-  border-top: 3px solid var(--primary);
-  border-radius: 50%;
-  animation: spin 1s linear infinite;
-}
-
 .error-message {
   color: var(--danger);
   font-size: 0.9rem;
@@ -1379,386 +757,329 @@ footer a:hover {
 </head>
 <body>
 
-<!-- Mobile Sidebar Overlay -->
-<div class="sidebar-overlay" id="sidebar-overlay"></div>
-
-<!-- ===== Sidebar ===== -->
-<div class="sidebar" id="sidebar">
-  <div class="sidebar-header">
-    <div class="sidebar-logo">
-      <img src="stone.png" alt="Rajasthan Stones Logo">
-      <span>Rajasthan Stones</span>
-    </div>
-    <button class="sidebar-toggle" id="sidebar-toggle">
-      <i class="fas fa-chevron-left"></i>
-    </button>
-    <button class="mobile-sidebar-close" id="mobile-sidebar-close">
-      <i class="fas fa-times"></i>
-    </button>
+<!-- ===== Top Header ===== -->
+<header class="top-header">
+  <div class="header-logo">
+    <img src="stone.png" alt="Rajasthan Stones Logo">
+    <span>Rajasthan SandStone Hub</span>
   </div>
-  <ul class="sidebar-nav">
-    <li><a href="index.html"><i class="fas fa-home"></i> <span>Home</span></a></li>
-    <li><a href="sandstone.html"><i class="fas fa-gem"></i> <span>Sand Stone</span></a></li>
-    <li><a href="kota.html"><i class="fas fa-cube"></i> <span>Kota Stone</span></a></li>
-    <li><a href="granite.html"><i class="fas fa-mountain"></i> <span>Granite</span></a></li>
-    <li><a href="marble.html"><i class="fas fa-square"></i> <span>Marble</span></a></li>
-    <li><a href="dholpur.html"><i class="fas fa-palette"></i> <span>Dholpur</span></a></li>
-    <li><a href="tiles.html"><i class="fas fa-th-large"></i> <span>Tiles</span></a></li>
-    <li><a href="mandana.html"><i class="fas fa-draw-polygon"></i> <span>Mandana</span></a></li>
-    <li><a href="other-stones.html"><i class="fas fa-shapes"></i> <span>Other Stones</span></a></li>
-    <li><a href="history.html"><i class="fas fa-history"></i> <span>My History</span></a></li>
-    <li><a href="about.html"><i class="fas fa-info-circle"></i> <span>About Us</span></a></li>
-    <li><a href="contact.html"><i class="fas fa-phone"></i> <span>Contact</span></a></li>
-    <li><a href="privacy.html"><i class="fas fa-shield-alt"></i> <span>Privacy Policy</span></a></li>
-    <li><a href="terms.html"><i class="fas fa-file-contract"></i> <span>Terms & Conditions</span></a></li>
-  </ul>
-</div>
+</header>
 
-<!-- ===== Main Content ===== -->
-<div class="main-content" id="main-content">
-  <!-- ===== Top Header ===== -->
-  <header class="top-header">
-    <button class="mobile-menu-btn" id="mobile-menu-btn">
-      <i class="fas fa-bars"></i>
-    </button>
-    <div class="header-actions">
-      <button id="home-btn" class="btn btn-outline" onclick="window.location='index.html'">
-        <i class="fas fa-home"></i> Home
-      </button>
-      <button id="history-btn" style="display:none;" class="btn btn-outline" onclick="window.location='history.html'">
-        <i class="fas fa-history"></i> My History
-      </button>
-      <button id="btn-open-signin" class="btn btn-primary">
-        <i class="fas fa-sign-in-alt"></i> Sign In
-      </button>
-      <button id="btn-open-signup" class="btn btn-outline">Sign Up</button>
-      <button id="btn-signout" style="display:none;" class="btn btn-outline">Sign Out</button>
-    </div>
-    <div class="user-profile">
-      <div class="user-info">
-        <div class="user-avatar" id="user-avatar">G</div>
-        <span class="user-name" id="user-name">Guest User</span>
+<!-- ===== Main Container ===== -->
+<div class="container">
+  <h1 class="page-title">Add Stone Product</h1>
+  
+  <div class="compulsory-note">
+    <i class="fas fa-exclamation-circle"></i> Fields marked with * are compulsory
+  </div>
+
+  <div class="form-container">
+    <form id="product-form">
+      <input type="hidden" id="product-id">
+
+      <!-- ===== Basic Information Section ===== -->
+      <div class="form-section">
+        <h3 class="section-title"><i class="fas fa-info-circle"></i> Basic Information</h3>
+        
+        <div class="form-group">
+          <label for="uses" class="required">Uses</label>
+          <select id="uses" required>
+            <option value="">Select Uses</option>
+            <option value="Flooring">Flooring</option>
+            <option value="Wall Cladding">Wall Cladding</option>
+            <option value="Countertops">Countertops</option>
+            <option value="Paving">Paving</option>
+            <option value="Staircase">Staircase</option>
+            <option value="Landscaping">Landscaping</option>
+            <option value="Monuments">Monuments</option>
+            <option value="Sculptures">Sculptures</option>
+            <option value="Interior Design">Interior Design</option>
+            <option value="Exterior Design">Exterior Design</option>
+            <option value="Other">Other (Please specify)</option>
+          </select>
+          <span class="field-hint">Select the primary use of this stone product</span>
+        </div>
+
+        <div class="form-group" id="other-uses-container" style="display: none;">
+          <label for="other_uses">Specify Other Uses</label>
+          <input type="text" id="other_uses" placeholder="Please specify other uses">
+          <span class="field-hint">Enter specific uses not listed above</span>
+        </div>
+
+        <div class="form-group">
+          <label for="category" class="required">Category</label>
+          <select id="category" required>
+            <option value="">Select Category</option>
+            <option value="Sand Stone">Sand Stone</option>
+            <option value="Kota Stone">Kota Stone</option>
+            <option value="Granite">Granite</option>
+            <option value="Marble">Marble</option>
+            <option value="Dholpur">Dholpur</option>
+            <option value="Tiles">Tiles</option>
+            <option value="Mandana">Mandana</option>
+            <option value="Other Stones">Other Stones</option>
+          </select>
+          <span class="field-hint">Select the main category of your stone product</span>
+        </div>
+
+        <div class="form-group">
+          <label for="stone_name" class="required">Stone Name</label>
+          <input type="text" id="stone_name" placeholder="Enter stone name" required>
+          <span class="field-hint">Name of the stone product (e.g., Raj Green Sandstone, White Marble, etc.)</span>
+        </div>
+
+        <div class="form-group">
+          <label for="sub_category">Sub-category</label>
+          <input type="text" id="sub_category" placeholder="Enter sub-category">
+          <span class="field-hint">Optional: Slabs, Tiles, Blocks, etc.</span>
+        </div>
       </div>
-    </div>
-  </header>
 
-  <!-- ===== Main Container ===== -->
-  <div class="container">
-    <h1 class="page-title">Add Stone Product</h1>
-    
-    <div class="compulsory-note">
-      <i class="fas fa-exclamation-circle"></i> Fields marked with * are compulsory
-    </div>
-
-    <div class="form-container">
-      <form id="product-form">
-        <input type="hidden" id="product-id">
-
-        <!-- ===== Basic Information Section ===== -->
-        <div class="form-section">
-          <h3 class="section-title"><i class="fas fa-info-circle"></i> Basic Information</h3>
-          
-          <div class="form-group">
-            <label for="category" class="required">Category</label>
-            <select id="category" required>
-              <option value="">Select Category</option>
-              <option value="Sand Stone">Sand Stone</option>
-              <option value="Kota Stone">Kota Stone</option>
-              <option value="Granite">Granite</option>
-              <option value="Marble">Marble</option>
-              <option value="Dholpur">Dholpur</option>
-              <option value="Tiles">Tiles</option>
-              <option value="Mandana">Mandana</option>
-              <option value="Other Stones">Other Stones</option>
-            </select>
-            <span class="field-hint">Select the main category of your stone product</span>
+      <!-- ===== Product Details Section ===== -->
+      <div class="form-section">
+        <h3 class="section-title"><i class="fas fa-cube"></i> Product Details</h3>
+        
+        <div class="form-group type-select-container">
+          <label for="type">Type</label>
+          <select id="type">
+            <option value="">Select Type</option>
+            <option value="Natural">Natural</option>
+            <option value="Calibrated">Calibrated</option>
+            <option value="Polished">Polished</option>
+            <option value="Honed">Honed</option>
+            <option value="Brushed">Brushed</option>
+            <option value="Flamed">Flamed</option>
+            <option value="Tumbled">Tumbled</option>
+            <option value="Other">Other (Please specify)</option>
+          </select>
+          <div class="type-other-input" id="type-other-container">
+            <input type="text" id="type_other" placeholder="Enter custom type">
           </div>
-
-          <div class="form-group">
-            <label for="stone_name" class="required">Stone Name</label>
-            <input type="text" id="stone_name" placeholder="Enter stone name" required>
-            <span class="field-hint">Name of the stone product (e.g., Raj Green Sandstone, White Marble, etc.)</span>
-          </div>
-
-          <div class="form-group">
-            <label for="uses" class="required">Uses</label>
-            <select id="uses" required>
-              <option value="">Select Uses</option>
-              <option value="Flooring">Flooring</option>
-              <option value="Wall Cladding">Wall Cladding</option>
-              <option value="Countertops">Countertops</option>
-              <option value="Paving">Paving</option>
-              <option value="Staircase">Staircase</option>
-              <option value="Landscaping">Landscaping</option>
-              <option value="Monuments">Monuments</option>
-              <option value="Sculptures">Sculptures</option>
-              <option value="Interior Design">Interior Design</option>
-              <option value="Exterior Design">Exterior Design</option>
-              <option value="Other">Other (Please specify)</option>
-            </select>
-            <span class="field-hint">Select the primary use of this stone product</span>
-          </div>
-
-          <div class="form-group" id="other-uses-container" style="display: none;">
-            <label for="other_uses">Specify Other Uses</label>
-            <input type="text" id="other_uses" placeholder="Please specify other uses">
-            <span class="field-hint">Enter specific uses not listed above</span>
-          </div>
-
-          <div class="form-group">
-            <label for="sub_category">Sub-category</label>
-            <input type="text" id="sub_category" placeholder="Enter sub-category">
-            <span class="field-hint">Optional: Slabs, Tiles, Blocks, etc.</span>
-          </div>
+          <span class="field-hint">Select the type of stone finish or processing</span>
         </div>
 
-        <!-- ===== Product Details Section ===== -->
-        <div class="form-section">
-          <h3 class="section-title"><i class="fas fa-cube"></i> Product Details</h3>
-          
-          <div class="form-group type-select-container">
-            <label for="type">Type</label>
-            <select id="type">
-              <option value="">Select Type</option>
-              <option value="Natural">Natural</option>
-              <option value="Calibrated">Calibrated</option>
-              <option value="Polished">Polished</option>
-              <option value="Honed">Honed</option>
-              <option value="Brushed">Brushed</option>
-              <option value="Flamed">Flamed</option>
-              <option value="Tumbled">Tumbled</option>
-              <option value="Other">Other (Please specify)</option>
-            </select>
-            <div class="type-other-input" id="type-other-container">
-              <input type="text" id="type_other" placeholder="Enter custom type">
-            </div>
-            <span class="field-hint">Select the type of stone finish or processing</span>
-          </div>
-
-          <div class="form-row">
-            <div class="form-col">
-              <div class="form-group">
-                <label for="color">Color</label>
-                <input type="text" id="color" placeholder="Enter color">
-                <span class="field-hint">Optional: Green, Brown, White, Black, etc.</span>
-              </div>
-            </div>
-            <div class="form-col">
-              <div class="form-group">
-                <label for="thickness">Thickness</label>
-                <input type="text" id="thickness" placeholder="Enter thickness">
-                <span class="field-hint">Optional: 20-40 mm, 10-20 mm, etc.</span>
-              </div>
+        <div class="form-row">
+          <div class="form-col">
+            <div class="form-group">
+              <label for="color">Color</label>
+              <input type="text" id="color" placeholder="Enter color">
+              <span class="field-hint">Optional: Green, Brown, White, Black, etc.</span>
             </div>
           </div>
-
-          <div class="form-row">
-            <div class="form-col">
-              <div class="form-group">
-                <label for="length">Length</label>
-                <input type="text" id="length" placeholder="Enter length">
-                <span class="field-hint">Optional: In mm, cm, or feet</span>
-              </div>
-            </div>
-            <div class="form-col">
-              <div class="form-group">
-                <label for="width">Width</label>
-                <input type="text" id="width" placeholder="Enter width">
-                <span class="field-hint">Optional: In mm, cm, or feet</span>
-              </div>
-            </div>
-          </div>
-
-          <div class="form-group">
-            <label for="size">Size</label>
-            <input type="text" id="size" placeholder="Enter size">
-            <span class="field-hint">Optional: Custom sizes, Standard tiles, Slabs dimensions</span>
-          </div>
-
-          <div class="form-group">
-            <label for="finish">Finish</label>
-            <input type="text" id="finish" placeholder="Enter finish">
-            <span class="field-hint">Optional: Natural, Polished, Honed, Calibrated, etc.</span>
-          </div>
-
-          <div class="form-group">
-            <label for="usage">Usage</label>
-            <input type="text" id="usage" placeholder="Enter usage">
-            <span class="field-hint">Optional: Flooring, Wall Cladding, Countertops, etc.</span>
-          </div>
-        </div>
-
-        <!-- ===== Pricing & Rate Section ===== -->
-        <div class="form-section">
-          <h3 class="section-title"><i class="fas fa-tag"></i> Pricing & Rate</h3>
-          
-          <div class="form-row">
-            <div class="form-col">
-              <div class="form-group">
-                <label for="price">Price</label>
-                <input type="number" id="price" placeholder="Enter price">
-                <span class="field-hint">Optional: Price of the product</span>
-              </div>
-            </div>
-            <div class="form-col">
-              <div class="form-group">
-                <label for="price_unit">Unit</label>
-                <select id="price_unit">
-                  <option value="">Select Unit</option>
-                  <option value="sqft">Per Sq Ft</option>
-                  <option value="sqm">Per Sq M</option>
-                  <option value="piece">Per Piece</option>
-                  <option value="kg">Per Kg</option>
-                  <option value="ton">Per Ton</option>
-                  <option value="cubic">Per Cubic Ft</option>
-                  <option value="other">Other Unit</option>
-                </select>
-                <span class="field-hint">Select pricing unit</span>
-              </div>
-            </div>
-          </div>
-
-          <div class="form-group" id="other-unit-container" style="display: none;">
-            <label for="other_unit">Specify Other Unit</label>
-            <input type="text" id="other_unit" placeholder="Enter custom unit">
-            <span class="field-hint">Enter unit not listed above</span>
-          </div>
-
-          <div class="form-group">
-            <label for="rate_description">Rate Description</label>
-            <textarea id="rate_description" placeholder="Enter detailed rate description, quantity discounts, etc." rows="3"></textarea>
-            <span class="field-hint">Optional: Detailed pricing information, bulk discounts, etc.</span>
-          </div>
-        </div>
-
-        <!-- ===== Technical Specifications Section ===== -->
-        <div class="form-section">
-          <h3 class="section-title"><i class="fas fa-flask"></i> Technical Specifications</h3>
-          
-          <div class="form-group">
-            <label for="water_absorption">Water Absorption</label>
-            <input type="text" id="water_absorption" placeholder="Enter water absorption">
-            <span class="field-hint">Optional: 2-3%, 0.5-1%, etc.</span>
-          </div>
-
-          <div class="form-group">
-            <label for="density">Density</label>
-            <input type="text" id="density" placeholder="Enter density">
-            <span class="field-hint">Optional: 2.4-2.6 g/cm³, 2.7-2.9 g/cm³, etc.</span>
-          </div>
-
-          <div class="form-group">
-            <label for="compressive_strength">Compressive Strength</label>
-            <input type="text" id="compressive_strength" placeholder="Enter compressive strength">
-            <span class="field-hint">Optional: 1800-2200 kg/cm², 2500-3000 kg/cm², etc.</span>
-          </div>
-
-          <div class="form-group">
-            <label for="description">Description</label>
-            <textarea id="description" placeholder="Enter product description" rows="4"></textarea>
-            <span class="field-hint">Optional: Detailed description about the stone product</span>
-          </div>
-        </div>
-
-        <!-- ===== Contact Information Section ===== -->
-        <div class="form-section">
-          <h3 class="section-title"><i class="fas fa-address-card"></i> Contact Information</h3>
-          
-          <div class="form-group">
-            <label for="contact_country_code" class="required">Country Code</label>
-            <div class="phone-input-container">
-              <span class="country-code-prefix">+</span>
-              <input type="text" id="contact_country_code" class="country-code-input" placeholder="91" value="91" required maxlength="4" oninput="validateCountryCode(this)">
-            </div>
-            <span class="field-hint">Enter country code without + (e.g., 91 for India)</span>
-          </div>
-
-          <div class="form-group">
-            <label for="contact_number" class="required">Mobile Number</label>
-            <div class="phone-input-container">
-              <span class="phone-prefix">+<span id="country-code-display">91</span></span>
-              <input type="text" id="contact_number" class="phone-input" placeholder="Mobile Number" required maxlength="10" oninput="validatePhoneNumber(this)">
-            </div>
-            <span class="field-hint">Enter 10-digit mobile number without country code</span>
-          </div>
-
-          <div class="form-group">
-            <label for="email" class="required">Email Address</label>
-            <input type="email" id="email" placeholder="Enter email address" required>
-            <span class="field-hint">Your business email address</span>
-          </div>
-
-          <div class="form-group">
-            <label for="factory_name" class="required">Company / Factory Name</label>
-            <input type="text" id="factory_name" placeholder="Enter company/factory name" required>
-            <span class="field-hint">Name of your business or factory</span>
-          </div>
-
-          <div class="form-group">
-            <label for="address" class="required">Address</label>
-            <textarea id="address" placeholder="Enter complete address" rows="3" required></textarea>
-            <span class="field-hint">Complete business address</span>
-          </div>
-
-          <div class="form-group">
-            <label for="gst_number">GST Number</label>
-            <input type="text" id="gst_number" placeholder="Enter GST number">
-            <span class="field-hint">Optional: Your business GST number</span>
-          </div>
-        </div>
-
-        <!-- ===== Additional Fields Section ===== -->
-        <div class="additional-fields-section">
-          <h3 class="section-title"><i class="fas fa-plus-circle"></i> Additional Information</h3>
-          <span class="field-hint">Add any extra fields you want to include in your product listing</span>
-          
-          <div id="additional-fields-container">
-            <!-- Additional fields will be added here dynamically -->
-          </div>
-          
-          <button type="button" class="add-field-btn" id="add-field-btn">
-            <i class="fas fa-plus"></i> Add Custom Field
-          </button>
-        </div>
-
-        <!-- ===== Image Upload Section with Camera ===== -->
-        <div class="form-section">
-          <h3 class="section-title"><i class="fas fa-images"></i> Product Images</h3>
-          
-          <div class="form-group">
-            <label class="required">Upload Product Images</label>
-            <div class="image-upload-section">
-              <div class="upload-options">
-                <div class="upload-btn" onclick="document.getElementById('imageInput').click()">
-                  <i class="fas fa-folder-open"></i> Choose from Gallery
-                </div>
-                <div class="upload-btn btn-camera" id="camera-btn">
-                  <i class="fas fa-camera"></i> Take Photo
-                </div>
-                <div class="upload-btn btn-danger" id="cancel-upload">
-                  <i class="fas fa-times"></i> Clear All Images
-                </div>
-              </div>
-              <input type="file" id="imageInput" accept="image/*" multiple style="display: none;">
-              <small class="field-hint">Select multiple images (max 10) - You can use both gallery and camera. At least one image is required.</small>
-              <div class="preview" id="preview"></div>
+          <div class="form-col">
+            <div class="form-group">
+              <label for="thickness">Thickness</label>
+              <input type="text" id="thickness" placeholder="Enter thickness">
+              <span class="field-hint">Optional: 20-40 mm, 10-20 mm, etc.</span>
             </div>
           </div>
         </div>
 
-        <button type="submit" class="submit-btn" id="submit-btn">
-          <i class="fas fa-save"></i> Save Product
+        <div class="form-row">
+          <div class="form-col">
+            <div class="form-group">
+              <label for="length">Length</label>
+              <input type="text" id="length" placeholder="Enter length">
+              <span class="field-hint">Optional: In mm, cm, or feet</span>
+            </div>
+          </div>
+          <div class="form-col">
+            <div class="form-group">
+              <label for="width">Width</label>
+              <input type="text" id="width" placeholder="Enter width">
+              <span class="field-hint">Optional: In mm, cm, or feet</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="size">Size</label>
+          <input type="text" id="size" placeholder="Enter size">
+          <span class="field-hint">Optional: Custom sizes, Standard tiles, Slabs dimensions</span>
+        </div>
+
+        <div class="form-group">
+          <label for="finish">Finish</label>
+          <input type="text" id="finish" placeholder="Enter finish">
+          <span class="field-hint">Optional: Natural, Polished, Honed, Calibrated, etc.</span>
+        </div>
+
+        <div class="form-group">
+          <label for="usage">Usage</label>
+          <input type="text" id="usage" placeholder="Enter usage">
+          <span class="field-hint">Optional: Flooring, Wall Cladding, Countertops, etc.</span>
+        </div>
+      </div>
+
+      <!-- ===== Pricing & Rate Section ===== -->
+      <div class="form-section">
+        <h3 class="section-title"><i class="fas fa-tag"></i> Pricing & Rate</h3>
+        
+        <div class="form-row">
+          <div class="form-col">
+            <div class="form-group">
+              <label for="price">Price</label>
+              <input type="number" id="price" placeholder="Enter price">
+              <span class="field-hint">Optional: Price of the product</span>
+            </div>
+          </div>
+          <div class="form-col">
+            <div class="form-group">
+              <label for="price_unit">Unit</label>
+              <select id="price_unit">
+                <option value="">Select Unit</option>
+                <option value="sqft">Per Sq Ft</option>
+                <option value="sqm">Per Sq M</option>
+                <option value="piece">Per Piece</option>
+                <option value="kg">Per Kg</option>
+                <option value="ton">Per Ton</option>
+                <option value="cubic">Per Cubic Ft</option>
+                <option value="other">Other Unit</option>
+              </select>
+              <span class="field-hint">Select pricing unit</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-group" id="other-unit-container" style="display: none;">
+          <label for="other_unit">Specify Other Unit</label>
+          <input type="text" id="other_unit" placeholder="Enter custom unit">
+          <span class="field-hint">Enter unit not listed above</span>
+        </div>
+
+        <div class="form-group">
+          <label for="rate_description">Rate Description</label>
+          <textarea id="rate_description" placeholder="Enter detailed rate description, quantity discounts, etc." rows="3"></textarea>
+          <span class="field-hint">Optional: Detailed pricing information, bulk discounts, etc.</span>
+        </div>
+      </div>
+
+      <!-- ===== Technical Specifications Section ===== -->
+      <div class="form-section">
+        <h3 class="section-title"><i class="fas fa-flask"></i> Technical Specifications</h3>
+        
+        <div class="form-group">
+          <label for="water_absorption">Water Absorption</label>
+          <input type="text" id="water_absorption" placeholder="Enter water absorption">
+          <span class="field-hint">Optional: 2-3%, 0.5-1%, etc.</span>
+        </div>
+
+        <div class="form-group">
+          <label for="density">Density</label>
+          <input type="text" id="density" placeholder="Enter density">
+          <span class="field-hint">Optional: 2.4-2.6 g/cm³, 2.7-2.9 g/cm³, etc.</span>
+        </div>
+
+        <div class="form-group">
+          <label for="compressive_strength">Compressive Strength</label>
+          <input type="text" id="compressive_strength" placeholder="Enter compressive strength">
+          <span class="field-hint">Optional: 1800-2200 kg/cm², 2500-3000 kg/cm², etc.</span>
+        </div>
+
+        <div class="form-group">
+          <label for="description">Description</label>
+          <textarea id="description" placeholder="Enter product description" rows="4"></textarea>
+          <span class="field-hint">Optional: Detailed description about the stone product</span>
+        </div>
+      </div>
+
+      <!-- ===== Contact Information Section ===== -->
+      <div class="form-section">
+        <h3 class="section-title"><i class="fas fa-address-card"></i> Contact Information</h3>
+        
+        <div class="form-group">
+          <label for="contact_country_code" class="required">Country Code</label>
+          <div class="phone-input-container">
+            <span class="country-code-prefix">+</span>
+            <input type="text" id="contact_country_code" class="country-code-input" placeholder="91" value="91" required maxlength="4" oninput="validateCountryCode(this)">
+          </div>
+          <span class="field-hint">Enter country code without + (e.g., 91 for India)</span>
+        </div>
+
+        <div class="form-group">
+          <label for="contact_number" class="required">Mobile Number</label>
+          <div class="phone-input-container">
+            <span class="phone-prefix">+<span id="country-code-display">91</span></span>
+            <input type="text" id="contact_number" class="phone-input" placeholder="Mobile Number" required maxlength="10" oninput="validatePhoneNumber(this)">
+          </div>
+          <span class="field-hint">Enter 10-digit mobile number without country code</span>
+        </div>
+
+        <div class="form-group">
+          <label for="email" class="required">Email Address</label>
+          <input type="email" id="email" placeholder="Enter email address" required>
+          <span class="field-hint">Your business email address</span>
+        </div>
+
+        <div class="form-group">
+          <label for="factory_name" class="required">Company / Factory Name</label>
+          <input type="text" id="factory_name" placeholder="Enter company/factory name" required>
+          <span class="field-hint">Name of your business or factory</span>
+        </div>
+
+        <div class="form-group">
+          <label for="address" class="required">Address</label>
+          <textarea id="address" placeholder="Enter complete address" rows="3" required></textarea>
+          <span class="field-hint">Complete business address</span>
+        </div>
+
+        <div class="form-group">
+          <label for="gst_number">GST Number</label>
+          <input type="text" id="gst_number" placeholder="Enter GST number">
+          <span class="field-hint">Optional: Your business GST number</span>
+        </div>
+      </div>
+
+      <!-- ===== Additional Fields Section ===== -->
+      <div class="additional-fields-section">
+        <h3 class="section-title"><i class="fas fa-plus-circle"></i> Additional Information</h3>
+        <span class="field-hint">Add any extra fields you want to include in your product listing</span>
+        
+        <div id="additional-fields-container">
+          <!-- Additional fields will be added here dynamically -->
+        </div>
+        
+        <button type="button" class="add-field-btn" id="add-field-btn">
+          <i class="fas fa-plus"></i> Add Custom Field
         </button>
-      </form>
-    </div>
-  </div>
+      </div>
 
-  <!-- ===== Footer ===== -->
-  <footer>
-    &copy; 2025 Rajasthan SandStone Hub | Designed by RJ Services | 
-    <a href="about.html">About Us</a> | <a href="contact.html">Contact</a>
-  </footer>
+      <!-- ===== Image Upload Section with Camera ===== -->
+      <div class="form-section">
+        <h3 class="section-title"><i class="fas fa-images"></i> Product Images</h3>
+        
+        <div class="form-group">
+          <label class="required">Upload Product Images</label>
+          <div class="image-upload-section">
+            <div class="upload-options">
+              <div class="upload-btn" onclick="document.getElementById('imageInput').click()">
+                <i class="fas fa-folder-open"></i> Choose from Gallery
+              </div>
+              <div class="upload-btn btn-camera" id="camera-btn">
+                <i class="fas fa-camera"></i> Take Photo
+              </div>
+              <div class="upload-btn btn-danger" id="cancel-upload">
+                <i class="fas fa-times"></i> Clear All Images
+              </div>
+            </div>
+            <input type="file" id="imageInput" accept="image/*" multiple style="display: none;">
+            <small class="field-hint">Select multiple images (max 10) - You can use both gallery and camera. At least one image is required.</small>
+            <div class="preview" id="preview"></div>
+          </div>
+        </div>
+      </div>
+
+      <button type="submit" class="submit-btn" id="submit-btn">
+        <i class="fas fa-save"></i> Save Product
+      </button>
+    </form>
+  </div>
 </div>
+
+<!-- ===== Footer ===== -->
+<footer>
+  &copy; 2025 Rajasthan SandStone Hub | Designed by RJ Services
+</footer>
 
 <!-- ===== Processing Overlay ===== -->
 <div class="processing-overlay" id="processing-overlay">
@@ -1790,77 +1111,17 @@ footer a:hover {
   </div>
 </div>
 
-<!-- ===== Sign In Modal ===== -->
-<div class="modal" id="signin-modal">
-  <div class="modal-content">
-    <button class="modal-close">&times;</button>
-    <h2>Sign In</h2>
-    <div class="form-group">
-      <input type="email" id="signin-email" placeholder="Email Address">
-    </div>
-    <div class="form-group">
-      <input type="password" id="signin-password" placeholder="Password">
-    </div>
-    <button id="signin-btn" class="submit-btn">Sign In</button>
-    <div class="modal-divider">
-      <span>OR</span>
-    </div>
-    <button id="modal-google-signin" class="btn" style="background:#4285F4;color:white; display:flex; align-items:center; justify-content:center; gap:10px; width:100%; padding:14px;">
-      <img src="https://developers.google.com/identity/images/g-logo.png" alt="Google" style="width:20px; height:20px;">
-      Sign In with Google
-    </button>
-    <div class="feedback" id="signin-feedback"></div>
-    <a href="#" id="switch-to-signup">Don't have an account? Sign Up</a>
-  </div>
-</div>
-
-<!-- ===== Sign Up Modal ===== -->
-<div class="modal" id="signup-modal">
-  <div class="modal-content">
-    <button class="modal-close">&times;</button>
-    <h2>Create Account</h2>
-    <div class="form-group">
-      <input type="text" id="signup-name" placeholder="Full Name" required>
-      <div class="error-message" id="name-error">Please enter your full name</div>
-    </div>
-    <div class="form-group">
-      <input type="email" id="signup-email" placeholder="Email Address" required>
-      <div class="error-message" id="email-error">Please enter a valid email address</div>
-    </div>
-    <div class="form-group">
-      <div class="phone-input-container">
-        <span class="phone-prefix">+91</span>
-        <input type="text" id="signup-phone" class="phone-input" placeholder="Phone Number (10 digits)" maxlength="10" required oninput="validatePhoneNumber(this)">
-      </div>
-      <div class="error-message" id="phone-error">Please enter a valid 10-digit phone number</div>
-    </div>
-    <div class="form-group">
-      <input type="password" id="signup-password" placeholder="Password" required>
-      <div class="error-message" id="password-error">Password must be at least 6 characters</div>
-    </div>
-    <button id="signup-btn" class="submit-btn">Create Account</button>
-    <div class="feedback" id="signup-feedback"></div>
-    <a href="#" id="switch-to-signin">Already have an account? Sign In</a>
-  </div>
-</div>
-
 <script type="module">
 // CORRECTED IMPORTS - Using your firebase-config.js exports
 import { 
   db, 
   auth, 
-  googleProvider,
   collection, 
   addDoc, 
   doc, 
   updateDoc, 
   serverTimestamp,
-  signInWithPopup,
-  signOut,
-  onAuthStateChanged,
-  createUserWithEmailAndPassword,
-  signInWithEmailAndPassword,
-  updateProfile
+  onAuthStateChanged
 } from './firebase-config.js';
 
 /* ===== Global Variables ===== */
@@ -2208,269 +1469,6 @@ document.getElementById('contact_country_code').addEventListener('input', functi
   document.getElementById('country-code-display').textContent = this.value || '91';
 });
 
-/* ===== Mobile Sidebar Toggle ===== */
-const mobileMenuBtn = document.getElementById('mobile-menu-btn');
-const mobileSidebarClose = document.getElementById('mobile-sidebar-close');
-const sidebar = document.getElementById('sidebar');
-const sidebarOverlay = document.getElementById('sidebar-overlay');
-const mainContent = document.getElementById('main-content');
-
-function toggleMobileSidebar() {
-  sidebar.classList.toggle('active');
-  sidebarOverlay.classList.toggle('active');
-  document.body.style.overflow = sidebar.classList.contains('active') ? 'hidden' : '';
-}
-
-mobileMenuBtn.addEventListener('click', toggleMobileSidebar);
-mobileSidebarClose.addEventListener('click', toggleMobileSidebar);
-sidebarOverlay.addEventListener('click', toggleMobileSidebar);
-
-// Close sidebar when clicking on links (mobile)
-document.querySelectorAll('.sidebar-nav a').forEach(link => {
-  link.addEventListener('click', () => {
-    if (window.innerWidth <= 768) {
-      toggleMobileSidebar();
-    }
-  });
-});
-
-/* ===== Desktop Sidebar Toggle ===== */
-document.getElementById('sidebar-toggle').addEventListener('click', () => {
-  if (window.innerWidth > 768) {
-    sidebar.classList.toggle('collapsed');
-    mainContent.classList.toggle('expanded');
-    
-    const toggleIcon = document.querySelector('.sidebar-toggle i');
-    if (sidebar.classList.contains('collapsed')) {
-      toggleIcon.className = 'fas fa-chevron-right';
-    } else {
-      toggleIcon.className = 'fas fa-chevron-left';
-    }
-  }
-});
-
-/* ===== Modal Functions ===== */
-function openModal(id){ 
-  document.getElementById(id).classList.add('active'); 
-  document.body.style.overflow = 'hidden';
-}
-
-function closeModal(id){ 
-  document.getElementById(id).classList.remove('active'); 
-  document.body.style.overflow = '';
-}
-
-// Close modals when clicking close button
-document.querySelectorAll('.modal-close').forEach(btn => { 
-  btn.addEventListener('click', (e) => { 
-    e.stopPropagation();
-    const modal = e.target.closest('.modal');
-    if (modal) {
-      closeModal(modal.id);
-    }
-  }); 
-});
-
-// Close modals when clicking outside
-document.querySelectorAll('.modal').forEach(modal => {
-  modal.addEventListener('click', (e) => {
-    if (e.target === modal) {
-      closeModal(modal.id);
-    }
-  });
-});
-
-document.addEventListener('keydown', (e) => { 
-  if(e.key === "Escape"){ 
-    document.querySelectorAll('.modal').forEach(modal => closeModal(modal.id));
-    document.getElementById('camera-modal').classList.remove('active');
-    document.body.style.overflow = '';
-  } 
-});
-
-// Switch between sign in and sign up
-document.getElementById('switch-to-signup').addEventListener('click', (e) => {
-  e.preventDefault();
-  closeModal('signin-modal');
-  openModal('signup-modal');
-});
-
-document.getElementById('switch-to-signin').addEventListener('click', (e) => {
-  e.preventDefault();
-  closeModal('signup-modal');
-  openModal('signin-modal');
-});
-
-/* ===== Header Buttons & Auth ===== */
-const btnOpenSignin = document.getElementById('btn-open-signin');
-const btnOpenSignup = document.getElementById('btn-open-signup');
-const btnSignOut = document.getElementById('btn-signout');
-const historyBtn = document.getElementById('history-btn');
-const userAvatar = document.getElementById('user-avatar');
-const userName = document.getElementById('user-name');
-
-btnOpenSignin.addEventListener('click', () => openModal('signin-modal'));
-btnOpenSignup.addEventListener('click', () => openModal('signup-modal'));
-
-if(historyBtn) {
-  historyBtn.addEventListener('click', () => {
-    window.location.href = 'history.html';
-  });
-}
-
-/* ===== Firebase Auth ===== */
-const modalGoogleBtn = document.getElementById('modal-google-signin');
-const signinFeedback = document.getElementById('signin-feedback');
-const signupFeedback = document.getElementById('signup-feedback');
-
-// Google Sign In
-modalGoogleBtn.addEventListener('click', async () => {
-  signinFeedback.textContent = '';
-  try { 
-    const result = await signInWithPopup(auth, googleProvider);
-    signinFeedback.style.color = 'green';
-    signinFeedback.textContent = `✅ Signed in as ${result.user.displayName}`;
-    setTimeout(() => closeModal('signin-modal'), 1500);
-  } catch(err) { 
-    signinFeedback.style.color = 'red'; 
-    signinFeedback.textContent = '❌ ' + err.message; 
-  }
-});
-
-// Email/Password Sign In
-document.getElementById('signin-btn').addEventListener('click', async () => {
-  const email = document.getElementById('signin-email').value.trim();
-  const password = document.getElementById('signin-password').value.trim();
-  signinFeedback.textContent = '';
-  
-  if (!email || !password) {
-    signinFeedback.style.color = 'red';
-    signinFeedback.textContent = '❌ Please fill in all fields';
-    return;
-  }
-  
-  try { 
-    await signInWithEmailAndPassword(auth, email, password);
-    signinFeedback.style.color = 'green'; 
-    signinFeedback.textContent = '✅ Signed in successfully!';
-    setTimeout(() => closeModal('signin-modal'), 1500);
-  } catch(err) { 
-    signinFeedback.style.color = 'red'; 
-    signinFeedback.textContent = '❌ ' + err.message; 
-  }
-});
-
-// Sign Out
-btnSignOut.addEventListener('click', async () => { 
-  await signOut(auth); 
-  alert('Signed out successfully'); 
-});
-
-// Auth state listener
-onAuthStateChanged(auth, (user) => {
-  if (user) {
-    btnOpenSignin.style.display = 'none'; 
-    btnOpenSignup.style.display = 'none'; 
-    btnSignOut.style.display = 'inline-block'; 
-    if(historyBtn) historyBtn.style.display = 'inline-block';
-    
-    const displayName = user.displayName || 'User';
-    userName.textContent = displayName;
-    userAvatar.textContent = displayName.charAt(0).toUpperCase();
-  } else {
-    btnOpenSignin.style.display = 'inline-block'; 
-    btnOpenSignup.style.display = 'inline-block'; 
-    btnSignOut.style.display = 'none'; 
-    if(historyBtn) historyBtn.style.display = 'none';
-    userName.textContent = 'Guest User';
-    userAvatar.textContent = 'G';
-  }
-});
-
-/* ===== Sign Up Form Validation ===== */
-const signupBtn = document.getElementById('signup-btn');
-
-function validateEmail(email) {
-  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  return emailRegex.test(email);
-}
-
-function validatePhone(phone) {
-  const phoneRegex = /^[6-9]\d{9}$/;
-  return phoneRegex.test(phone);
-}
-
-function validateSignupForm() {
-  const name = document.getElementById('signup-name').value.trim();
-  const email = document.getElementById('signup-email').value.trim();
-  const phone = document.getElementById('signup-phone').value.trim();
-  const password = document.getElementById('signup-password').value.trim();
-  
-  let isValid = true;
-  
-  document.querySelectorAll('.error-message').forEach(error => error.classList.remove('show'));
-  
-  if (!name) {
-    document.getElementById('name-error').classList.add('show');
-    isValid = false;
-  }
-  
-  if (!email || !validateEmail(email)) {
-    document.getElementById('email-error').classList.add('show');
-    isValid = false;
-  }
-  
-  if (!phone || !validatePhone(phone)) {
-    document.getElementById('phone-error').classList.add('show');
-    isValid = false;
-  }
-  
-  if (!password || password.length < 6) {
-    document.getElementById('password-error').classList.add('show');
-    isValid = false;
-  }
-  
-  return isValid;
-}
-
-async function completeSignup() {
-  const name = document.getElementById('signup-name').value.trim();
-  const email = document.getElementById('signup-email').value.trim();
-  const phone = document.getElementById('signup-phone').value.trim();
-  const password = document.getElementById('signup-password').value.trim();
-  
-  try {
-    const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-    await updateProfile(userCredential.user, { displayName: name });
-    
-    signupFeedback.style.color = 'green';
-    signupFeedback.textContent = '✅ Account created successfully!';
-    
-    setTimeout(() => {
-      closeModal('signup-modal');
-      resetSignupForm();
-    }, 1500);
-    
-  } catch(err) { 
-    signupFeedback.style.color = 'red'; 
-    signupFeedback.textContent = '❌ ' + err.message; 
-  }
-}
-
-function resetSignupForm() {
-  document.getElementById('signup-name').value = '';
-  document.getElementById('signup-email').value = '';
-  document.getElementById('signup-phone').value = '';
-  document.getElementById('signup-password').value = '';
-  document.querySelectorAll('.error-message').forEach(error => error.classList.remove('show'));
-  signupFeedback.textContent = '';
-}
-
-signupBtn.addEventListener('click', async () => {
-  if (!validateSignupForm()) return;
-  await completeSignup();
-});
-
 /* ===== Product Form Logic ===== */
 const form = document.getElementById("product-form");
 const productIdInput = document.getElementById("product-id");
@@ -2523,58 +1521,59 @@ window.addEventListener("DOMContentLoaded", () => {
     const p = JSON.parse(decodeURIComponent(editData));
 
     productIdInput.value = editId;
-    form.category.value = p.category || "";
-    form.stone_name.value = p.stone_name || "";
     
     // Handle uses and other uses
     if (p.uses) {
       if (['Flooring', 'Wall Cladding', 'Countertops', 'Paving', 'Staircase', 'Landscaping', 'Monuments', 'Sculptures', 'Interior Design', 'Exterior Design'].includes(p.uses)) {
-        form.uses.value = p.uses;
+        document.getElementById('uses').value = p.uses;
       } else {
-        form.uses.value = 'Other';
+        document.getElementById('uses').value = 'Other';
         document.getElementById('other-uses-container').style.display = 'block';
         document.getElementById('other_uses').value = p.uses;
       }
     }
     
-    form.sub_category.value = p.sub_category || "";
+    // Category remains as category
+    document.getElementById('category').value = p.category || "";
+    document.getElementById('stone_name').value = p.stone_name || "";
+    document.getElementById('sub_category').value = p.sub_category || "";
     
     // Handle type and other type
     if (p.type) {
       if (['Natural', 'Calibrated', 'Polished', 'Honed', 'Brushed', 'Flamed', 'Tumbled'].includes(p.type)) {
-        form.type.value = p.type;
+        document.getElementById('type').value = p.type;
       } else {
-        form.type.value = 'Other';
+        document.getElementById('type').value = 'Other';
         document.getElementById('type-other-container').style.display = 'block';
         document.getElementById('type_other').value = p.type;
       }
     }
     
-    form.color.value = p.color || "";
-    form.thickness.value = p.thickness || "";
-    form.length.value = p.length || "";
-    form.width.value = p.width || "";
-    form.size.value = p.size || "";
-    form.finish.value = p.finish || "";
-    form.usage.value = p.usage || "";
-    form.water_absorption.value = p.water_absorption || "";
-    form.density.value = p.density || "";
-    form.compressive_strength.value = p.compressive_strength || "";
-    form.description.value = p.description || "";
-    form.price.value = p.price || "";
+    document.getElementById('color').value = p.color || "";
+    document.getElementById('thickness').value = p.thickness || "";
+    document.getElementById('length').value = p.length || "";
+    document.getElementById('width').value = p.width || "";
+    document.getElementById('size').value = p.size || "";
+    document.getElementById('finish').value = p.finish || "";
+    document.getElementById('usage').value = p.usage || "";
+    document.getElementById('water_absorption').value = p.water_absorption || "";
+    document.getElementById('density').value = p.density || "";
+    document.getElementById('compressive_strength').value = p.compressive_strength || "";
+    document.getElementById('description').value = p.description || "";
+    document.getElementById('price').value = p.price || "";
     
     // Handle price unit
     if (p.price_unit) {
       if (['sqft', 'sqm', 'piece', 'kg', 'ton', 'cubic'].includes(p.price_unit)) {
-        form.price_unit.value = p.price_unit;
+        document.getElementById('price_unit').value = p.price_unit;
       } else {
-        form.price_unit.value = 'other';
+        document.getElementById('price_unit').value = 'other';
         document.getElementById('other-unit-container').style.display = 'block';
         document.getElementById('other_unit').value = p.price_unit;
       }
     }
     
-    form.rate_description.value = p.rate_description || "";
+    document.getElementById('rate_description').value = p.rate_description || "";
     
     // Handle phone number and country code
     let phoneNumber = p.contact_number || "";
@@ -2588,14 +1587,14 @@ window.addEventListener("DOMContentLoaded", () => {
       }
     }
     
-    form.contact_country_code.value = countryCode;
+    document.getElementById('contact_country_code').value = countryCode;
     document.getElementById('country-code-display').textContent = countryCode;
-    form.contact_number.value = phoneNumber;
+    document.getElementById('contact_number').value = phoneNumber;
     
-    form.email.value = p.email || "";
-    form.factory_name.value = p.factory_name || "";
-    form.address.value = p.address || "";
-    form.gst_number.value = p.gst_number || "";
+    document.getElementById('email').value = p.email || "";
+    document.getElementById('factory_name').value = p.factory_name || "";
+    document.getElementById('address').value = p.address || "";
+    document.getElementById('gst_number').value = p.gst_number || "";
 
     // Load additional fields
     if (p.additional_fields && p.additional_fields.length) {
@@ -2629,6 +1628,7 @@ window.addEventListener("DOMContentLoaded", () => {
 /* AUTH CHECK */
 onAuthStateChanged(auth, user => {
   if (!user) {
+    alert("Please sign in to add products");
     window.location = "index.html";
   }
 });
@@ -2642,21 +1642,21 @@ form.onsubmit = async (e) => {
 
   // ✅ PERSONAL INFO VALIDATION IN PRODUCT FIELDS
   const productFieldsToCheck = [
-    { value: form.stone_name.value, name: 'Stone Name', field: form.stone_name },
-    { value: form.sub_category.value, name: 'Sub-category', field: form.sub_category },
-    { value: form.type.value === 'Other' ? document.getElementById('type_other').value : form.type.value, name: 'Type', field: form.type },
-    { value: form.color.value, name: 'Color', field: form.color },
-    { value: form.thickness.value, name: 'Thickness', field: form.thickness },
-    { value: form.size.value, name: 'Size', field: form.size },
-    { value: form.finish.value, name: 'Finish', field: form.finish },
-    { value: form.usage.value, name: 'Usage', field: form.usage },
-    { value: form.water_absorption.value, name: 'Water Absorption', field: form.water_absorption },
-    { value: form.density.value, name: 'Density', field: form.density },
-    { value: form.compressive_strength.value, name: 'Compressive Strength', field: form.compressive_strength },
-    { value: form.description.value, name: 'Description', field: form.description },
-    { value: form.length.value, name: 'Length', field: document.getElementById('length') },
-    { value: form.width.value, name: 'Width', field: document.getElementById('width') },
-    { value: form.rate_description.value, name: 'Rate Description', field: document.getElementById('rate_description') }
+    { value: document.getElementById('stone_name').value, name: 'Stone Name', field: document.getElementById('stone_name') },
+    { value: document.getElementById('sub_category').value, name: 'Sub-category', field: document.getElementById('sub_category') },
+    { value: document.getElementById('type').value === 'Other' ? document.getElementById('type_other').value : document.getElementById('type').value, name: 'Type', field: document.getElementById('type') },
+    { value: document.getElementById('color').value, name: 'Color', field: document.getElementById('color') },
+    { value: document.getElementById('thickness').value, name: 'Thickness', field: document.getElementById('thickness') },
+    { value: document.getElementById('size').value, name: 'Size', field: document.getElementById('size') },
+    { value: document.getElementById('finish').value, name: 'Finish', field: document.getElementById('finish') },
+    { value: document.getElementById('usage').value, name: 'Usage', field: document.getElementById('usage') },
+    { value: document.getElementById('water_absorption').value, name: 'Water Absorption', field: document.getElementById('water_absorption') },
+    { value: document.getElementById('density').value, name: 'Density', field: document.getElementById('density') },
+    { value: document.getElementById('compressive_strength').value, name: 'Compressive Strength', field: document.getElementById('compressive_strength') },
+    { value: document.getElementById('description').value, name: 'Description', field: document.getElementById('description') },
+    { value: document.getElementById('length').value, name: 'Length', field: document.getElementById('length') },
+    { value: document.getElementById('width').value, name: 'Width', field: document.getElementById('width') },
+    { value: document.getElementById('rate_description').value, name: 'Rate Description', field: document.getElementById('rate_description') }
   ];
 
   let personalInfoFound = false;
@@ -2707,14 +1707,14 @@ form.onsubmit = async (e) => {
   }
 
   // Validate phone number
-  const phoneNumber = form.contact_number.value.trim();
+  const phoneNumber = document.getElementById('contact_number').value.trim();
   if (phoneNumber.length !== 10) {
     alert("Please enter a valid 10-digit mobile number");
     return;
   }
 
   // Validate country code
-  const countryCode = form.contact_country_code.value.trim();
+  const countryCode = document.getElementById('contact_country_code').value.trim();
   if (!countryCode) {
     alert("Please enter a valid country code");
     return;
@@ -2730,44 +1730,44 @@ form.onsubmit = async (e) => {
     let imageUrls = await uploadImages();
 
     // Determine final values for uses, type, and price_unit
-    const finalUses = form.uses.value === 'Other' ? document.getElementById('other_uses').value : form.uses.value;
-    const finalType = form.type.value === 'Other' ? document.getElementById('type_other').value : form.type.value;
-    const finalPriceUnit = form.price_unit.value === 'other' ? document.getElementById('other_unit').value : form.price_unit.value;
+    const finalUses = document.getElementById('uses').value === 'Other' ? document.getElementById('other_uses').value : document.getElementById('uses').value;
+    const finalType = document.getElementById('type').value === 'Other' ? document.getElementById('type_other').value : document.getElementById('type').value;
+    const finalPriceUnit = document.getElementById('price_unit').value === 'other' ? document.getElementById('other_unit').value : document.getElementById('price_unit').value;
 
     const data = {
-      // Basic Information
-      category: form.category.value,
-      stone_name: form.stone_name.value,
+      // Basic Information - USES FIRST, then CATEGORY
       uses: finalUses,
-      sub_category: form.sub_category.value,
+      category: document.getElementById('category').value,
+      stone_name: document.getElementById('stone_name').value,
+      sub_category: document.getElementById('sub_category').value,
       
       // Product Details
       type: finalType,
-      color: form.color.value,
-      thickness: form.thickness.value,
+      color: document.getElementById('color').value,
+      thickness: document.getElementById('thickness').value,
       length: document.getElementById('length').value,
       width: document.getElementById('width').value,
-      size: form.size.value,
-      finish: form.finish.value,
-      usage: form.usage.value,
+      size: document.getElementById('size').value,
+      finish: document.getElementById('finish').value,
+      usage: document.getElementById('usage').value,
       
       // Technical Specifications
-      water_absorption: form.water_absorption.value,
-      density: form.density.value,
-      compressive_strength: form.compressive_strength.value,
-      description: form.description.value,
+      water_absorption: document.getElementById('water_absorption').value,
+      density: document.getElementById('density').value,
+      compressive_strength: document.getElementById('compressive_strength').value,
+      description: document.getElementById('description').value,
       
       // Pricing
-      price: form.price.value ? parseFloat(form.price.value) : "",
+      price: document.getElementById('price').value ? parseFloat(document.getElementById('price').value) : "",
       price_unit: finalPriceUnit,
       rate_description: document.getElementById('rate_description').value,
       
       // Contact Information
       contact_number: "+" + countryCode + " " + phoneNumber,
-      email: form.email.value,
-      factory_name: form.factory_name.value,
-      address: form.address.value,
-      gst_number: form.gst_number.value,
+      email: document.getElementById('email').value,
+      factory_name: document.getElementById('factory_name').value,
+      address: document.getElementById('address').value,
+      gst_number: document.getElementById('gst_number').value,
       
       // Additional Fields
       additional_fields: getAdditionalFieldsData(),
@@ -2802,7 +1802,7 @@ form.onsubmit = async (e) => {
     additionalFieldsCount = 0;
     
     // Reset country code to default
-    form.contact_country_code.value = "91";
+    document.getElementById('contact_country_code').value = "91";
     document.getElementById('country-code-display').textContent = "91";
 
     // Hide other input containers
@@ -2826,22 +1826,6 @@ form.onsubmit = async (e) => {
     submitBtn.innerHTML = '<i class="fas fa-save"></i> Save Product';
   }
 };
-
-/* ===== Handle Window Resize ===== */
-function handleResize() {
-  if (window.innerWidth > 768) {
-    sidebar.classList.remove('hidden');
-    sidebarOverlay.classList.remove('active');
-    document.body.style.overflow = '';
-  } else {
-    if (!sidebar.classList.contains('active')) {
-      sidebar.classList.add('hidden');
-    }
-  }
-}
-
-window.addEventListener('resize', handleResize);
-window.addEventListener('load', handleResize);
 
 // Make functions available globally for onclick events
 window.removeImage = removeImage;
