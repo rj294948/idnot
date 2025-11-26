@@ -1,1000 +1,1287 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Manage Products - StoneCraft UK</title>
-    <meta name="description" content="Manage your stone products inventory">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
-    <!-- Firebase SDK -->
-    <script type="module">
-        // Import Firebase modules
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.5.0/firebase-app.js";
-        import { 
-            getFirestore, 
-            collection, 
-            addDoc, 
-            getDocs, 
-            query, 
-            orderBy, 
-            doc, 
-            deleteDoc, 
-            updateDoc,
-            onSnapshot
-        } from "https://www.gstatic.com/firebasejs/12.5.0/firebase-firestore.js";
-        import { 
-            getAuth, 
-            onAuthStateChanged,
-            signOut
-        } from "https://www.gstatic.com/firebasejs/12.5.0/firebase-auth.js";
-        import { 
-            getStorage, 
-            ref, 
-            uploadBytes, 
-            getDownloadURL 
-        } from "https://www.gstatic.com/firebasejs/12.5.0/firebase-storage.js";
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Add Product - Rajasthan SandStone Hub</title>
+<link rel="icon" href="stone.png" type="image/png">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<style>
+/* ===== General Styles ===== */
+:root {
+  --primary: #c7a97b;
+  --primary-dark: #a58a62;
+  --secondary: #5a4a3a;
+  --light: #f8f5f0;
+  --dark: #333;
+  --gray: #e0e0e0;
+  --success: #28a745;
+  --danger: #dc3545;
+  --warning: #ffc107;
+  --info: #17a2b8;
+  --shadow: 0 4px 12px rgba(0,0,0,0.1);
+  --radius: 8px;
+  --transition: all 0.3s ease;
+}
 
-        // Firebase Configuration
-        const firebaseConfig = {
-            apiKey: "AIzaSyDxNMhU09mINvq_aDLtylBg3FucCK-MzYE",
-            authDomain: "sandstonebijoliya-293d2.firebaseapp.com",
-            projectId: "sandstonebijoliya-293d2",
-            storageBucket: "sandstonebijoliya-293d2.appspot.com",
-            messagingSenderId: "133756247845",
-            appId: "1:133756247845:web:8e769ce2af3db1765484cc",
-            measurementId: "G-H7JMX9VNYF"
-        };
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
 
-        // Initialize Firebase
-        const app = initializeApp(firebaseConfig);
-        const db = getFirestore(app);
-        const auth = getAuth(app);
-        const storage = getStorage(app);
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  line-height: 1.6;
+  color: var(--dark);
+  background: var(--light);
+  display: flex;
+  min-height: 100vh;
+}
 
-        // Make them globally available
-        window.firebaseApp = app;
-        window.firebaseDb = db;
-        window.firebaseAuth = auth;
-        window.firebaseStorage = storage;
-        window.firebaseFunctions = {
-            collection, addDoc, getDocs, query, orderBy, doc, deleteDoc, updateDoc, onSnapshot,
-            onAuthStateChanged, signOut,
-            ref, uploadBytes, getDownloadURL
-        };
+/* ===== Sidebar ===== */
+.sidebar {
+  width: 250px;
+  background: var(--primary);
+  color: white;
+  padding: 20px 0;
+  position: fixed;
+  height: 100vh;
+  overflow-y: auto;
+  box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+  z-index: 1000;
+  transition: var(--transition);
+}
 
-        console.log("Firebase initialized successfully");
-    </script>
-    
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
-        
-        body {
-            background-color: #f8f9fa;
-            color: #333;
-            line-height: 1.6;
-        }
-        
-        .container {
-            width: 100%;
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 0 15px;
-        }
-        
-        /* Header Styles */
-        header {
-            background-color: #fff;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            z-index: 100;
-        }
-        
-        .main-header {
-            padding: 15px 0;
-        }
-        
-        .header-content {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        
-        .logo {
-            display: flex;
-            align-items: center;
-        }
-        
-        .logo h1 {
-            font-size: 28px;
-            color: #333;
-            font-weight: 700;
-        }
-        
-        .logo span {
-            color: #b8860b;
-        }
-        
-        /* Admin Dashboard */
-        .admin-dashboard {
-            margin-top: 120px;
-            padding: 40px 0;
-        }
-        
-        .dashboard-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 40px;
-            flex-wrap: wrap;
-            gap: 20px;
-        }
-        
-        .dashboard-title {
-            font-size: 32px;
-            color: #333;
-            font-weight: 700;
-        }
-        
-        .btn {
-            display: inline-block;
-            background: #b8860b;
-            color: white;
-            padding: 12px 25px;
-            border: none;
-            border-radius: 6px;
-            font-size: 14px;
-            font-weight: 600;
-            cursor: pointer;
-            text-decoration: none;
-            transition: all 0.3s ease;
-        }
-        
-        .btn:hover {
-            background: #a3780a;
-            transform: translateY(-2px);
-        }
-        
-        .btn-secondary {
-            background: #6c757d;
-        }
-        
-        .btn-secondary:hover {
-            background: #545b62;
-        }
-        
-        .btn-danger {
-            background: #dc3545;
-        }
-        
-        .btn-danger:hover {
-            background: #c82333;
-        }
-        
-        .btn-success {
-            background: #28a745;
-        }
-        
-        .btn-success:hover {
-            background: #218838;
-        }
-        
-        /* Products Grid */
-        .products-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-            gap: 30px;
-            margin-bottom: 50px;
-        }
-        
-        .product-card {
-            background: white;
-            border-radius: 12px;
-            overflow: hidden;
-            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
-            transition: all 0.3s ease;
-        }
-        
-        .product-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
-        }
-        
-        .product-image {
-            width: 100%;
-            height: 200px;
-            background-size: cover;
-            background-position: center;
-            background-repeat: no-repeat;
-            background-color: #f8f9fa;
-        }
-        
-        .product-content {
-            padding: 20px;
-        }
-        
-        .product-title {
-            font-size: 18px;
-            font-weight: 600;
-            color: #333;
-            margin-bottom: 10px;
-        }
-        
-        .product-category {
-            display: inline-block;
-            background: #e9ecef;
-            color: #495057;
-            padding: 4px 12px;
-            border-radius: 20px;
-            font-size: 12px;
-            font-weight: 500;
-            margin-bottom: 10px;
-        }
-        
-        .product-price {
-            font-size: 20px;
-            font-weight: 700;
-            color: #b8860b;
-            margin-bottom: 15px;
-        }
-        
-        .product-description {
-            color: #666;
-            font-size: 14px;
-            line-height: 1.5;
-            margin-bottom: 15px;
-            display: -webkit-box;
-            -webkit-line-clamp: 2;
-            -webkit-box-orient: vertical;
-            overflow: hidden;
-        }
-        
-        .product-actions {
-            display: flex;
-            gap: 10px;
-            margin-top: 15px;
-        }
-        
-        .btn-small {
-            padding: 8px 15px;
-            font-size: 12px;
-            flex: 1;
-        }
-        
-        /* Modal Styles */
-        .modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.5);
-            z-index: 1000;
-            align-items: center;
-            justify-content: center;
-        }
-        
-        .modal.active {
-            display: flex;
-        }
-        
-        .modal-content {
-            background: white;
-            border-radius: 12px;
-            width: 90%;
-            max-width: 600px;
-            max-height: 90vh;
-            overflow-y: auto;
-        }
-        
-        .modal-header {
-            padding: 20px;
-            border-bottom: 1px solid #e9ecef;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        
-        .modal-title {
-            font-size: 24px;
-            font-weight: 600;
-            color: #333;
-        }
-        
-        .close-modal {
-            background: none;
-            border: none;
-            font-size: 24px;
-            cursor: pointer;
-            color: #666;
-        }
-        
-        .modal-body {
-            padding: 20px;
-        }
-        
-        .form-group {
-            margin-bottom: 20px;
-        }
-        
-        .form-label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: 600;
-            color: #333;
-        }
-        
-        .form-input {
-            width: 100%;
-            padding: 12px;
-            border: 2px solid #e9ecef;
-            border-radius: 6px;
-            font-size: 14px;
-            transition: border-color 0.3s;
-        }
-        
-        .form-input:focus {
-            outline: none;
-            border-color: #b8860b;
-        }
-        
-        .form-textarea {
-            min-height: 100px;
-            resize: vertical;
-        }
-        
-        .form-select {
-            width: 100%;
-            padding: 12px;
-            border: 2px solid #e9ecef;
-            border-radius: 6px;
-            font-size: 14px;
-            background: white;
-        }
-        
-        .form-select:focus {
-            outline: none;
-            border-color: #b8860b;
-        }
-        
-        .form-checkbox-group {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 15px;
-            margin-top: 10px;
-        }
-        
-        .form-checkbox {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-        
-        .form-checkbox input {
-            width: 18px;
-            height: 18px;
-        }
-        
-        .file-upload {
-            border: 2px dashed #e9ecef;
-            border-radius: 6px;
-            padding: 30px;
-            text-align: center;
-            cursor: pointer;
-            transition: border-color 0.3s;
-        }
-        
-        .file-upload:hover {
-            border-color: #b8860b;
-        }
-        
-        .file-upload i {
-            font-size: 40px;
-            color: #b8860b;
-            margin-bottom: 10px;
-        }
-        
-        .file-input {
-            display: none;
-        }
-        
-        .image-preview {
-            margin-top: 15px;
-            text-align: center;
-        }
-        
-        .preview-image {
-            max-width: 200px;
-            max-height: 150px;
-            border-radius: 6px;
-            margin-bottom: 10px;
-        }
-        
-        .modal-footer {
-            padding: 20px;
-            border-top: 1px solid #e9ecef;
-            display: flex;
-            justify-content: flex-end;
-            gap: 10px;
-        }
-        
-        /* Loading States */
-        .loading {
-            text-align: center;
-            padding: 60px;
-            color: #666;
-        }
-        
-        .loading i {
-            font-size: 40px;
-            margin-bottom: 20px;
-        }
-        
-        .no-products {
-            text-align: center;
-            padding: 60px;
-            color: #666;
-            grid-column: 1 / -1;
-        }
-        
-        .no-products i {
-            font-size: 60px;
-            margin-bottom: 20px;
-            color: #ddd;
-        }
-        
-        /* Alert Messages */
-        .alert {
-            padding: 15px;
-            border-radius: 6px;
-            margin-bottom: 20px;
-            display: none;
-        }
-        
-        .alert-success {
-            background: #d4edda;
-            color: #155724;
-            border: 1px solid #c3e6cb;
-        }
-        
-        .alert-error {
-            background: #f8d7da;
-            color: #721c24;
-            border: 1px solid #f5c6cb;
-        }
-        
-        /* Responsive Design */
-        @media (max-width: 768px) {
-            .admin-dashboard {
-                margin-top: 100px;
-            }
-            
-            .dashboard-header {
-                flex-direction: column;
-                align-items: flex-start;
-            }
-            
-            .products-grid {
-                grid-template-columns: 1fr;
-            }
-            
-            .product-actions {
-                flex-direction: column;
-            }
-            
-            .modal-content {
-                width: 95%;
-                margin: 20px;
-            }
-        }
-    </style>
+.sidebar-header {
+  padding: 0 20px 20px;
+  border-bottom: 1px solid rgba(255,255,255,0.2);
+  margin-bottom: 15px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.sidebar-logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 1.3rem;
+  font-weight: 700;
+}
+
+.sidebar-logo img {
+  height: 40px;
+  border-radius: 5px;
+}
+
+.sidebar-nav {
+  list-style: none;
+}
+
+.sidebar-nav a {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 20px;
+  color: white;
+  text-decoration: none;
+  transition: var(--transition);
+  border-left: 3px solid transparent;
+}
+
+.sidebar-nav a:hover, .sidebar-nav a.active {
+  background: rgba(255,255,255,0.1);
+  border-left-color: white;
+}
+
+.sidebar-nav i {
+  width: 20px;
+  text-align: center;
+}
+
+/* ===== Main Content ===== */
+.main-content {
+  flex: 1;
+  margin-left: 250px;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ===== Header ===== */
+.top-header {
+  background: white;
+  padding: 15px 30px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: var(--shadow);
+  position: sticky;
+  top: 0;
+  z-index: 999;
+}
+
+.user-profile {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.user-info {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: var(--light);
+  padding: 8px 15px;
+  border-radius: var(--radius);
+}
+
+.user-avatar {
+  width: 35px;
+  height: 35px;
+  border-radius: 50%;
+  background: var(--primary);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+}
+
+.header-actions {
+  display: flex;
+  gap: 10px;
+}
+
+.btn {
+  padding: 8px 16px;
+  border-radius: var(--radius);
+  font-weight: 600;
+  transition: var(--transition);
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  cursor: pointer;
+  border: none;
+  text-decoration: none;
+}
+
+.btn-primary {
+  background: var(--primary);
+  color: white;
+}
+
+.btn-primary:hover {
+  background: var(--primary-dark);
+}
+
+.btn-outline {
+  background: transparent;
+  border: 1px solid var(--primary);
+  color: var(--primary);
+}
+
+.btn-outline:hover {
+  background: var(--primary);
+  color: white;
+}
+
+/* ===== Container ===== */
+.container {
+  padding: 30px;
+  flex: 1;
+  max-width: 1200px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+.page-title {
+  text-align: center;
+  margin-bottom: 30px;
+  position: relative;
+  padding-bottom: 15px;
+  color: var(--secondary);
+  font-size: 2rem;
+}
+
+.page-title:after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 80px;
+  height: 4px;
+  background: var(--primary);
+}
+
+/* ===== Form Styles ===== */
+.form-container {
+  background: white;
+  padding: 40px;
+  border-radius: 15px;
+  box-shadow: var(--shadow);
+  border: 1px solid var(--gray);
+}
+
+.form-group {
+  margin-bottom: 25px;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 10px;
+  color: var(--secondary);
+  font-weight: 600;
+  font-size: 1rem;
+}
+
+.form-group label.required:after {
+  content: " *";
+  color: var(--danger);
+}
+
+select, input, textarea {
+  width: 100%;
+  padding: 14px 16px;
+  border-radius: var(--radius);
+  border: 1px solid var(--gray);
+  font-size: 1rem;
+  transition: var(--transition);
+  background: #fafafa;
+}
+
+select:focus, input:focus, textarea:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(199,169,123,0.2);
+  background: white;
+}
+
+.phone-input-container {
+  position: relative;
+}
+
+.phone-prefix {
+  position: absolute;
+  left: 16px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--secondary);
+  font-weight: 600;
+}
+
+.country-code-input {
+  padding-left: 50px !important;
+}
+
+.country-code-prefix {
+  position: absolute;
+  left: 16px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--secondary);
+  font-weight: 600;
+  background: var(--light);
+  padding: 4px 8px;
+  border-radius: 4px;
+  border: 1px solid var(--gray);
+}
+
+.submit-btn {
+  background: var(--primary);
+  color: white;
+  font-weight: 600;
+  border: none;
+  padding: 16px 32px;
+  border-radius: var(--radius);
+  cursor: pointer;
+  font-size: 1.1rem;
+  transition: var(--transition);
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.submit-btn:hover {
+  background: var(--primary-dark);
+  transform: translateY(-2px);
+}
+
+.submit-btn:disabled {
+  background: var(--gray);
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* ===== Form Sections ===== */
+.form-section {
+  margin-bottom: 40px;
+  padding-bottom: 30px;
+  border-bottom: 2px solid var(--light);
+}
+
+.section-title {
+  font-size: 1.4rem;
+  color: var(--primary);
+  margin-bottom: 20px;
+  padding-bottom: 10px;
+  border-bottom: 2px solid var(--primary);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+/* ===== Additional Fields ===== */
+.additional-fields-section {
+  background: var(--light);
+  padding: 25px;
+  border-radius: var(--radius);
+  margin-top: 30px;
+  border: 2px dashed var(--primary);
+}
+
+.add-field-btn {
+  background: var(--info);
+  color: white;
+  border: none;
+  padding: 12px 20px;
+  border-radius: var(--radius);
+  cursor: pointer;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 15px;
+  transition: var(--transition);
+}
+
+.add-field-btn:hover {
+  background: #138496;
+}
+
+.additional-field {
+  display: flex;
+  gap: 15px;
+  margin-bottom: 15px;
+  align-items: flex-end;
+}
+
+.field-input {
+  flex: 1;
+}
+
+.remove-field-btn {
+  background: var(--danger);
+  color: white;
+  border: none;
+  padding: 12px 16px;
+  border-radius: var(--radius);
+  cursor: pointer;
+  transition: var(--transition);
+  height: fit-content;
+}
+
+.remove-field-btn:hover {
+  background: #c82333;
+}
+
+/* ===== Image Upload ===== */
+.image-upload-section {
+  margin: 20px 0;
+}
+
+.upload-options {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 15px;
+  flex-wrap: wrap;
+}
+
+.upload-btn {
+  padding: 12px 20px;
+  border: 2px dashed var(--primary);
+  border-radius: var(--radius);
+  background: var(--light);
+  color: var(--primary);
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--transition);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 1;
+  min-width: 200px;
+  justify-content: center;
+}
+
+.upload-btn:hover {
+  background: var(--primary);
+  color: white;
+  border-style: solid;
+}
+
+.preview {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin: 20px 0;
+  padding: 15px;
+  background: var(--light);
+  border-radius: var(--radius);
+  min-height: 100px;
+}
+
+.preview-item {
+  position: relative;
+  display: inline-block;
+}
+
+.preview img {
+  width: 150px;
+  height: 150px;
+  object-fit: cover;
+  border-radius: var(--radius);
+  border: 2px solid var(--gray);
+  transition: var(--transition);
+}
+
+.preview img:hover {
+  transform: scale(1.05);
+  border-color: var(--primary);
+}
+
+.remove-image {
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  background: var(--danger);
+  color: white;
+  border: none;
+  border-radius: 50%;
+  width: 24px;
+  height: 24px;
+  font-size: 12px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* ===== Processing Overlay ===== */
+.processing-overlay {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.7);
+  justify-content: center;
+  align-items: center;
+  z-index: 4000;
+  flex-direction: column;
+}
+
+.processing-overlay.active {
+  display: flex;
+}
+
+.processing-content {
+  background: white;
+  padding: 40px;
+  border-radius: 15px;
+  text-align: center;
+  max-width: 400px;
+  width: 90%;
+  box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+}
+
+.processing-spinner {
+  width: 60px;
+  height: 60px;
+  border: 5px solid #f3f3f3;
+  border-top: 5px solid var(--primary);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin: 0 auto 20px;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* ===== Footer ===== */
+footer {
+  background: var(--dark);
+  color: white;
+  text-align: center;
+  padding: 20px;
+  margin-top: auto;
+}
+
+/* ===== Utility Styles ===== */
+.field-hint {
+  color: #666;
+  font-size: 0.85rem;
+  margin-top: 5px;
+  display: block;
+}
+
+.compulsory-note {
+  text-align: center;
+  color: var(--danger);
+  font-size: 0.9rem;
+  margin-bottom: 20px;
+  font-weight: 600;
+}
+
+.error-message {
+  color: var(--danger);
+  font-size: 0.9rem;
+  margin-top: 5px;
+  display: none;
+}
+
+.error-message.show {
+  display: block;
+}
+
+/* ===== Responsive Design ===== */
+@media (max-width: 768px) {
+  .sidebar {
+    width: 100%;
+    transform: translateX(-100%);
+    position: fixed;
+  }
+  
+  .sidebar.active {
+    transform: translateX(0);
+  }
+  
+  .main-content {
+    margin-left: 0;
+  }
+  
+  .container {
+    padding: 20px;
+  }
+  
+  .form-container {
+    padding: 25px;
+  }
+  
+  .upload-options {
+    flex-direction: column;
+  }
+  
+  .upload-btn {
+    min-width: 100%;
+  }
+  
+  .additional-field {
+    flex-direction: column;
+  }
+}
+</style>
 </head>
 <body>
-    <!-- Header Section -->
-    <header>
-        <div class="main-header">
-            <div class="container header-content">
-                <div class="logo">
-                    <a href="index.html" style="text-decoration: none; color: inherit;">
-                        <h1>Stone<span>Craft</span> Admin</h1>
-                    </a>
-                </div>
-                
-                <div class="user-actions">
-                    <a href="index.html" class="btn btn-secondary">
-                        <i class="fas fa-home"></i> Back to Site
-                    </a>
-                    <button class="btn btn-danger" id="logoutBtn">
-                        <i class="fas fa-sign-out-alt"></i> Logout
-                    </button>
-                </div>
-            </div>
-        </div>
-    </header>
 
-    <!-- Admin Dashboard -->
-    <section class="admin-dashboard">
-        <div class="container">
-            <div class="dashboard-header">
-                <h1 class="dashboard-title">Manage Products</h1>
-                <button class="btn" id="addProductBtn">
-                    <i class="fas fa-plus"></i> Add New Product
-                </button>
-            </div>
-            
-            <!-- Alert Messages -->
-            <div id="alertMessage" class="alert"></div>
-            
-            <!-- Products Grid -->
-            <div class="products-grid" id="productsGrid">
-                <div class="loading">
-                    <i class="fas fa-spinner fa-spin"></i>
-                    <p>Loading products...</p>
-                </div>
-            </div>
-        </div>
-    </section>
+<!-- ===== Sidebar ===== -->
+<div class="sidebar" id="sidebar">
+  <div class="sidebar-header">
+    <div class="sidebar-logo">
+      <img src="stone.png" alt="Rajasthan Stones Logo">
+      <span>Rajasthan Stones</span>
+    </div>
+  </div>
+  <ul class="sidebar-nav">
+    <li><a href="index.html"><i class="fas fa-home"></i> <span>Home</span></a></li>
+    <li><a href="add-product.html" class="active"><i class="fas fa-plus-circle"></i> <span>Add Product</span></a></li>
+    <li><a href="products.html"><i class="fas fa-boxes"></i> <span>View Products</span></a></li>
+    <li><a href="history.html"><i class="fas fa-history"></i> <span>My History</span></a></li>
+  </ul>
+</div>
 
-    <!-- Add/Edit Product Modal -->
-    <div class="modal" id="productModal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2 class="modal-title" id="modalTitle">Add New Product</h2>
-                <button class="close-modal" id="closeModal">&times;</button>
-            </div>
-            <div class="modal-body">
-                <form id="productForm">
-                    <input type="hidden" id="productId">
-                    
-                    <div class="form-group">
-                        <label class="form-label" for="productName">Product Name *</label>
-                        <input type="text" class="form-input" id="productName" required>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label class="form-label" for="productCategory">Category *</label>
-                        <select class="form-select" id="productCategory" required>
-                            <option value="">Select Category</option>
-                            <option value="flooring">Flooring</option>
-                            <option value="wall">Wall Decoration</option>
-                            <option value="bathroom">Bathroom</option>
-                            <option value="outdoor">Outdoor</option>
-                            <option value="kitchen">Kitchen</option>
-                            <option value="commercial">Commercial</option>
-                        </select>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label class="form-label" for="productPrice">Price (per sqm) *</label>
-                        <input type="number" class="form-input" id="productPrice" step="0.01" min="0" required>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label class="form-label" for="productDescription">Description *</label>
-                        <textarea class="form-input form-textarea" id="productDescription" required></textarea>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label class="form-label">Pattern Types</label>
-                        <div class="form-checkbox-group">
-                            <label class="form-checkbox">
-                                <input type="checkbox" name="productTypes" value="herringbone">
-                                Herringbone
-                            </label>
-                            <label class="form-checkbox">
-                                <input type="checkbox" name="productTypes" value="checkerboard">
-                                Checkerboard
-                            </label>
-                            <label class="form-checkbox">
-                                <input type="checkbox" name="productTypes" value="random">
-                                Random Layout
-                            </label>
-                            <label class="form-checkbox">
-                                <input type="checkbox" name="productTypes" value="brick">
-                                Brick Pattern
-                            </label>
-                            <label class="form-checkbox">
-                                <input type="checkbox" name="productTypes" value="diagonal">
-                                Diagonal
-                            </label>
-                            <label class="form-checkbox">
-                                <input type="checkbox" name="productTypes" value="hexagon">
-                                Hexagon
-                            </label>
-                        </div>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label class="form-label">Product Image *</label>
-                        <div class="file-upload" id="fileUpload">
-                            <i class="fas fa-cloud-upload-alt"></i>
-                            <p>Click to upload product image</p>
-                            <p style="font-size: 12px; color: #666;">Recommended: 400x300px JPG or PNG</p>
-                            <input type="file" class="file-input" id="productImage" accept="image/*">
-                        </div>
-                        <div class="image-preview" id="imagePreview"></div>
-                    </div>
-                </form>
-            </div>
-            <div class="modal-footer">
-                <button class="btn btn-secondary" id="cancelBtn">Cancel</button>
-                <button class="btn" id="saveProductBtn">Save Product</button>
-            </div>
-        </div>
+<!-- ===== Main Content ===== -->
+<div class="main-content" id="main-content">
+  <!-- ===== Top Header ===== -->
+  <header class="top-header">
+    <div class="header-actions">
+      <button class="btn btn-outline" onclick="window.location='index.html'">
+        <i class="fas fa-home"></i> Home
+      </button>
+      <button id="btn-signout" class="btn btn-outline" style="display:none;">Sign Out</button>
+    </div>
+    <div class="user-profile">
+      <div class="user-info">
+        <div class="user-avatar" id="user-avatar">G</div>
+        <span class="user-name" id="user-name">Guest User</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- ===== Main Container ===== -->
+  <div class="container">
+    <h1 class="page-title">Add Stone Product</h1>
+    
+    <div class="compulsory-note">
+      <i class="fas fa-exclamation-circle"></i> Fields marked with * are compulsory
     </div>
 
-    <script type="module">
-        // Wait for Firebase to be available
-        const initializeApp = async () => {
-            await new Promise(resolve => setTimeout(resolve, 500));
-            
-            if (!window.firebaseAuth) {
-                console.error("Firebase not initialized properly");
-                return;
-            }
+    <div class="form-container">
+      <form id="product-form">
+        <input type="hidden" id="product-id">
 
-            console.log("Initializing Admin Dashboard...");
+        <!-- ===== Basic Information Section ===== -->
+        <div class="form-section">
+          <h3 class="section-title"><i class="fas fa-info-circle"></i> Basic Information</h3>
+          
+          <div class="form-group">
+            <label for="category" class="required">Category</label>
+            <select id="category" required>
+              <option value="">Select Category</option>
+              <option value="sandstone">Sand Stone</option>
+              <option value="kota">Kota Stone</option>
+              <option value="granite">Granite</option>
+              <option value="marble">Marble</option>
+              <option value="dholpur">Dholpur</option>
+              <option value="tiles">Tiles</option>
+              <option value="mandana">Mandana</option>
+              <option value="other">Other Stones</option>
+            </select>
+            <span class="field-hint">Select the main category of your stone product</span>
+          </div>
 
-            // Products Manager Class
-            class ProductsManager {
-                constructor() {
-                    this.products = [];
-                    this.currentProduct = null;
-                    this.init();
-                }
+          <div class="form-group">
+            <label for="stone_name" class="required">Stone Name</label>
+            <input type="text" id="stone_name" placeholder="Enter stone name" required>
+            <span class="field-hint">Name of the stone product (e.g., Raj Green Sandstone, White Marble, etc.)</span>
+          </div>
 
-                init() {
-                    this.setupEventListeners();
-                    this.checkAuth();
-                }
+          <div class="form-group">
+            <label for="sub_category">Sub-category</label>
+            <input type="text" id="sub_category" placeholder="Enter sub-category">
+            <span class="field-hint">Optional: Slabs, Tiles, Blocks, etc.</span>
+          </div>
+        </div>
 
-                setupEventListeners() {
-                    // Modal controls
-                    document.getElementById('addProductBtn').addEventListener('click', () => this.openAddModal());
-                    document.getElementById('closeModal').addEventListener('click', () => this.closeModal());
-                    document.getElementById('cancelBtn').addEventListener('click', () => this.closeModal());
-                    
-                    // Form submission
-                    document.getElementById('saveProductBtn').addEventListener('click', () => this.saveProduct());
-                    
-                    // File upload
-                    document.getElementById('fileUpload').addEventListener('click', () => document.getElementById('productImage').click());
-                    document.getElementById('productImage').addEventListener('change', (e) => this.handleImageUpload(e));
-                    
-                    // Logout
-                    document.getElementById('logoutBtn').addEventListener('click', () => this.handleLogout());
-                }
+        <!-- ===== Product Details Section ===== -->
+        <div class="form-section">
+          <h3 class="section-title"><i class="fas fa-cube"></i> Product Details</h3>
+          
+          <div class="form-group">
+            <label for="type">Type</label>
+            <input type="text" id="type" placeholder="Enter type">
+            <span class="field-hint">Optional: Natural, Calibrated, Polished, Honed, etc.</span>
+          </div>
 
-                checkAuth() {
-                    window.firebaseFunctions.onAuthStateChanged(window.firebaseAuth, (user) => {
-                        if (user) {
-                            console.log("User authenticated:", user.email);
-                            this.loadProducts();
-                        } else {
-                            console.log("User not authenticated, redirecting to login...");
-                            window.location.href = 'login.html';
-                        }
-                    });
-                }
+          <div class="form-group">
+            <label for="color">Color</label>
+            <input type="text" id="color" placeholder="Enter color">
+            <span class="field-hint">Optional: Green, Brown, White, Black, etc.</span>
+          </div>
 
-                async loadProducts() {
-                    try {
-                        const productsCollection = window.firebaseFunctions.collection(window.firebaseDb, 'products');
-                        const q = window.firebaseFunctions.query(productsCollection, window.firebaseFunctions.orderBy('createdAt', 'desc'));
-                        
-                        // Real-time listener
-                        window.firebaseFunctions.onSnapshot(q, (snapshot) => {
-                            this.products = [];
-                            snapshot.forEach((doc) => {
-                                this.products.push({
-                                    id: doc.id,
-                                    ...doc.data()
-                                });
-                            });
-                            this.renderProducts();
-                        });
-                        
-                    } catch (error) {
-                        console.error("Error loading products:", error);
-                        this.showAlert('Error loading products: ' + error.message, 'error');
-                    }
-                }
+          <div class="form-group">
+            <label for="thickness">Thickness</label>
+            <input type="text" id="thickness" placeholder="Enter thickness">
+            <span class="field-hint">Optional: 20-40 mm, 10-20 mm, etc.</span>
+          </div>
 
-                renderProducts() {
-                    const productsGrid = document.getElementById('productsGrid');
-                    
-                    if (this.products.length === 0) {
-                        productsGrid.innerHTML = `
-                            <div class="no-products">
-                                <i class="fas fa-box-open"></i>
-                                <h3>No Products Found</h3>
-                                <p>Get started by adding your first product</p>
-                                <button class="btn" onclick="productsManager.openAddModal()" style="margin-top: 20px;">
-                                    <i class="fas fa-plus"></i> Add First Product
-                                </button>
-                            </div>
-                        `;
-                        return;
-                    }
+          <div class="form-group">
+            <label for="size">Size</label>
+            <input type="text" id="size" placeholder="Enter size">
+            <span class="field-hint">Optional: Custom sizes, Standard tiles, Slabs dimensions</span>
+          </div>
 
-                    productsGrid.innerHTML = this.products.map(product => `
-                        <div class="product-card">
-                            <div class="product-image" style="background-image: url('${product.imageUrl || 'https://images.unsplash.com/photo-1586023492125-27b2c045efd7?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=400&q=80'}')"></div>
-                            <div class="product-content">
-                                <h3 class="product-title">${product.name}</h3>
-                                <span class="product-category">${this.formatCategory(product.category)}</span>
-                                <div class="product-price">£${parseFloat(product.price).toFixed(2)}</div>
-                                <p class="product-description">${product.description}</p>
-                                <div class="product-actions">
-                                    <button class="btn btn-small" onclick="productsManager.editProduct('${product.id}')">
-                                        <i class="fas fa-edit"></i> Edit
-                                    </button>
-                                    <button class="btn btn-small btn-danger" onclick="productsManager.deleteProduct('${product.id}')">
-                                        <i class="fas fa-trash"></i> Delete
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    `).join('');
-                }
+          <div class="form-group">
+            <label for="finish">Finish</label>
+            <input type="text" id="finish" placeholder="Enter finish">
+            <span class="field-hint">Optional: Natural, Polished, Honed, Calibrated, etc.</span>
+          </div>
 
-                openAddModal() {
-                    this.currentProduct = null;
-                    document.getElementById('modalTitle').textContent = 'Add New Product';
-                    document.getElementById('productForm').reset();
-                    document.getElementById('imagePreview').innerHTML = '';
-                    document.getElementById('productModal').classList.add('active');
-                }
+          <div class="form-group">
+            <label for="usage">Usage</label>
+            <input type="text" id="usage" placeholder="Enter usage">
+            <span class="field-hint">Optional: Flooring, Wall Cladding, Countertops, etc.</span>
+          </div>
+        </div>
 
-                openEditModal(product) {
-                    this.currentProduct = product;
-                    document.getElementById('modalTitle').textContent = 'Edit Product';
-                    
-                    // Fill form with product data
-                    document.getElementById('productId').value = product.id;
-                    document.getElementById('productName').value = product.name;
-                    document.getElementById('productCategory').value = product.category;
-                    document.getElementById('productPrice').value = product.price;
-                    document.getElementById('productDescription').value = product.description;
-                    
-                    // Set pattern types
-                    const checkboxes = document.querySelectorAll('input[name="productTypes"]');
-                    checkboxes.forEach(checkbox => {
-                        checkbox.checked = product.types && product.types.includes(checkbox.value);
-                    });
-                    
-                    // Show image preview
-                    if (product.imageUrl) {
-                        document.getElementById('imagePreview').innerHTML = `
-                            <img src="${product.imageUrl}" class="preview-image" alt="Preview">
-                            <p>Current image</p>
-                        `;
-                    }
-                    
-                    document.getElementById('productModal').classList.add('active');
-                }
+        <!-- ===== Technical Specifications Section ===== -->
+        <div class="form-section">
+          <h3 class="section-title"><i class="fas fa-flask"></i> Technical Specifications</h3>
+          
+          <div class="form-group">
+            <label for="water_absorption">Water Absorption</label>
+            <input type="text" id="water_absorption" placeholder="Enter water absorption">
+            <span class="field-hint">Optional: 2-3%, 0.5-1%, etc.</span>
+          </div>
 
-                closeModal() {
-                    document.getElementById('productModal').classList.remove('active');
-                    this.currentProduct = null;
-                }
+          <div class="form-group">
+            <label for="density">Density</label>
+            <input type="text" id="density" placeholder="Enter density">
+            <span class="field-hint">Optional: 2.4-2.6 g/cm³, 2.7-2.9 g/cm³, etc.</span>
+          </div>
 
-                async handleImageUpload(event) {
-                    const file = event.target.files[0];
-                    if (!file) return;
+          <div class="form-group">
+            <label for="compressive_strength">Compressive Strength</label>
+            <input type="text" id="compressive_strength" placeholder="Enter compressive strength">
+            <span class="field-hint">Optional: 1800-2200 kg/cm², 2500-3000 kg/cm², etc.</span>
+          </div>
 
-                    // Show preview
-                    const reader = new FileReader();
-                    reader.onload = (e) => {
-                        document.getElementById('imagePreview').innerHTML = `
-                            <img src="${e.target.result}" class="preview-image" alt="Preview">
-                            <p>Selected image: ${file.name}</p>
-                        `;
-                    };
-                    reader.readAsDataURL(file);
-                }
+          <div class="form-group">
+            <label for="description">Description</label>
+            <textarea id="description" placeholder="Enter product description" rows="4"></textarea>
+            <span class="field-hint">Optional: Detailed description about the stone product</span>
+          </div>
+        </div>
 
-                async saveProduct() {
-                    try {
-                        const formData = this.getFormData();
-                        
-                        if (!this.validateForm(formData)) {
-                            return;
-                        }
+        <!-- ===== Pricing Section ===== -->
+        <div class="form-section">
+          <h3 class="section-title"><i class="fas fa-tag"></i> Pricing</h3>
+          
+          <div class="form-group">
+            <label for="price">Price</label>
+            <input type="number" id="price" placeholder="Enter price">
+            <span class="field-hint">Optional: Price of the product</span>
+          </div>
 
-                        // Show loading state
-                        const saveBtn = document.getElementById('saveProductBtn');
-                        saveBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
-                        saveBtn.disabled = true;
+          <div class="form-group">
+            <label for="price_unit">Unit</label>
+            <input type="text" id="price_unit" placeholder="Enter unit (sqft/piece/kg)">
+            <span class="field-hint">Optional: sqft, piece, kg, ton, etc.</span>
+          </div>
+        </div>
 
-                        let imageUrl = formData.imageUrl;
+        <!-- ===== Contact Information Section ===== -->
+        <div class="form-section">
+          <h3 class="section-title"><i class="fas fa-address-card"></i> Contact Information</h3>
+          
+          <div class="form-group">
+            <label for="contact_country_code" class="required">Country Code</label>
+            <div class="phone-input-container">
+              <span class="country-code-prefix">+</span>
+              <input type="text" id="contact_country_code" class="country-code-input" placeholder="91" value="91" required maxlength="4">
+            </div>
+            <span class="field-hint">Enter country code without + (e.g., 91 for India)</span>
+          </div>
 
-                        // Upload new image if selected
-                        const imageFile = document.getElementById('productImage').files[0];
-                        if (imageFile) {
-                            imageUrl = await this.uploadImage(imageFile);
-                        }
+          <div class="form-group">
+            <label for="contact_number" class="required">Mobile Number</label>
+            <div class="phone-input-container">
+              <span class="phone-prefix">+<span id="country-code-display">91</span></span>
+              <input type="text" id="contact_number" class="phone-input" placeholder="Mobile Number" required maxlength="10">
+            </div>
+            <span class="field-hint">Enter 10-digit mobile number without country code</span>
+          </div>
 
-                        const productData = {
-                            name: formData.name,
-                            category: formData.category,
-                            price: parseFloat(formData.price),
-                            description: formData.description,
-                            types: formData.types,
-                            imageUrl: imageUrl,
-                            updatedAt: new Date()
-                        };
+          <div class="form-group">
+            <label for="email" class="required">Email Address</label>
+            <input type="email" id="email" placeholder="Enter email address" required>
+            <span class="field-hint">Your business email address</span>
+          </div>
 
-                        if (this.currentProduct) {
-                            // Update existing product
-                            const productRef = window.firebaseFunctions.doc(window.firebaseDb, 'products', this.currentProduct.id);
-                            await window.firebaseFunctions.updateDoc(productRef, productData);
-                            this.showAlert('Product updated successfully!', 'success');
-                        } else {
-                            // Add new product
-                            productData.createdAt = new Date();
-                            await window.firebaseFunctions.addDoc(
-                                window.firebaseFunctions.collection(window.firebaseDb, 'products'), 
-                                productData
-                            );
-                            this.showAlert('Product added successfully!', 'success');
-                        }
+          <div class="form-group">
+            <label for="factory_name" class="required">Company / Factory Name</label>
+            <input type="text" id="factory_name" placeholder="Enter company/factory name" required>
+            <span class="field-hint">Name of your business or factory</span>
+          </div>
 
-                        this.closeModal();
-                        
-                    } catch (error) {
-                        console.error("Error saving product:", error);
-                        this.showAlert('Error saving product: ' + error.message, 'error');
-                    } finally {
-                        // Reset button state
-                        const saveBtn = document.getElementById('saveProductBtn');
-                        saveBtn.innerHTML = 'Save Product';
-                        saveBtn.disabled = false;
-                    }
-                }
+          <div class="form-group">
+            <label for="address" class="required">Address</label>
+            <input type="text" id="address" placeholder="Enter complete address" required>
+            <span class="field-hint">Complete business address</span>
+          </div>
 
-                getFormData() {
-                    const name = document.getElementById('productName').value.trim();
-                    const category = document.getElementById('productCategory').value;
-                    const price = document.getElementById('productPrice').value;
-                    const description = document.getElementById('productDescription').value.trim();
-                    
-                    // Get selected types
-                    const types = [];
-                    document.querySelectorAll('input[name="productTypes"]:checked').forEach(checkbox => {
-                        types.push(checkbox.value);
-                    });
+          <div class="form-group">
+            <label for="gst_number">GST Number</label>
+            <input type="text" id="gst_number" placeholder="Enter GST number">
+            <span class="field-hint">Optional: Your business GST number</span>
+          </div>
+        </div>
 
-                    return {
-                        name,
-                        category,
-                        price,
-                        description,
-                        types,
-                        imageUrl: this.currentProduct ? this.currentProduct.imageUrl : ''
-                    };
-                }
+        <!-- ===== Additional Fields Section ===== -->
+        <div class="additional-fields-section">
+          <h3 class="section-title"><i class="fas fa-plus-circle"></i> Additional Information</h3>
+          <span class="field-hint">Add any extra fields you want to include in your product listing</span>
+          
+          <div id="additional-fields-container">
+            <!-- Additional fields will be added here dynamically -->
+          </div>
+          
+          <button type="button" class="add-field-btn" id="add-field-btn">
+            <i class="fas fa-plus"></i> Add Custom Field
+          </button>
+        </div>
 
-                validateForm(formData) {
-                    if (!formData.name) {
-                        this.showAlert('Product name is required', 'error');
-                        return false;
-                    }
-                    if (!formData.category) {
-                        this.showAlert('Product category is required', 'error');
-                        return false;
-                    }
-                    if (!formData.price || parseFloat(formData.price) <= 0) {
-                        this.showAlert('Valid price is required', 'error');
-                        return false;
-                    }
-                    if (!formData.description) {
-                        this.showAlert('Product description is required', 'error');
-                        return false;
-                    }
+        <!-- ===== Image Upload Section ===== -->
+        <div class="form-section">
+          <h3 class="section-title"><i class="fas fa-images"></i> Product Images</h3>
+          
+          <div class="form-group">
+            <label class="required">Upload Product Images</label>
+            <div class="image-upload-section">
+              <div class="upload-options">
+                <div class="upload-btn" onclick="document.getElementById('imageInput').click()">
+                  <i class="fas fa-folder-open"></i> Choose from Gallery
+                </div>
+                <div class="upload-btn" id="cancel-upload">
+                  <i class="fas fa-times"></i> Clear All Images
+                </div>
+              </div>
+              <input type="file" id="imageInput" accept="image/*" multiple style="display: none;">
+              <small class="field-hint">Select multiple images (max 10) - At least one image is required.</small>
+              <div class="preview" id="preview"></div>
+            </div>
+          </div>
+        </div>
 
-                    // Check if image is provided for new products
-                    if (!this.currentProduct && !document.getElementById('productImage').files[0]) {
-                        this.showAlert('Product image is required', 'error');
-                        return false;
-                    }
+        <button type="submit" class="submit-btn" id="submit-btn">
+          <i class="fas fa-save"></i> Save Product
+        </button>
+      </form>
+    </div>
+  </div>
 
-                    return true;
-                }
+  <!-- ===== Footer ===== -->
+  <footer>
+    &copy; 2025 Rajasthan SandStone Hub | Designed by RJ Services
+  </footer>
+</div>
 
-                async uploadImage(file) {
-                    try {
-                        // Create a unique filename
-                        const timestamp = Date.now();
-                        const fileName = `products/${timestamp}_${file.name}`;
-                        
-                        // Create storage reference
-                        const storageRef = window.firebaseFunctions.ref(window.firebaseStorage, fileName);
-                        
-                        // Upload file
-                        const snapshot = await window.firebaseFunctions.uploadBytes(storageRef, file);
-                        
-                        // Get download URL
-                        const downloadURL = await window.firebaseFunctions.getDownloadURL(snapshot.ref);
-                        
-                        return downloadURL;
-                    } catch (error) {
-                        console.error("Error uploading image:", error);
-                        throw new Error('Failed to upload image');
-                    }
-                }
+<!-- ===== Processing Overlay ===== -->
+<div class="processing-overlay" id="processing-overlay">
+  <div class="processing-content">
+    <div class="processing-spinner"></div>
+    <div class="processing-text">Processing Your Product</div>
+    <div class="processing-subtext">Please wait while we save your product details...</div>
+  </div>
+</div>
 
-                editProduct(productId) {
-                    const product = this.products.find(p => p.id === productId);
-                    if (product) {
-                        this.openEditModal(product);
-                    }
-                }
+<script type="module">
+// Firebase imports
+import { 
+  db, 
+  auth,
+  collection, 
+  addDoc, 
+  doc, 
+  updateDoc, 
+  serverTimestamp,
+  signOut,
+  onAuthStateChanged
+} from './firebase-config.js';
 
-                async deleteProduct(productId) {
-                    if (!confirm('Are you sure you want to delete this product? This action cannot be undone.')) {
-                        return;
-                    }
+/* ===== Global Variables ===== */
+let imagesBase64 = [];
+let additionalFieldsCount = 0;
 
-                    try {
-                        const productRef = window.firebaseFunctions.doc(window.firebaseDb, 'products', productId);
-                        await window.firebaseFunctions.deleteDoc(productRef);
-                        this.showAlert('Product deleted successfully!', 'success');
-                    } catch (error) {
-                        console.error("Error deleting product:", error);
-                        this.showAlert('Error deleting product: ' + error.message, 'error');
-                    }
-                }
+/* ===== Additional Fields Functionality ===== */
+document.getElementById('add-field-btn').addEventListener('click', addAdditionalField);
 
-                formatCategory(category) {
-                    const categories = {
-                        'flooring': 'Flooring',
-                        'wall': 'Wall Decoration',
-                        'bathroom': 'Bathroom',
-                        'outdoor': 'Outdoor',
-                        'kitchen': 'Kitchen',
-                        'commercial': 'Commercial'
-                    };
-                    return categories[category] || category;
-                }
+function addAdditionalField() {
+  additionalFieldsCount++;
+  const container = document.getElementById('additional-fields-container');
+  const fieldId = 'additional_field_' + additionalFieldsCount;
+  
+  const fieldHTML = `
+    <div class="additional-field" id="${fieldId}">
+      <div class="field-input">
+        <label>Field Name</label>
+        <input type="text" placeholder="Enter field name" class="additional-field-name">
+      </div>
+      <div class="field-input">
+        <label>Field Value</label>
+        <input type="text" placeholder="Enter field value" class="additional-field-value">
+      </div>
+      <button type="button" class="remove-field-btn" onclick="removeAdditionalField('${fieldId}')">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+  `;
+  
+  container.insertAdjacentHTML('beforeend', fieldHTML);
+}
 
-                showAlert(message, type) {
-                    const alert = document.getElementById('alertMessage');
-                    alert.textContent = message;
-                    alert.className = `alert alert-${type}`;
-                    alert.style.display = 'block';
-                    
-                    setTimeout(() => {
-                        alert.style.display = 'none';
-                    }, 5000);
-                }
+function removeAdditionalField(fieldId) {
+  const field = document.getElementById(fieldId);
+  if (field) {
+    field.remove();
+  }
+}
 
-                async handleLogout() {
-                    try {
-                        await window.firebaseFunctions.signOut(window.firebaseAuth);
-                        window.location.href = 'login.html';
-                    } catch (error) {
-                        console.error("Error logging out:", error);
-                    this.showAlert('Error logging out: ' + error.message, 'error');
-                    }
-                }
-            }
+// Get additional fields data
+function getAdditionalFieldsData() {
+  const fields = [];
+  const fieldElements = document.querySelectorAll('.additional-field');
+  
+  fieldElements.forEach(field => {
+    const nameInput = field.querySelector('.additional-field-name');
+    const valueInput = field.querySelector('.additional-field-value');
+    
+    if (nameInput.value.trim() && valueInput.value.trim()) {
+      fields.push({
+        name: nameInput.value.trim(),
+        value: valueInput.value.trim()
+      });
+    }
+  });
+  
+  return fields;
+}
 
-            // Initialize Products Manager
-            window.productsManager = new ProductsManager();
-        };
+/* ===== Image Upload Functionality ===== */
+// Add image to preview
+function addImageToPreview(imageDataUrl) {
+  const preview = document.getElementById('preview');
+  const imageId = 'img_' + Date.now();
+  
+  const previewItem = document.createElement('div');
+  previewItem.className = 'preview-item';
+  previewItem.id = imageId;
+  previewItem.innerHTML = `
+    <img src="${imageDataUrl}" alt="Product Image">
+    <button type="button" class="remove-image" onclick="removeImage('${imageId}')">
+      <i class="fas fa-times"></i>
+    </button>
+  `;
+  
+  preview.appendChild(previewItem);
+  imagesBase64.push(imageDataUrl);
+  updateFileInput();
+}
 
-        // Start the application
-        initializeApp();
-    </script>
+// Remove image from preview
+function removeImage(imageId) {
+  const previewItem = document.getElementById(imageId);
+  if (previewItem) {
+    const img = previewItem.querySelector('img');
+    const imgSrc = img.src;
+    
+    const index = imagesBase64.findIndex(image => image === imgSrc);
+    if (index > -1) {
+      imagesBase64.splice(index, 1);
+    }
+    
+    previewItem.remove();
+    
+    if (imagesBase64.length === 0) {
+      document.getElementById('imageInput').value = '';
+    }
+  }
+}
+
+// Cancel Upload Button Functionality
+document.getElementById('cancel-upload').addEventListener('click', function() {
+  document.getElementById('imageInput').value = '';
+  document.getElementById('preview').innerHTML = '';
+  imagesBase64 = [];
+  updateFileInput();
+});
+
+// Update file input for validation
+function updateFileInput() {
+  const fileInput = document.getElementById('imageInput');
+  if (imagesBase64.length > 0) {
+    fileInput.setCustomValidity('');
+  } else {
+    fileInput.setCustomValidity('Please select at least one image');
+  }
+}
+
+/* ===== Validation Functions ===== */
+function validatePhoneNumber(input) {
+  input.value = input.value.replace(/\D/g, '');
+  if (input.value.length > 10) {
+    input.value = input.value.slice(0, 10);
+  }
+}
+
+function validateCountryCode(input) {
+  input.value = input.value.replace(/\D/g, '');
+  if (input.value.length > 4) {
+    input.value = input.value.slice(0, 4);
+  }
+  // Update displayed country code
+  document.getElementById('country-code-display').textContent = input.value || '91';
+}
+
+// Update country code display when input changes
+document.getElementById('contact_country_code').addEventListener('input', function() {
+  document.getElementById('country-code-display').textContent = this.value || '91';
+});
+
+/* ===== Auth Functions ===== */
+const btnSignOut = document.getElementById('btn-signout');
+const userAvatar = document.getElementById('user-avatar');
+const userName = document.getElementById('user-name');
+
+// Sign Out
+btnSignOut.addEventListener('click', async () => { 
+  await signOut(auth); 
+  alert('Signed out successfully'); 
+});
+
+// Auth state listener
+onAuthStateChanged(auth, (user) => {
+  if (user) {
+    btnSignOut.style.display = 'inline-block';
+    
+    const displayName = user.displayName || 'User';
+    userName.textContent = displayName;
+    userAvatar.textContent = displayName.charAt(0).toUpperCase();
+  } else {
+    btnSignOut.style.display = 'none';
+    userName.textContent = 'Guest User';
+    userAvatar.textContent = 'G';
+    // Redirect to login if not authenticated
+    window.location.href = 'index.html';
+  }
+});
+
+/* ===== Image Upload to Worker ===== */
+async function uploadImages() {
+  let urls = [];
+
+  for (let img of imagesBase64) {
+    try {
+      const res = await fetch("https://mute-frost-eefa.ravijain236129.workers.dev", {
+        method: "POST",
+        headers: {"Content-Type":"application/json"},
+        body: JSON.stringify({ base64: img })
+      });
+
+      const out = await res.json();
+      if (out.status === "success") urls.push(out.url);
+
+    } catch (e) {
+      console.error("Upload Error:", e);
+    }
+  }
+  return urls;
+}
+
+/* ===== Product Form Logic ===== */
+const form = document.getElementById("product-form");
+const productIdInput = document.getElementById("product-id");
+const preview = document.getElementById("preview");
+const imageInput = document.getElementById("imageInput");
+const submitBtn = document.getElementById("submit-btn");
+const processingOverlay = document.getElementById("processing-overlay");
+
+// Handle file input changes
+imageInput.addEventListener("change", () => {
+  const files = Array.from(imageInput.files).slice(0, 10 - imagesBase64.length);
+
+  files.forEach(file => {
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      addImageToPreview(event.target.result);
+    };
+    reader.readAsDataURL(file);
+  });
+});
+
+/* EDIT MODE - FOR MY HISTORY PAGE */
+window.addEventListener("DOMContentLoaded", () => {
+  const editId = localStorage.getItem("editProductId");
+  const editData = localStorage.getItem("editProductData");
+
+  if (editId && editData) {
+    const p = JSON.parse(decodeURIComponent(editData));
+
+    productIdInput.value = editId;
+    form.category.value = p.category || "";
+    form.stone_name.value = p.stone_name || "";
+    form.sub_category.value = p.sub_category || "";
+    form.type.value = p.type || "";
+    form.color.value = p.color || "";
+    form.thickness.value = p.thickness || "";
+    form.size.value = p.size || "";
+    form.finish.value = p.finish || "";
+    form.usage.value = p.usage || "";
+    form.water_absorption.value = p.water_absorption || "";
+    form.density.value = p.density || "";
+    form.compressive_strength.value = p.compressive_strength || "";
+    form.description.value = p.description || "";
+    form.price.value = p.price || "";
+    form.price_unit.value = p.price_unit || "";
+    
+    // Handle phone number and country code
+    let phoneNumber = p.contact_number || "";
+    let countryCode = "91"; // default
+    
+    if (phoneNumber.startsWith('+')) {
+      const parts = phoneNumber.split(' ');
+      if (parts.length > 1) {
+        countryCode = parts[0].substring(1); // Remove +
+        phoneNumber = parts[1];
+      }
+    }
+    
+    form.contact_country_code.value = countryCode;
+    document.getElementById('country-code-display').textContent = countryCode;
+    form.contact_number.value = phoneNumber;
+    
+    form.email.value = p.email || "";
+    form.factory_name.value = p.factory_name || "";
+    form.address.value = p.address || "";
+    form.gst_number.value = p.gst_number || "";
+
+    // Load additional fields
+    if (p.additional_fields && p.additional_fields.length) {
+      p.additional_fields.forEach(field => {
+        addAdditionalField();
+        const lastField = document.querySelector('.additional-field:last-child');
+        if (lastField) {
+          lastField.querySelector('.additional-field-name').value = field.name;
+          lastField.querySelector('.additional-field-value').value = field.value;
+        }
+      });
+    }
+
+    // Show existing images
+    if (p.images && p.images.length) {
+      imagesBase64 = [];
+      p.images.forEach(img => {
+        addImageToPreview(img);
+      });
+    }
+  }
+});
+
+/* AUTH CHECK */
+onAuthStateChanged(auth, user => {
+  if (!user) {
+    window.location = "index.html";
+  }
+});
+
+/* SAVE / UPDATE PRODUCT */
+form.onsubmit = async (e) => {
+  e.preventDefault();
+
+  const user = auth.currentUser;
+  if (!user) return alert("Login required");
+
+  // Validate images
+  if (imagesBase64.length === 0) {
+    alert("Please add at least one product image");
+    return;
+  }
+
+  // Validate phone number
+  const phoneNumber = form.contact_number.value.trim();
+  if (phoneNumber.length !== 10) {
+    alert("Please enter a valid 10-digit mobile number");
+    return;
+  }
+
+  // Validate country code
+  const countryCode = form.contact_country_code.value.trim();
+  if (!countryCode) {
+    alert("Please enter a valid country code");
+    return;
+  }
+
+  // Show processing overlay
+  processingOverlay.classList.add('active');
+  submitBtn.disabled = true;
+  submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
+
+  try {
+    // Upload images
+    let imageUrls = await uploadImages();
+
+    const data = {
+      // Basic Information
+      category: form.category.value,
+      stone_name: form.stone_name.value,
+      sub_category: form.sub_category.value,
+      
+      // Product Details
+      type: form.type.value,
+      color: form.color.value,
+      thickness: form.thickness.value,
+      size: form.size.value,
+      finish: form.finish.value,
+      usage: form.usage.value,
+      
+      // Technical Specifications
+      water_absorption: form.water_absorption.value,
+      density: form.density.value,
+      compressive_strength: form.compressive_strength.value,
+      description: form.description.value,
+      
+      // Pricing
+      price: form.price.value ? parseFloat(form.price.value) : "",
+      price_unit: form.price_unit.value,
+      
+      // Contact Information
+      contact_number: "+" + countryCode + " " + phoneNumber,
+      email: form.email.value,
+      factory_name: form.factory_name.value,
+      address: form.address.value,
+      gst_number: form.gst_number.value,
+      
+      // Additional Fields
+      additional_fields: getAdditionalFieldsData(),
+      
+      // System Fields
+      images: imageUrls,
+      status: "active", // Product active status for your website
+      created_at: serverTimestamp(),
+      userId: user.uid
+    };
+
+    const id = productIdInput.value;
+
+    if (id) {
+      await updateDoc(doc(db, "products", id), data);
+    } else {
+      await addDoc(collection(db, "products"), data);
+    }
+
+    // Hide processing overlay
+    processingOverlay.classList.remove('active');
+    
+    // Show success message
+    alert(id ? "Product updated successfully!" : "Product added successfully!");
+
+    // Reset form
+    form.reset();
+    preview.innerHTML = "";
+    imageInput.value = "";
+    imagesBase64 = [];
+    productIdInput.value = "";
+    document.getElementById('additional-fields-container').innerHTML = "";
+    additionalFieldsCount = 0;
+    
+    // Reset country code to default
+    form.contact_country_code.value = "91";
+    document.getElementById('country-code-display').textContent = "91";
+
+  } catch (err) {
+    // Hide processing overlay on error
+    processingOverlay.classList.remove('active');
+    alert("Error: " + err.message);
+  } finally {
+    // Reset submit button
+    submitBtn.disabled = false;
+    submitBtn.innerHTML = '<i class="fas fa-save"></i> Save Product';
+  }
+};
+
+// Make functions available globally for onclick events
+window.removeImage = removeImage;
+window.removeAdditionalField = removeAdditionalField;
+window.validatePhoneNumber = validatePhoneNumber;
+window.validateCountryCode = validateCountryCode;
+</script>
+
 </body>
 </html>
