@@ -1,4 +1,4 @@
-// app.js - Main application logic (FIXED VERSION)
+// app.js - COMPLETE FIXED VERSION
 import { 
     db, auth, googleProvider,
     collection, getDocs, onAuthStateChanged, signOut, signInWithPopup
@@ -94,11 +94,11 @@ async function initializeData() {
         const firestoreInitialized = await initializeFirestoreData();
         
         if (firestoreInitialized) {
-            // Load categories from Firestore
-            await loadCategories();
-            
-            // Load products from Firestore  
+            // Load products first (because categories need products data)
             await loadProducts();
+            
+            // Load categories from Firestore or generate from products
+            await loadCategories();
             
             console.log("✅ Data loaded successfully from Firestore");
         } else {
@@ -116,37 +116,31 @@ async function initializeData() {
     }
 }
 
-async function loadCategories() {
-    try {
-        const querySnapshot = await getDocs(collection(db, 'categories'));
-        categories = [];
-        querySnapshot.forEach((doc) => {
-            categories.push({
-                id: doc.id,
-                ...doc.data()
-            });
-        });
-        
-        if (categories.length === 0) {
-            throw new Error("No categories found in Firestore");
-        }
-        
-    } catch (error) {
-        console.warn("Using mock categories due to error:", error.message);
-        categories = getMockCategories();
-    }
-}
-
 async function loadProducts() {
     try {
         const querySnapshot = await getDocs(collection(db, 'products'));
         products = [];
         querySnapshot.forEach((doc) => {
-            products.push({
+            const productData = doc.data();
+            
+            // Transform data to match expected structure
+            const transformedProduct = {
                 id: doc.id,
-                ...doc.data()
-            });
+                name: productData.stone_name || productData.name || 'Unnamed Product',
+                category: productData.category || 'uncategorized',
+                price: productData.price ? `£${productData.price}` : 'Price not set',
+                image: productData.images && productData.images.length > 0 ? productData.images[0] : 'https://images.unsplash.com/photo-1586023492125-27b2c045efd7?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=400&q=80',
+                description: productData.description || 'No description available',
+                stone_name: productData.stone_name,
+                type: productData.type,
+                // Include all original fields
+                ...productData
+            };
+            
+            products.push(transformedProduct);
         });
+        
+        console.log("✅ Products loaded from Firestore:", products);
         
         if (products.length === 0) {
             throw new Error("No products found in Firestore");
@@ -158,40 +152,82 @@ async function loadProducts() {
     }
 }
 
-// Mock Data (Fallback)
-function getMockCategories() {
-    return [
-        {
-            id: '1',
-            name: 'Flooring',
-            type: 'flooring',
-            image: 'https://images.unsplash.com/photo-1586023492125-27b2c045efd7?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=600&q=80',
-            description: 'Stone flooring solutions'
-        },
-        {
-            id: '2', 
-            name: 'Wall Decoration',
-            type: 'wall',
-            image: 'https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=600&q=80',
-            description: 'Wall cladding and decoration'
-        },
-        {
-            id: '3',
-            name: 'Bathroom',
-            type: 'bathroom', 
-            image: 'https://images.unsplash.com/photo-1600607687920-26eb2c5fab6a?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=600&q=80',
-            description: 'Bathroom stone solutions'
-        },
-        {
-            id: '4',
-            name: 'Outdoor',
-            type: 'outdoor',
-            image: 'https://images.unsplash.com/photo-1600585154340-2e5db6e509e9?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=600&q=80',
-            description: 'Outdoor stone applications'
+async function loadCategories() {
+    try {
+        const querySnapshot = await getDocs(collection(db, 'categories'));
+        categories = [];
+        querySnapshot.forEach((doc) => {
+            categories.push({
+                id: doc.id,
+                ...doc.data()
+            });
+        });
+        
+        // Agar categories empty hain, toh products se categories generate karein
+        if (categories.length === 0) {
+            categories = generateCategoriesFromProducts();
         }
-    ];
+        
+        console.log("✅ Categories loaded:", categories);
+        
+    } catch (error) {
+        console.warn("Using generated categories due to error:", error.message);
+        categories = generateCategoriesFromProducts();
+    }
 }
 
+// Products se categories generate karein
+function generateCategoriesFromProducts() {
+    const categoryMap = {};
+    
+    products.forEach(product => {
+        const categoryType = product.category || 'uncategorized';
+        if (!categoryMap[categoryType]) {
+            categoryMap[categoryType] = {
+                name: formatCategoryName(categoryType),
+                type: categoryType,
+                image: getCategoryImage(categoryType),
+                description: `${formatCategoryName(categoryType)} stone solutions`,
+                productCount: 0
+            };
+        }
+        categoryMap[categoryType].productCount++;
+    });
+    
+    return Object.values(categoryMap).map((cat, index) => ({
+        id: `cat_${index}`,
+        ...cat
+    }));
+}
+
+function formatCategoryName(category) {
+    const nameMap = {
+        'sandstone': 'Sandstone',
+        'flooring': 'Flooring',
+        'wall': 'Wall Decoration',
+        'bathroom': 'Bathroom',
+        'outdoor': 'Outdoor',
+        'kitchen': 'Kitchen',
+        'commercial': 'Commercial',
+        'uncategorized': 'Other Stones'
+    };
+    return nameMap[category] || category.charAt(0).toUpperCase() + category.slice(1);
+}
+
+function getCategoryImage(category) {
+    const imageMap = {
+        'sandstone': 'https://images.unsplash.com/photo-1586023492125-27b2c045efd7?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=600&q=80',
+        'flooring': 'https://images.unsplash.com/photo-1586023492125-27b2c045efd7?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=600&q=80',
+        'wall': 'https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=600&q=80',
+        'bathroom': 'https://images.unsplash.com/photo-1600607687920-26eb2c5fab6a?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=600&q=80',
+        'outdoor': 'https://images.unsplash.com/photo-1600585154340-2e5db6e509e9?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=600&q=80',
+        'kitchen': 'https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=600&q=80',
+        'commercial': 'https://images.unsplash.com/photo-1497366754035-f200968a6e72?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=600&q=80'
+    };
+    return imageMap[category] || 'https://images.unsplash.com/photo-1586023492125-27b2c045efd7?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=600&q=80';
+}
+
+// Mock Data (Fallback)
 function getMockProducts() {
     return [
         {
@@ -203,33 +239,13 @@ function getMockProducts() {
             description: 'Premium quality kota stone for flooring',
             stone_name: 'Kota Blue',
             type: 'Natural Stone'
-        },
-        {
-            id: '2',
-            name: 'Sandstone Pavers',
-            category: 'outdoor',
-            price: '£35.00',
-            image: 'https://images.unsplash.com/photo-1600585154340-2e5db6e509e9?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=400&q=80',
-            description: 'Natural sandstone for outdoor paving',
-            stone_name: 'Raj Green Sandstone',
-            type: 'Calibrated'
-        },
-        {
-            id: '3',
-            name: 'Marble Tiles',
-            category: 'bathroom',
-            price: '£75.00',
-            image: 'https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=400&q=80',
-            description: 'Luxury marble tiles for bathrooms',
-            stone_name: 'White Marble',
-            type: 'Polished'
         }
     ];
 }
 
 async function loadMockData() {
-    categories = getMockCategories();
     products = getMockProducts();
+    categories = generateCategoriesFromProducts();
     showDemoNotification();
 }
 
@@ -397,12 +413,14 @@ function performSearch() {
 
 function formatCategory(category) {
     const categoryMap = {
+        'sandstone': 'Sandstone',
         'flooring': 'Flooring',
         'wall': 'Wall Decoration',
         'bathroom': 'Bathroom',
         'outdoor': 'Outdoor',
         'kitchen': 'Kitchen',
-        'commercial': 'Commercial'
+        'commercial': 'Commercial',
+        'uncategorized': 'Other Stones'
     };
     return categoryMap[category] || category;
 }
@@ -432,7 +450,7 @@ function renderCategories() {
         categoriesHTML += `
             <div class="use-category-item">
                 <a href="category-products.html?category=${category.type}" class="use-category-link">
-                    <div class="use-category-image" style="background-image: url('${category.image || 'https://images.unsplash.com/photo-1586023492125-27b2c045efd7?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=600&q=80'}')"></div>
+                    <div class="use-category-image" style="background-image: url('${category.image}')"></div>
                     <div class="use-category-name">${category.name}</div>
                     <div class="product-count">${categoryProducts.length} products</div>
                 </a>
