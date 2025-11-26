@@ -1149,17 +1149,15 @@
             console.log('📊 Loading data from Firestore...');
             
             try {
-                // Load Categories and Products from Firestore
-                await loadCategoriesFromFirestore();
+                // Load Products from Firestore - USAGE SE DATA LENA HAI
                 await loadProductsFromFirestore();
                 
                 console.log('✅ Data loaded successfully from Firestore');
-                console.log('📁 Categories: ' + appState.categories.length);
                 console.log('📦 Products: ' + appState.products.length);
                 
-                // Generate dynamic navigation and categories
-                generateUsesNavigationFromCategories();
-                updateCategoriesSection();
+                // Generate dynamic navigation and categories from USAGE data
+                generateUsesNavigationFromUsage();
+                updateCategoriesSectionFromUsage();
                 
             } catch (error) {
                 console.error('❌ Error loading data from Firestore:', error);
@@ -1170,29 +1168,7 @@
             console.log('✅ StoneCraft Application initialized successfully');
         }
 
-        // Load Categories from Firestore
-        async function loadCategoriesFromFirestore() {
-            try {
-                const querySnapshot = await getDocs(collection(db, "categories"));
-                appState.categories = [];
-                
-                querySnapshot.forEach((doc) => {
-                    const data = doc.data();
-                    appState.categories.push({
-                        id: doc.id,
-                        ...data
-                    });
-                });
-                
-                console.log('✅ Categories loaded from Firestore: ', appState.categories);
-                
-            } catch (error) {
-                console.error('Error loading categories:', error);
-                throw error;
-            }
-        }
-
-        // Load Products from Firestore
+        // Load Products from Firestore - USAGE SE DATA LENA HAI
         async function loadProductsFromFirestore() {
             try {
                 const querySnapshot = await getDocs(collection(db, "products"));
@@ -1220,8 +1196,8 @@
                     });
                     appState.products = updatedProducts;
                     console.log('🔄 Products updated in real-time');
-                    generateUsesNavigationFromCategories();
-                    updateCategoriesSection();
+                    generateUsesNavigationFromUsage();
+                    updateCategoriesSectionFromUsage();
                 });
                 
             } catch (error) {
@@ -1230,60 +1206,60 @@
             }
         }
 
-        // Function to generate uses navigation from Categories and Products data
-        function generateUsesNavigationFromCategories() {
+        // Function to generate uses navigation from USAGE data (not category)
+        function generateUsesNavigationFromUsage() {
             const usesContainer = document.getElementById('dynamicUsesContainer');
             if (!usesContainer) return;
             
             usesContainer.innerHTML = '';
             
-            // Create a map of categories with their unique types from products
-            const categoryTypesMap = {};
+            // Extract unique USAGES from products
+            const uniqueUsages = [...new Set(appState.products
+                .filter(product => product.uses) // Only products with uses
+                .map(product => product.uses)
+            )];
             
-            // Process products to extract unique types for each category
-            appState.products.forEach(product => {
-                if (product.category && product.type) {
-                    if (!categoryTypesMap[product.category]) {
-                        categoryTypesMap[product.category] = new Set();
-                    }
-                    categoryTypesMap[product.category].add(product.type);
-                }
-            });
+            console.log('📊 Unique Usages:', uniqueUsages);
             
-            console.log('📊 Category Types Map:', categoryTypesMap);
-            
-            // Create navigation items for each category
-            appState.categories.forEach(category => {
-                const categoryKey = category.name.toLowerCase().replace(/\s+/g, '-');
+            // Create navigation items for each usage
+            uniqueUsages.forEach(usage => {
+                const usageKey = usage.toLowerCase().replace(/\s+/g, '-');
                 const useItem = document.createElement('div');
                 useItem.className = 'use-item';
                 
-                const categoryTypes = categoryTypesMap[category.name] ? 
-                    Array.from(categoryTypesMap[category.name]) : [];
+                // Get unique stone names for this usage
+                const usageProducts = appState.products.filter(product => 
+                    product.uses === usage
+                );
                 
-                console.log(`📁 ${category.name} Types:`, categoryTypes);
+                const uniqueStoneNames = [...new Set(usageProducts
+                    .filter(product => product.stone_name)
+                    .map(product => product.stone_name)
+                )];
                 
-                if (categoryTypes.length > 0) {
-                    // Category with types - create mega menu
+                console.log(`📁 ${usage} Stone Names:`, uniqueStoneNames);
+                
+                if (uniqueStoneNames.length > 0) {
+                    // Usage with stone names - create mega menu
                     useItem.innerHTML = `
-                        <div class="use-link">${category.name}</div>
+                        <div class="use-link">${usage}</div>
                         <div class="mega-menu">
                             <div class="patterns-grid">
-                                ${categoryTypes.map(type => {
-                                    const typeSlug = type.toLowerCase().replace(/\s+/g, '-');
-                                    // Find a product image for this type or use default
-                                    const typeProduct = appState.products.find(p => 
-                                        p.category === category.name && p.type === type
+                                ${uniqueStoneNames.map(stoneName => {
+                                    const stoneSlug = stoneName.toLowerCase().replace(/\s+/g, '-');
+                                    // Find a product image for this stone or use default
+                                    const stoneProduct = appState.products.find(p => 
+                                        p.uses === usage && p.stone_name === stoneName
                                     );
-                                    const imageUrl = typeProduct?.images?.[0] || 
+                                    const imageUrl = stoneProduct?.images?.[0] || 
                                         'https://images.unsplash.com/photo-1586023492125-27b2c045efd7?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=400&q=80';
                                     
-                                    console.log(`🖼️ ${category.name} - ${type}:`, imageUrl);
+                                    console.log(`🖼️ ${usage} - ${stoneName}:`, imageUrl);
                                     
                                     return `
-                                        <a href="category-products.html?category=${categoryKey}&type=${typeSlug}" class="pattern-item" data-category="${category.name}" data-type="${type}">
+                                        <a href="category-products.html?usage=${usageKey}&stone=${stoneSlug}" class="pattern-item" data-usage="${usage}" data-stone="${stoneName}">
                                             <div class="pattern-image" style="background-image: url('${imageUrl}')"></div>
-                                            <div class="pattern-name">${type}</div>
+                                            <div class="pattern-name">${stoneName}</div>
                                         </a>
                                     `;
                                 }).join('')}
@@ -1291,9 +1267,9 @@
                         </div>
                     `;
                 } else {
-                    // Category without types - simple link
+                    // Usage without stone names - simple link
                     useItem.innerHTML = `
-                        <a href="category-products.html?category=${categoryKey}" class="use-link">${category.name}</a>
+                        <a href="category-products.html?usage=${usageKey}" class="use-link">${usage}</a>
                     `;
                 }
                 
@@ -1304,6 +1280,47 @@
             setTimeout(() => {
                 initializeMegaMenu();
             }, 100);
+        }
+
+        // Function to update categories section with USAGE data (not category)
+        function updateCategoriesSectionFromUsage() {
+            const categoriesGrid = document.getElementById('dynamicCategories');
+            if (!categoriesGrid) return;
+            
+            categoriesGrid.innerHTML = '';
+            
+            // Extract unique USAGES from products
+            const uniqueUsages = [...new Set(appState.products
+                .filter(product => product.uses) // Only products with uses
+                .map(product => product.uses)
+            )];
+            
+            uniqueUsages.forEach(usage => {
+                const categoryItem = document.createElement('div');
+                categoryItem.className = 'use-category-item';
+                
+                // Count products in this usage
+                const productCount = appState.products.filter(product => 
+                    product.uses === usage
+                ).length;
+                
+                // Find a product image for this usage or use default
+                const usageProduct = appState.products.find(p => p.uses === usage);
+                const imageUrl = usageProduct?.images?.[0] || 
+                    'https://images.unsplash.com/photo-1586023492125-27b2c045efd7?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=400&q=80';
+                
+                const usageSlug = usage.toLowerCase().replace(/\s+/g, '-');
+                
+                categoryItem.innerHTML = `
+                    <a href="category-products.html?usage=${usageSlug}" class="use-category-link">
+                        <div class="use-category-image" style="background-image: url('${imageUrl}')"></div>
+                        <div class="use-category-name">${usage}</div>
+                        <div class="product-count">${productCount} Products</div>
+                    </a>
+                `;
+                
+                categoriesGrid.appendChild(categoryItem);
+            });
         }
 
         // Initialize mega menu functionality - FIXED VERSION
@@ -1395,41 +1412,6 @@
             console.log('✅ Mega Menu initialization complete');
         }
 
-        // Function to update categories section with dynamic data
-        function updateCategoriesSection() {
-            const categoriesGrid = document.getElementById('dynamicCategories');
-            if (!categoriesGrid) return;
-            
-            categoriesGrid.innerHTML = '';
-            
-            appState.categories.forEach(category => {
-                const categoryItem = document.createElement('div');
-                categoryItem.className = 'use-category-item';
-                
-                // Count products in this category
-                const productCount = appState.products.filter(product => 
-                    product.category === category.name
-                ).length;
-                
-                // Find a product image for this category or use default
-                const categoryProduct = appState.products.find(p => p.category === category.name);
-                const imageUrl = categoryProduct?.images?.[0] || 
-                    'https://images.unsplash.com/photo-1586023492125-27b2c045efd7?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=400&q=80';
-                
-                const categorySlug = category.name.toLowerCase().replace(/\s+/g, '-');
-                
-                categoryItem.innerHTML = `
-                    <a href="category-products.html?category=${categorySlug}" class="use-category-link">
-                        <div class="use-category-image" style="background-image: url('${imageUrl}')"></div>
-                        <div class="use-category-name">${category.name}</div>
-                        <div class="product-count">${productCount} Products</div>
-                    </a>
-                `;
-                
-                categoriesGrid.appendChild(categoryItem);
-            });
-        }
-
         // Initialize authentication
         function initializeAuth() {
             onAuthStateChanged(auth, (user) => {
@@ -1483,7 +1465,7 @@
             initializeUserProfile();
         }
 
-        // Initialize search functionality
+        // Initialize search functionality - UPDATED FOR USAGE
         function initializeSearch() {
             const searchInput = document.getElementById('searchInput');
             const searchButton = document.getElementById('searchButton');
@@ -1521,9 +1503,9 @@
                 // Simulate API delay
                 setTimeout(() => {
                     const results = appState.products.filter(product => 
-                        product.name.toLowerCase().includes(query) ||
-                        product.category.toLowerCase().includes(query) ||
-                        product.type.toLowerCase().includes(query)
+                        (product.stone_name && product.stone_name.toLowerCase().includes(query)) ||
+                        (product.uses && product.uses.toLowerCase().includes(query)) ||
+                        (product.type && product.type.toLowerCase().includes(query))
                     );
                     
                     displaySearchResults(results, query);
@@ -1542,12 +1524,12 @@
                     const resultItem = document.createElement('div');
                     resultItem.className = 'search-result-item';
                     resultItem.innerHTML = `
-                        <div class="search-result-image" style="background-image: url('${product.images[0]}')"></div>
+                        <div class="search-result-image" style="background-image: url('${product.images?.[0] || 'https://images.unsplash.com/photo-1586023492125-27b2c045efd7?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=400&q=80'}')"></div>
                         <div class="search-result-content">
-                            <div class="search-result-name">${product.name}</div>
-                            <div class="search-result-category">${product.category} • ${product.type}</div>
+                            <div class="search-result-name">${product.stone_name || 'Stone Product'}</div>
+                            <div class="search-result-category">${product.uses || 'General'} • ${product.type || 'Natural Stone'}</div>
                         </div>
-                        <div class="search-result-price">£${product.price}</div>
+                        <div class="search-result-price">${product.price ? '£' + product.price : 'Price on request'}</div>
                     `;
                     
                     resultItem.addEventListener('click', function() {
@@ -1603,8 +1585,53 @@
             }
         }
 
+        // Fallback sample data if Firestore fails
+        function loadSampleData() {
+            console.log('📝 Loading sample data...');
+            
+            // Sample usage data
+            const sampleUsages = [
+                'Flooring', 'Wall Cladding', 'Countertops', 'Paving', 
+                'Staircase', 'Landscaping', 'Monuments', 'Sculptures'
+            ];
+            
+            // Sample products with usage data
+            const sampleProducts = [
+                {
+                    id: '1',
+                    stone_name: 'Raj Green Sandstone',
+                    uses: 'Flooring',
+                    type: 'Natural',
+                    images: ['https://images.unsplash.com/photo-1586023492125-27b2c045efd7?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80'],
+                    price: 45
+                },
+                {
+                    id: '2', 
+                    stone_name: 'White Marble',
+                    uses: 'Countertops',
+                    type: 'Polished',
+                    images: ['https://images.unsplash.com/photo-1595428774223-ef52624120d2?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80'],
+                    price: 120
+                },
+                {
+                    id: '3',
+                    stone_name: 'Kota Brown',
+                    uses: 'Paving',
+                    type: 'Natural',
+                    images: ['https://images.unsplash.com/photo-1586023492125-27b2c045efd7?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80'],
+                    price: 35
+                }
+            ];
+            
+            appState.products = sampleProducts;
+            
+            // Generate navigation from sample data
+            generateUsesNavigationFromUsage();
+            updateCategoriesSectionFromUsage();
+        }
+
         // Demo: Show how new types are automatically added
-        console.log('🔄 Navigation will automatically update when new products with types are added to Firestore');
+        console.log('🔄 Navigation will automatically update when new products with usage are added to Firestore');
     </script>
 </body>
 </html>
