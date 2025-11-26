@@ -1230,124 +1230,6 @@
             }
         }
 
-        // Sample data as fallback - WITH PROPER TYPES DATA
-        function loadSampleData() {
-            console.log('📝 Loading sample data...');
-            
-            // Sample Categories data
-            appState.categories = [
-                { id: "1", name: "Flooring", description: "Premium stone flooring solutions" },
-                { id: "2", name: "Wall Decoration", description: "Beautiful wall decoration stones" },
-                { id: "3", name: "Bathroom", description: "Luxury bathroom stone solutions" },
-                { id: "4", name: "Outdoor", description: "Durable outdoor stone applications" },
-                { id: "5", name: "Kitchen", description: "Elegant kitchen stone solutions" },
-                { id: "6", name: "Commercial", description: "Commercial grade stone applications" }
-            ];
-
-            // Sample Products data with PROPER TYPES and IMAGES
-            appState.products = [
-                { 
-                    id: "1", 
-                    name: "Premium Sandstone Tiles", 
-                    category: "Flooring", 
-                    type: "Herringbone",
-                    price: 45.99,
-                    images: ["https://images.unsplash.com/photo-1586023492125-27b2c045efd7?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=400&q=80"],
-                    description: "Premium sandstone tiles in herringbone pattern"
-                },
-                { 
-                    id: "2", 
-                    name: "Checkerboard Marble", 
-                    category: "Flooring", 
-                    type: "Checkerboard",
-                    price: 67.50,
-                    images: ["https://images.unsplash.com/photo-1628745277897-d8e04e11c0af?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=400&q=80"],
-                    description: "Elegant checkerboard marble flooring"
-                },
-                { 
-                    id: "3", 
-                    name: "Random Layout Limestone", 
-                    category: "Flooring", 
-                    type: "Random Layout",
-                    price: 38.75,
-                    images: ["https://images.unsplash.com/photo-1595428774223-ef52624120d2?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=400&q=80"],
-                    description: "Beautiful random layout limestone flooring"
-                },
-                { 
-                    id: "4", 
-                    name: "Brick Pattern Sandstone", 
-                    category: "Flooring", 
-                    type: "Brick Pattern",
-                    price: 42.25,
-                    images: ["https://images.unsplash.com/photo-1600585154340-2e5db6e509e9?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=400&q=80"],
-                    description: "Classic brick pattern sandstone flooring"
-                },
-                { 
-                    id: "5", 
-                    name: "Stone Cladding Panels", 
-                    category: "Wall Decoration", 
-                    type: "Stone Cladding",
-                    price: 55.00,
-                    images: ["https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=400&q=80"],
-                    description: "Natural stone cladding panels for walls"
-                },
-                { 
-                    id: "6", 
-                    name: "Feature Wall Stone", 
-                    category: "Wall Decoration", 
-                    type: "Feature Walls",
-                    price: 62.50,
-                    images: ["https://images.unsplash.com/photo-1600607687644-c7f6d5c5b6f9?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=400&q=80"],
-                    description: "Premium stone for feature walls"
-                },
-                { 
-                    id: "7", 
-                    name: "Stone Mosaic Tiles", 
-                    category: "Wall Decoration", 
-                    type: "Stone Mosaic",
-                    price: 75.25,
-                    images: ["https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=400&q=80"],
-                    description: "Beautiful stone mosaic tiles"
-                },
-                { 
-                    id: "8", 
-                    name: "Bathroom Marble Tiles", 
-                    category: "Bathroom", 
-                    type: "Wall Tiles",
-                    price: 48.99,
-                    images: ["https://images.unsplash.com/photo-1584622650111-993a426fbf0a?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=400&q=80"],
-                    description: "Luxury marble tiles for bathroom walls"
-                },
-                { 
-                    id: "9", 
-                    name: "Outdoor Paving Stones", 
-                    category: "Outdoor", 
-                    type: "Paving",
-                    price: 35.75,
-                    images: ["https://images.unsplash.com/photo-1621552102666-40ae371950e8?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=400&q=80"],
-                    description: "Durable outdoor paving stones"
-                },
-                { 
-                    id: "10", 
-                    name: "Kitchen Countertop Marble", 
-                    category: "Kitchen", 
-                    type: "Countertops",
-                    price: 120.00,
-                    images: ["https://images.unsplash.com/photo-1556909114-4d0d853e5e25?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=400&q=80"],
-                    description: "Premium marble for kitchen countertops"
-                },
-                { 
-                    id: "11", 
-                    name: "Commercial Floor Tiles", 
-                    category: "Commercial", 
-                    type: "Flooring",
-                    price: 52.50,
-                    images: ["https://images.unsplash.com/photo-1586023492125-27b2c045efd7?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=400&q=80"],
-                    description: "Durable commercial floor tiles"
-                }
-            ];
-        }
-
         // Function to generate uses navigation from Categories and Products data
         function generateUsesNavigationFromCategories() {
             const usesContainer = document.getElementById('dynamicUsesContainer');
@@ -1419,53 +1301,98 @@
             });
             
             // Reinitialize mega menu functionality
-            initializeMegaMenu();
+            setTimeout(() => {
+                initializeMegaMenu();
+            }, 100);
         }
 
-        // Initialize mega menu functionality
+        // Initialize mega menu functionality - FIXED VERSION
         function initializeMegaMenu() {
+            console.log('🔄 Initializing Mega Menu...');
+            
             const usesTopBar = document.querySelector('.uses-top-bar');
             const useItems = document.querySelectorAll('.use-item');
             const container = document.querySelector('.uses-top-bar .container');
             
-            if (!container || !usesTopBar) return;
+            if (!container || !usesTopBar) {
+                console.log('❌ Mega Menu container not found');
+                return;
+            }
+            
+            console.log('✅ Mega Menu elements found:', {
+                usesTopBar: !!usesTopBar,
+                useItems: useItems.length,
+                container: !!container
+            });
             
             const containerRect = container.getBoundingClientRect();
             
-            useItems.forEach(item => {
+            useItems.forEach((item, index) => {
                 const megaMenu = item.querySelector('.mega-menu');
+                console.log(`📦 Use Item ${index + 1}:`, {
+                    hasMegaMenu: !!megaMenu,
+                    itemText: item.textContent.trim()
+                });
 
                 if (megaMenu) {
                     // Set mega menu width and position
                     megaMenu.style.width = containerRect.width + 'px';
-                    megaMenu.style.left = -(item.getBoundingClientRect().left - containerRect.left) + 'px';
-
+                    megaMenu.style.left = '0px';
+                    
+                    // Fix: Use mouseenter/mouseleave instead of hover
                     item.addEventListener('mouseenter', () => {
+                        console.log('🐭 Mouse entered:', item.textContent.trim());
+                        // Hide all other mega menus
                         document.querySelectorAll('.mega-menu').forEach(menu => {
                             if (menu !== megaMenu) {
                                 menu.style.display = 'none';
                             }
                         });
+                        // Show current mega menu
                         megaMenu.style.display = 'block';
                     });
                     
-                    item.addEventListener('mouseleave', () => {
+                    item.addEventListener('mouseleave', (e) => {
+                        console.log('🐭 Mouse left:', item.textContent.trim());
+                        // Check if mouse is moving to mega menu
+                        const relatedTarget = e.relatedTarget;
+                        if (!megaMenu.contains(relatedTarget)) {
+                            setTimeout(() => {
+                                if (!item.matches(':hover') && !megaMenu.matches(':hover')) {
+                                    megaMenu.style.display = 'none';
+                                }
+                            }, 100);
+                        }
+                    });
+                    
+                    // Also handle mega menu mouse events
+                    megaMenu.addEventListener('mouseenter', () => {
+                        console.log('🐭 Mouse entered mega menu');
+                        megaMenu.style.display = 'block';
+                    });
+                    
+                    megaMenu.addEventListener('mouseleave', () => {
+                        console.log('🐭 Mouse left mega menu');
                         setTimeout(() => {
-                            if (!item.matches(':hover')) {
+                            if (!item.matches(':hover') && !megaMenu.matches(':hover')) {
                                 megaMenu.style.display = 'none';
                             }
-                        }, 50);
+                        }, 100);
                     });
                 }
             });
             
+            // Close all mega menus when clicking outside
             document.addEventListener('click', (event) => {
                 if (!usesTopBar.contains(event.target)) {
+                    console.log('📌 Click outside - closing all mega menus');
                     document.querySelectorAll('.mega-menu').forEach(menu => {
                         menu.style.display = 'none';
                     });
                 }
             });
+            
+            console.log('✅ Mega Menu initialization complete');
         }
 
         // Function to update categories section with dynamic data
@@ -1549,9 +1476,6 @@
 
         // Initialize UI components
         function initializeUI() {
-            // Initialize mega menu functionality
-            initializeMegaMenu();
-            
             // Initialize search functionality
             initializeSearch();
             
