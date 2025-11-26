@@ -3,197 +3,998 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Firestore to Facebook - Manual Poster</title>
+    <title>Manage Products - StoneCraft UK</title>
+    <meta name="description" content="Manage your stone products inventory">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Firebase SDK -->
+    <script type="module">
+        // Import Firebase modules
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.5.0/firebase-app.js";
+        import { 
+            getFirestore, 
+            collection, 
+            addDoc, 
+            getDocs, 
+            query, 
+            orderBy, 
+            doc, 
+            deleteDoc, 
+            updateDoc,
+            onSnapshot
+        } from "https://www.gstatic.com/firebasejs/12.5.0/firebase-firestore.js";
+        import { 
+            getAuth, 
+            onAuthStateChanged,
+            signOut
+        } from "https://www.gstatic.com/firebasejs/12.5.0/firebase-auth.js";
+        import { 
+            getStorage, 
+            ref, 
+            uploadBytes, 
+            getDownloadURL 
+        } from "https://www.gstatic.com/firebasejs/12.5.0/firebase-storage.js";
+
+        // Firebase Configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyDxNMhU09mINvq_aDLtylBg3FucCK-MzYE",
+            authDomain: "sandstonebijoliya-293d2.firebaseapp.com",
+            projectId: "sandstonebijoliya-293d2",
+            storageBucket: "sandstonebijoliya-293d2.appspot.com",
+            messagingSenderId: "133756247845",
+            appId: "1:133756247845:web:8e769ce2af3db1765484cc",
+            measurementId: "G-H7JMX9VNYF"
+        };
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        const auth = getAuth(app);
+        const storage = getStorage(app);
+
+        // Make them globally available
+        window.firebaseApp = app;
+        window.firebaseDb = db;
+        window.firebaseAuth = auth;
+        window.firebaseStorage = storage;
+        window.firebaseFunctions = {
+            collection, addDoc, getDocs, query, orderBy, doc, deleteDoc, updateDoc, onSnapshot,
+            onAuthStateChanged, signOut,
+            ref, uploadBytes, getDownloadURL
+        };
+
+        console.log("Firebase initialized successfully");
+    </script>
+    
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: Arial, sans-serif; background: #1e3a8a; padding: 20px; }
-        .container { max-width: 1200px; margin: 0 auto; background: white; border-radius: 15px; padding: 25px; }
-        .header { background: linear-gradient(135deg, #7c3aed, #8b5cf6); color: white; padding: 25px; border-radius: 10px; text-align: center; margin-bottom: 20px; }
-        .btn { padding: 12px 20px; border: none; border-radius: 8px; cursor: pointer; margin: 5px; font-weight: bold; }
-        .btn-copy { background: #10b981; color: white; }
-        .btn-next { background: #3b82f6; color: white; }
-        .product-card { border: 2px solid #e2e8f0; padding: 20px; margin: 15px 0; border-radius: 10px; background: #f8fafc; }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: #f8f9fa;
+            color: #333;
+            line-height: 1.6;
+        }
+        
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 15px;
+        }
+        
+        /* Header Styles */
+        header {
+            background-color: #fff;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            z-index: 100;
+        }
+        
+        .main-header {
+            padding: 15px 0;
+        }
+        
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+        }
+        
+        .logo h1 {
+            font-size: 28px;
+            color: #333;
+            font-weight: 700;
+        }
+        
+        .logo span {
+            color: #b8860b;
+        }
+        
+        /* Admin Dashboard */
+        .admin-dashboard {
+            margin-top: 120px;
+            padding: 40px 0;
+        }
+        
+        .dashboard-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 40px;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+        
+        .dashboard-title {
+            font-size: 32px;
+            color: #333;
+            font-weight: 700;
+        }
+        
+        .btn {
+            display: inline-block;
+            background: #b8860b;
+            color: white;
+            padding: 12px 25px;
+            border: none;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+        
+        .btn:hover {
+            background: #a3780a;
+            transform: translateY(-2px);
+        }
+        
+        .btn-secondary {
+            background: #6c757d;
+        }
+        
+        .btn-secondary:hover {
+            background: #545b62;
+        }
+        
+        .btn-danger {
+            background: #dc3545;
+        }
+        
+        .btn-danger:hover {
+            background: #c82333;
+        }
+        
+        .btn-success {
+            background: #28a745;
+        }
+        
+        .btn-success:hover {
+            background: #218838;
+        }
+        
+        /* Products Grid */
+        .products-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 30px;
+            margin-bottom: 50px;
+        }
+        
+        .product-card {
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
+        
+        .product-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+        }
+        
+        .product-image {
+            width: 100%;
+            height: 200px;
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            background-color: #f8f9fa;
+        }
+        
+        .product-content {
+            padding: 20px;
+        }
+        
+        .product-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 10px;
+        }
+        
+        .product-category {
+            display: inline-block;
+            background: #e9ecef;
+            color: #495057;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 500;
+            margin-bottom: 10px;
+        }
+        
+        .product-price {
+            font-size: 20px;
+            font-weight: 700;
+            color: #b8860b;
+            margin-bottom: 15px;
+        }
+        
+        .product-description {
+            color: #666;
+            font-size: 14px;
+            line-height: 1.5;
+            margin-bottom: 15px;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+        
+        .product-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+        
+        .btn-small {
+            padding: 8px 15px;
+            font-size: 12px;
+            flex: 1;
+        }
+        
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .modal.active {
+            display: flex;
+        }
+        
+        .modal-content {
+            background: white;
+            border-radius: 12px;
+            width: 90%;
+            max-width: 600px;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+        
+        .modal-header {
+            padding: 20px;
+            border-bottom: 1px solid #e9ecef;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .modal-title {
+            font-size: 24px;
+            font-weight: 600;
+            color: #333;
+        }
+        
+        .close-modal {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: #666;
+        }
+        
+        .modal-body {
+            padding: 20px;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #333;
+        }
+        
+        .form-input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e9ecef;
+            border-radius: 6px;
+            font-size: 14px;
+            transition: border-color 0.3s;
+        }
+        
+        .form-input:focus {
+            outline: none;
+            border-color: #b8860b;
+        }
+        
+        .form-textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+        
+        .form-select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e9ecef;
+            border-radius: 6px;
+            font-size: 14px;
+            background: white;
+        }
+        
+        .form-select:focus {
+            outline: none;
+            border-color: #b8860b;
+        }
+        
+        .form-checkbox-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-top: 10px;
+        }
+        
+        .form-checkbox {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .form-checkbox input {
+            width: 18px;
+            height: 18px;
+        }
+        
+        .file-upload {
+            border: 2px dashed #e9ecef;
+            border-radius: 6px;
+            padding: 30px;
+            text-align: center;
+            cursor: pointer;
+            transition: border-color 0.3s;
+        }
+        
+        .file-upload:hover {
+            border-color: #b8860b;
+        }
+        
+        .file-upload i {
+            font-size: 40px;
+            color: #b8860b;
+            margin-bottom: 10px;
+        }
+        
+        .file-input {
+            display: none;
+        }
+        
+        .image-preview {
+            margin-top: 15px;
+            text-align: center;
+        }
+        
+        .preview-image {
+            max-width: 200px;
+            max-height: 150px;
+            border-radius: 6px;
+            margin-bottom: 10px;
+        }
+        
+        .modal-footer {
+            padding: 20px;
+            border-top: 1px solid #e9ecef;
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+        }
+        
+        /* Loading States */
+        .loading {
+            text-align: center;
+            padding: 60px;
+            color: #666;
+        }
+        
+        .loading i {
+            font-size: 40px;
+            margin-bottom: 20px;
+        }
+        
+        .no-products {
+            text-align: center;
+            padding: 60px;
+            color: #666;
+            grid-column: 1 / -1;
+        }
+        
+        .no-products i {
+            font-size: 60px;
+            margin-bottom: 20px;
+            color: #ddd;
+        }
+        
+        /* Alert Messages */
+        .alert {
+            padding: 15px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+            display: none;
+        }
+        
+        .alert-success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        
+        .alert-error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .admin-dashboard {
+                margin-top: 100px;
+            }
+            
+            .dashboard-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .products-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .product-actions {
+                flex-direction: column;
+            }
+            
+            .modal-content {
+                width: 95%;
+                margin: 20px;
+            }
+        }
     </style>
 </head>
 <body>
-    <div class="container">
-        <div class="header">
-            <h1>📋 MANUAL FACEBOOK POSTER</h1>
-            <p>Copy & Paste Method - 100% Working</p>
+    <!-- Header Section -->
+    <header>
+        <div class="main-header">
+            <div class="container header-content">
+                <div class="logo">
+                    <a href="index.html" style="text-decoration: none; color: inherit;">
+                        <h1>Stone<span>Craft</span> Admin</h1>
+                    </a>
+                </div>
+                
+                <div class="user-actions">
+                    <a href="index.html" class="btn btn-secondary">
+                        <i class="fas fa-home"></i> Back to Site
+                    </a>
+                    <button class="btn btn-danger" id="logoutBtn">
+                        <i class="fas fa-sign-out-alt"></i> Logout
+                    </button>
+                </div>
+            </div>
         </div>
+    </header>
 
-        <div id="notification"></div>
-        <div id="products-container"></div>
-        
-        <div style="text-align: center; margin-top: 30px;">
-            <button class="btn btn-next" onclick="loadNextProduct()">➡️ Next Product</button>
+    <!-- Admin Dashboard -->
+    <section class="admin-dashboard">
+        <div class="container">
+            <div class="dashboard-header">
+                <h1 class="dashboard-title">Manage Products</h1>
+                <button class="btn" id="addProductBtn">
+                    <i class="fas fa-plus"></i> Add New Product
+                </button>
+            </div>
+            
+            <!-- Alert Messages -->
+            <div id="alertMessage" class="alert"></div>
+            
+            <!-- Products Grid -->
+            <div class="products-grid" id="productsGrid">
+                <div class="loading">
+                    <i class="fas fa-spinner fa-spin"></i>
+                    <p>Loading products...</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Add/Edit Product Modal -->
+    <div class="modal" id="productModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title" id="modalTitle">Add New Product</h2>
+                <button class="close-modal" id="closeModal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="productForm">
+                    <input type="hidden" id="productId">
+                    
+                    <div class="form-group">
+                        <label class="form-label" for="productName">Product Name *</label>
+                        <input type="text" class="form-input" id="productName" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label" for="productCategory">Category *</label>
+                        <select class="form-select" id="productCategory" required>
+                            <option value="">Select Category</option>
+                            <option value="flooring">Flooring</option>
+                            <option value="wall">Wall Decoration</option>
+                            <option value="bathroom">Bathroom</option>
+                            <option value="outdoor">Outdoor</option>
+                            <option value="kitchen">Kitchen</option>
+                            <option value="commercial">Commercial</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label" for="productPrice">Price (per sqm) *</label>
+                        <input type="number" class="form-input" id="productPrice" step="0.01" min="0" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label" for="productDescription">Description *</label>
+                        <textarea class="form-input form-textarea" id="productDescription" required></textarea>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Pattern Types</label>
+                        <div class="form-checkbox-group">
+                            <label class="form-checkbox">
+                                <input type="checkbox" name="productTypes" value="herringbone">
+                                Herringbone
+                            </label>
+                            <label class="form-checkbox">
+                                <input type="checkbox" name="productTypes" value="checkerboard">
+                                Checkerboard
+                            </label>
+                            <label class="form-checkbox">
+                                <input type="checkbox" name="productTypes" value="random">
+                                Random Layout
+                            </label>
+                            <label class="form-checkbox">
+                                <input type="checkbox" name="productTypes" value="brick">
+                                Brick Pattern
+                            </label>
+                            <label class="form-checkbox">
+                                <input type="checkbox" name="productTypes" value="diagonal">
+                                Diagonal
+                            </label>
+                            <label class="form-checkbox">
+                                <input type="checkbox" name="productTypes" value="hexagon">
+                                Hexagon
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Product Image *</label>
+                        <div class="file-upload" id="fileUpload">
+                            <i class="fas fa-cloud-upload-alt"></i>
+                            <p>Click to upload product image</p>
+                            <p style="font-size: 12px; color: #666;">Recommended: 400x300px JPG or PNG</p>
+                            <input type="file" class="file-input" id="productImage" accept="image/*">
+                        </div>
+                        <div class="image-preview" id="imagePreview"></div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" id="cancelBtn">Cancel</button>
+                <button class="btn" id="saveProductBtn">Save Product</button>
+            </div>
         </div>
     </div>
 
     <script type="module">
-        import { 
-            db, 
-            collection, 
-            getDocs, 
-            doc, 
-            updateDoc,
-            serverTimestamp
-        } from './firebase-config.js';
-
-        let products = [];
-        let currentIndex = 0;
-
-        // Load products
-        async function loadProducts() {
-            try {
-                const querySnapshot = await getDocs(collection(db, "products"));
-                products = [];
-                querySnapshot.forEach((doc) => {
-                    products.push({ id: doc.id, ...doc.data() });
-                });
-                
-                // Filter only unpublished products
-                products = products.filter(p => !p.posted_to_facebook);
-                
-                if (products.length > 0) {
-                    showProduct(0);
-                } else {
-                    document.getElementById('products-container').innerHTML = `
-                        <div style="text-align: center; padding: 40px; color: #666;">
-                            <h3>✅ All products posted!</h3>
-                            <p>No pending products found.</p>
-                        </div>
-                    `;
-                }
-            } catch (error) {
-                console.error('Error:', error);
-            }
-        }
-
-        // Show product
-        function showProduct(index) {
-            if (index >= products.length) {
-                document.getElementById('products-container').innerHTML = `
-                    <div style="text-align: center; padding: 40px; color: #666;">
-                        <h3>🎉 All done!</h3>
-                        <p>All products processed.</p>
-                    </div>
-                `;
+        // Wait for Firebase to be available
+        const initializeApp = async () => {
+            await new Promise(resolve => setTimeout(resolve, 500));
+            
+            if (!window.firebaseAuth) {
+                console.error("Firebase not initialized properly");
                 return;
             }
 
-            const product = products[index];
-            const message = generateFacebookMessage(product);
-            
-            document.getElementById('products-container').innerHTML = `
-                <div class="product-card">
-                    <h3>📦 Product ${index + 1} of ${products.length}</h3>
-                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin: 20px 0;">
-                        <div>
-                            <h4>Product Details:</h4>
-                            <p><strong>Name:</strong> ${product.stone_name}</p>
-                            <p><strong>Price:</strong> ₹${product.price || 'N/A'} ${product.price_unit || ''}</p>
-                            <p><strong>Category:</strong> ${product.category || ''}</p>
+            console.log("Initializing Admin Dashboard...");
+
+            // Products Manager Class
+            class ProductsManager {
+                constructor() {
+                    this.products = [];
+                    this.currentProduct = null;
+                    this.init();
+                }
+
+                init() {
+                    this.setupEventListeners();
+                    this.checkAuth();
+                }
+
+                setupEventListeners() {
+                    // Modal controls
+                    document.getElementById('addProductBtn').addEventListener('click', () => this.openAddModal());
+                    document.getElementById('closeModal').addEventListener('click', () => this.closeModal());
+                    document.getElementById('cancelBtn').addEventListener('click', () => this.closeModal());
+                    
+                    // Form submission
+                    document.getElementById('saveProductBtn').addEventListener('click', () => this.saveProduct());
+                    
+                    // File upload
+                    document.getElementById('fileUpload').addEventListener('click', () => document.getElementById('productImage').click());
+                    document.getElementById('productImage').addEventListener('change', (e) => this.handleImageUpload(e));
+                    
+                    // Logout
+                    document.getElementById('logoutBtn').addEventListener('click', () => this.handleLogout());
+                }
+
+                checkAuth() {
+                    window.firebaseFunctions.onAuthStateChanged(window.firebaseAuth, (user) => {
+                        if (user) {
+                            console.log("User authenticated:", user.email);
+                            this.loadProducts();
+                        } else {
+                            console.log("User not authenticated, redirecting to login...");
+                            window.location.href = 'login.html';
+                        }
+                    });
+                }
+
+                async loadProducts() {
+                    try {
+                        const productsCollection = window.firebaseFunctions.collection(window.firebaseDb, 'products');
+                        const q = window.firebaseFunctions.query(productsCollection, window.firebaseFunctions.orderBy('createdAt', 'desc'));
+                        
+                        // Real-time listener
+                        window.firebaseFunctions.onSnapshot(q, (snapshot) => {
+                            this.products = [];
+                            snapshot.forEach((doc) => {
+                                this.products.push({
+                                    id: doc.id,
+                                    ...doc.data()
+                                });
+                            });
+                            this.renderProducts();
+                        });
+                        
+                    } catch (error) {
+                        console.error("Error loading products:", error);
+                        this.showAlert('Error loading products: ' + error.message, 'error');
+                    }
+                }
+
+                renderProducts() {
+                    const productsGrid = document.getElementById('productsGrid');
+                    
+                    if (this.products.length === 0) {
+                        productsGrid.innerHTML = `
+                            <div class="no-products">
+                                <i class="fas fa-box-open"></i>
+                                <h3>No Products Found</h3>
+                                <p>Get started by adding your first product</p>
+                                <button class="btn" onclick="productsManager.openAddModal()" style="margin-top: 20px;">
+                                    <i class="fas fa-plus"></i> Add First Product
+                                </button>
+                            </div>
+                        `;
+                        return;
+                    }
+
+                    productsGrid.innerHTML = this.products.map(product => `
+                        <div class="product-card">
+                            <div class="product-image" style="background-image: url('${product.imageUrl || 'https://images.unsplash.com/photo-1586023492125-27b2c045efd7?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=400&q=80'}')"></div>
+                            <div class="product-content">
+                                <h3 class="product-title">${product.name}</h3>
+                                <span class="product-category">${this.formatCategory(product.category)}</span>
+                                <div class="product-price">£${parseFloat(product.price).toFixed(2)}</div>
+                                <p class="product-description">${product.description}</p>
+                                <div class="product-actions">
+                                    <button class="btn btn-small" onclick="productsManager.editProduct('${product.id}')">
+                                        <i class="fas fa-edit"></i> Edit
+                                    </button>
+                                    <button class="btn btn-small btn-danger" onclick="productsManager.deleteProduct('${product.id}')">
+                                        <i class="fas fa-trash"></i> Delete
+                                    </button>
+                                </div>
+                            </div>
                         </div>
-                        <div>
-                            <h4>Facebook Post Text:</h4>
-                            <textarea id="post-text" rows="8" style="width: 100%; padding: 15px; border: 2px solid #3b82f6; border-radius: 8px; font-family: Arial; font-size: 14px;">${message}</textarea>
-                            <button class="btn btn-copy" onclick="copyToClipboard()" style="width: 100%; margin-top: 10px;">
-                                📋 Copy Text to Clipboard
-                            </button>
-                        </div>
-                    </div>
-                    <div style="background: #fef3c7; padding: 15px; border-radius: 8px; margin-top: 15px;">
-                        <h4>📝 Instructions:</h4>
-                        <ol>
-                            <li>Click "Copy Text to Clipboard"</li>
-                            <li>Go to <a href="https://facebook.com/950920808095297" target="_blank">Your Facebook Page</a></li>
-                            <li>Paste the text and post</li>
-                            <li>Come back and click "Next Product"</li>
-                        </ol>
-                    </div>
-                    <div style="text-align: center; margin-top: 20px;">
-                        <button class="btn" onclick="markAsPosted(${index})" style="background: #10b981; color: white;">
-                            ✅ Mark as Posted
-                        </button>
-                    </div>
-                </div>
-            `;
-            
-            currentIndex = index;
-        }
+                    `).join('');
+                }
 
-        // Generate Facebook message
-        function generateFacebookMessage(product) {
-            return `🏛️ ${product.stone_name}
+                openAddModal() {
+                    this.currentProduct = null;
+                    document.getElementById('modalTitle').textContent = 'Add New Product';
+                    document.getElementById('productForm').reset();
+                    document.getElementById('imagePreview').innerHTML = '';
+                    document.getElementById('productModal').classList.add('active');
+                }
 
-💰 Price: ₹${product.price || 'Contact for Price'} ${product.price_unit || ''}
-📦 Category: ${product.category || 'Natural Stone'}
+                openEditModal(product) {
+                    this.currentProduct = product;
+                    document.getElementById('modalTitle').textContent = 'Edit Product';
+                    
+                    // Fill form with product data
+                    document.getElementById('productId').value = product.id;
+                    document.getElementById('productName').value = product.name;
+                    document.getElementById('productCategory').value = product.category;
+                    document.getElementById('productPrice').value = product.price;
+                    document.getElementById('productDescription').value = product.description;
+                    
+                    // Set pattern types
+                    const checkboxes = document.querySelectorAll('input[name="productTypes"]');
+                    checkboxes.forEach(checkbox => {
+                        checkbox.checked = product.types && product.types.includes(checkbox.value);
+                    });
+                    
+                    // Show image preview
+                    if (product.imageUrl) {
+                        document.getElementById('imagePreview').innerHTML = `
+                            <img src="${product.imageUrl}" class="preview-image" alt="Preview">
+                            <p>Current image</p>
+                        `;
+                    }
+                    
+                    document.getElementById('productModal').classList.add('active');
+                }
 
-${product.description || 'Premium quality natural stone from Rajasthan. Perfect for construction, flooring, and decoration projects.'}
+                closeModal() {
+                    document.getElementById('productModal').classList.remove('active');
+                    this.currentProduct = null;
+                }
 
-🏪 RJ Multi Stone Hub
-📞 Contact for Bulk Orders & Pricing
-🚚 Delivery Available
-✅ Quality Guaranteed
+                async handleImageUpload(event) {
+                    const file = event.target.files[0];
+                    if (!file) return;
 
-#RajasthanStones #NaturalStone #${(product.category || 'Stone').replace(/\s+/g, '')} #${product.stone_name.replace(/\s+/g, '')} #RJMultiStoneHub`;
-        }
+                    // Show preview
+                    const reader = new FileReader();
+                    reader.onload = (e) => {
+                        document.getElementById('imagePreview').innerHTML = `
+                            <img src="${e.target.result}" class="preview-image" alt="Preview">
+                            <p>Selected image: ${file.name}</p>
+                        `;
+                    };
+                    reader.readAsDataURL(file);
+                }
 
-        // Copy to clipboard
-        function copyToClipboard() {
-            const textarea = document.getElementById('post-text');
-            textarea.select();
-            document.execCommand('copy');
-            
-            showNotification('✅ Text copied to clipboard! Now paste it on Facebook.', 'success');
-        }
+                async saveProduct() {
+                    try {
+                        const formData = this.getFormData();
+                        
+                        if (!this.validateForm(formData)) {
+                            return;
+                        }
 
-        // Mark as posted
-        async function markAsPosted(index) {
-            const product = products[index];
-            
-            try {
-                await updateDoc(doc(db, "products", product.id), {
-                    posted_to_facebook: true,
-                    posted_at: serverTimestamp(),
-                    post_method: 'Manual Copy-Paste'
-                });
-                
-                showNotification('✅ Product marked as posted!', 'success');
-                loadNextProduct();
-                
-            } catch (error) {
-                showNotification('❌ Error updating product: ' + error.message, 'error');
+                        // Show loading state
+                        const saveBtn = document.getElementById('saveProductBtn');
+                        saveBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
+                        saveBtn.disabled = true;
+
+                        let imageUrl = formData.imageUrl;
+
+                        // Upload new image if selected
+                        const imageFile = document.getElementById('productImage').files[0];
+                        if (imageFile) {
+                            imageUrl = await this.uploadImage(imageFile);
+                        }
+
+                        const productData = {
+                            name: formData.name,
+                            category: formData.category,
+                            price: parseFloat(formData.price),
+                            description: formData.description,
+                            types: formData.types,
+                            imageUrl: imageUrl,
+                            updatedAt: new Date()
+                        };
+
+                        if (this.currentProduct) {
+                            // Update existing product
+                            const productRef = window.firebaseFunctions.doc(window.firebaseDb, 'products', this.currentProduct.id);
+                            await window.firebaseFunctions.updateDoc(productRef, productData);
+                            this.showAlert('Product updated successfully!', 'success');
+                        } else {
+                            // Add new product
+                            productData.createdAt = new Date();
+                            await window.firebaseFunctions.addDoc(
+                                window.firebaseFunctions.collection(window.firebaseDb, 'products'), 
+                                productData
+                            );
+                            this.showAlert('Product added successfully!', 'success');
+                        }
+
+                        this.closeModal();
+                        
+                    } catch (error) {
+                        console.error("Error saving product:", error);
+                        this.showAlert('Error saving product: ' + error.message, 'error');
+                    } finally {
+                        // Reset button state
+                        const saveBtn = document.getElementById('saveProductBtn');
+                        saveBtn.innerHTML = 'Save Product';
+                        saveBtn.disabled = false;
+                    }
+                }
+
+                getFormData() {
+                    const name = document.getElementById('productName').value.trim();
+                    const category = document.getElementById('productCategory').value;
+                    const price = document.getElementById('productPrice').value;
+                    const description = document.getElementById('productDescription').value.trim();
+                    
+                    // Get selected types
+                    const types = [];
+                    document.querySelectorAll('input[name="productTypes"]:checked').forEach(checkbox => {
+                        types.push(checkbox.value);
+                    });
+
+                    return {
+                        name,
+                        category,
+                        price,
+                        description,
+                        types,
+                        imageUrl: this.currentProduct ? this.currentProduct.imageUrl : ''
+                    };
+                }
+
+                validateForm(formData) {
+                    if (!formData.name) {
+                        this.showAlert('Product name is required', 'error');
+                        return false;
+                    }
+                    if (!formData.category) {
+                        this.showAlert('Product category is required', 'error');
+                        return false;
+                    }
+                    if (!formData.price || parseFloat(formData.price) <= 0) {
+                        this.showAlert('Valid price is required', 'error');
+                        return false;
+                    }
+                    if (!formData.description) {
+                        this.showAlert('Product description is required', 'error');
+                        return false;
+                    }
+
+                    // Check if image is provided for new products
+                    if (!this.currentProduct && !document.getElementById('productImage').files[0]) {
+                        this.showAlert('Product image is required', 'error');
+                        return false;
+                    }
+
+                    return true;
+                }
+
+                async uploadImage(file) {
+                    try {
+                        // Create a unique filename
+                        const timestamp = Date.now();
+                        const fileName = `products/${timestamp}_${file.name}`;
+                        
+                        // Create storage reference
+                        const storageRef = window.firebaseFunctions.ref(window.firebaseStorage, fileName);
+                        
+                        // Upload file
+                        const snapshot = await window.firebaseFunctions.uploadBytes(storageRef, file);
+                        
+                        // Get download URL
+                        const downloadURL = await window.firebaseFunctions.getDownloadURL(snapshot.ref);
+                        
+                        return downloadURL;
+                    } catch (error) {
+                        console.error("Error uploading image:", error);
+                        throw new Error('Failed to upload image');
+                    }
+                }
+
+                editProduct(productId) {
+                    const product = this.products.find(p => p.id === productId);
+                    if (product) {
+                        this.openEditModal(product);
+                    }
+                }
+
+                async deleteProduct(productId) {
+                    if (!confirm('Are you sure you want to delete this product? This action cannot be undone.')) {
+                        return;
+                    }
+
+                    try {
+                        const productRef = window.firebaseFunctions.doc(window.firebaseDb, 'products', productId);
+                        await window.firebaseFunctions.deleteDoc(productRef);
+                        this.showAlert('Product deleted successfully!', 'success');
+                    } catch (error) {
+                        console.error("Error deleting product:", error);
+                        this.showAlert('Error deleting product: ' + error.message, 'error');
+                    }
+                }
+
+                formatCategory(category) {
+                    const categories = {
+                        'flooring': 'Flooring',
+                        'wall': 'Wall Decoration',
+                        'bathroom': 'Bathroom',
+                        'outdoor': 'Outdoor',
+                        'kitchen': 'Kitchen',
+                        'commercial': 'Commercial'
+                    };
+                    return categories[category] || category;
+                }
+
+                showAlert(message, type) {
+                    const alert = document.getElementById('alertMessage');
+                    alert.textContent = message;
+                    alert.className = `alert alert-${type}`;
+                    alert.style.display = 'block';
+                    
+                    setTimeout(() => {
+                        alert.style.display = 'none';
+                    }, 5000);
+                }
+
+                async handleLogout() {
+                    try {
+                        await window.firebaseFunctions.signOut(window.firebaseAuth);
+                        window.location.href = 'login.html';
+                    } catch (error) {
+                        console.error("Error logging out:", error);
+                    this.showAlert('Error logging out: ' + error.message, 'error');
+                    }
+                }
             }
-        }
 
-        // Load next product
-        function loadNextProduct() {
-            showProduct(currentIndex + 1);
-        }
+            // Initialize Products Manager
+            window.productsManager = new ProductsManager();
+        };
 
-        // Show notification
-        function showNotification(message, type) {
-            const notification = document.getElementById('notification');
-            notification.innerHTML = message;
-            notification.style.cssText = `
-                padding: 15px; 
-                margin: 15px 0; 
-                border-radius: 8px; 
-                background: ${type === 'success' ? '#dcfce7' : '#fecaca'};
-                color: ${type === 'success' ? '#166534' : '#991b1b'};
-                border: 2px solid ${type === 'success' ? '#bbf7d0' : '#fca5a5'};
-            `;
-            
-            setTimeout(() => {
-                notification.innerHTML = '';
-                notification.style.cssText = '';
-            }, 5000);
-        }
-
-        // Initialize
-        loadProducts();
+        // Start the application
+        initializeApp();
     </script>
 </body>
 </html>
