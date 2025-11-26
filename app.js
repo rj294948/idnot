@@ -1,4 +1,4 @@
-// app.js - Main application logic
+// app.js - Main application logic (FIXED VERSION)
 import { 
     db, auth, googleProvider,
     collection, getDocs, onAuthStateChanged, signOut, signInWithPopup
@@ -307,22 +307,33 @@ function handleSearchFocus() {
     }
 }
 
+// FIXED: Search function with proper error handling
 function displaySearchResults(query) {
     const searchResults = document.getElementById('searchResults');
     const searchTerm = query.toLowerCase();
     
-    const productResults = products.filter(product => 
-        product.name.toLowerCase().includes(searchTerm) ||
-        product.description.toLowerCase().includes(searchTerm) ||
-        product.category.toLowerCase().includes(searchTerm) ||
-        (product.stone_name && product.stone_name.toLowerCase().includes(searchTerm)) ||
-        (product.type && product.type.toLowerCase().includes(searchTerm))
-    );
+    const productResults = products.filter(product => {
+        // Safe property access with fallbacks
+        const name = product.name || '';
+        const description = product.description || '';
+        const category = product.category || '';
+        const stoneName = product.stone_name || '';
+        const type = product.type || '';
+        
+        return name.toLowerCase().includes(searchTerm) ||
+               description.toLowerCase().includes(searchTerm) ||
+               category.toLowerCase().includes(searchTerm) ||
+               stoneName.toLowerCase().includes(searchTerm) ||
+               type.toLowerCase().includes(searchTerm);
+    });
     
-    const categoryResults = categories.filter(category =>
-        category.name.toLowerCase().includes(searchTerm) ||
-        category.type.toLowerCase().includes(searchTerm)
-    );
+    const categoryResults = categories.filter(category => {
+        const name = category.name || '';
+        const type = category.type || '';
+        
+        return name.toLowerCase().includes(searchTerm) ||
+               type.toLowerCase().includes(searchTerm);
+    });
     
     let resultsHTML = '';
     
@@ -334,10 +345,11 @@ function displaySearchResults(query) {
             </div>
         `;
     } else {
+        // Show categories first
         categoryResults.forEach(category => {
             resultsHTML += `
                 <div class="search-result-item" onclick="window.location.href='category-products.html?category=${category.type}'">
-                    <div class="search-result-image" style="background-image: url('${category.image}')"></div>
+                    <div class="search-result-image" style="background-image: url('${category.image || 'https://images.unsplash.com/photo-1586023492125-27b2c045efd7?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=100&q=80'}')"></div>
                     <div class="search-result-content">
                         <div class="search-result-name">${category.name}</div>
                         <div class="search-result-category">Category</div>
@@ -346,15 +358,19 @@ function displaySearchResults(query) {
             `;
         });
         
+        // Then show products
         productResults.forEach(product => {
+            const productType = product.type ? `<div style="font-size: 12px; color: #666; margin: 2px 0;">${product.type}</div>` : '';
+            const productPrice = product.price || 'Price not set';
+            
             resultsHTML += `
                 <div class="search-result-item" onclick="window.location.href='product-details.html?id=${product.id}'">
-                    <div class="search-result-image" style="background-image: url('${product.image}')"></div>
+                    <div class="search-result-image" style="background-image: url('${product.image || 'https://images.unsplash.com/photo-1586023492125-27b2c045efd7?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=100&q=80'}')"></div>
                     <div class="search-result-content">
                         <div class="search-result-name">${product.name}</div>
                         <div class="search-result-category">${formatCategory(product.category)}</div>
-                        ${product.type ? `<div style="font-size: 12px; color: #666; margin: 2px 0;">${product.type}</div>` : ''}
-                        <div class="search-result-price">${product.price}</div>
+                        ${productType}
+                        <div class="search-result-price">${productPrice}</div>
                     </div>
                 </div>
             `;
@@ -416,7 +432,7 @@ function renderCategories() {
         categoriesHTML += `
             <div class="use-category-item">
                 <a href="category-products.html?category=${category.type}" class="use-category-link">
-                    <div class="use-category-image" style="background-image: url('${category.image}')"></div>
+                    <div class="use-category-image" style="background-image: url('${category.image || 'https://images.unsplash.com/photo-1586023492125-27b2c045efd7?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=600&q=80'}')"></div>
                     <div class="use-category-name">${category.name}</div>
                     <div class="product-count">${categoryProducts.length} products</div>
                 </a>
