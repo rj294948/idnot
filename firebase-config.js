@@ -1,4 +1,4 @@
-// ✅ firebase-config.js
+// firebase-config.js - Complete Updated Version
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.5.0/firebase-app.js";
 
 // Firestore
@@ -13,7 +13,8 @@ import {
   deleteDoc,
   updateDoc,
   where,
-  serverTimestamp
+  serverTimestamp,
+  onSnapshot
 } from "https://www.gstatic.com/firebasejs/12.5.0/firebase-firestore.js";
 
 // Auth
@@ -55,13 +56,16 @@ const auth = getAuth(app);
 const storage = getStorage(app);
 const googleProvider = new GoogleAuthProvider();
 
-// ===== Export =====
+// ===== Export Everything =====
 export {
+  // Firebase Apps
   app,
   db,
   auth,
   storage,
   googleProvider,
+  
+  // Firestore Functions
   collection,
   addDoc,
   getDocs,
@@ -72,14 +76,19 @@ export {
   updateDoc,
   where,
   serverTimestamp,
+  onSnapshot,
+  
+  // Auth Functions
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
   signOut,
   signInWithPopup,
   onAuthStateChanged,
   updateProfile,
+  
+  // Storage Functions
   ref,
   uploadBytes,
   uploadBytesResumable,
   getDownloadURL
-}; 
+};
