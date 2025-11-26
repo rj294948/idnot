@@ -3,6 +3,7 @@ import {
     db, auth, googleProvider,
     collection, getDocs, onAuthStateChanged, signOut, signInWithPopup
 } from './firebase-config.js';
+import { initializeFirestoreData } from './firestore-data.js';
 
 // Application State
 let currentUser = null;
@@ -89,13 +90,23 @@ async function initializeData() {
     try {
         console.log("📊 Loading data from Firestore...");
         
-        // Load categories
-        await loadCategories();
+        // Try to initialize Firestore with sample data
+        const firestoreInitialized = await initializeFirestoreData();
         
-        // Load products
-        await loadProducts();
+        if (firestoreInitialized) {
+            // Load categories from Firestore
+            await loadCategories();
+            
+            // Load products from Firestore  
+            await loadProducts();
+            
+            console.log("✅ Data loaded successfully from Firestore");
+        } else {
+            // Use mock data if Firestore initialization fails
+            await loadMockData();
+            console.log("✅ Using mock data");
+        }
         
-        console.log("✅ Data loaded successfully");
         console.log("📁 Categories:", categories.length);
         console.log("📦 Products:", products.length);
         
