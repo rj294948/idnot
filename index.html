@@ -1007,7 +1007,7 @@
                         <div class="product-banner-text">
                             <h3>Premium Sandstone Collection</h3>
                             <p>Durable and elegant sandstone for flooring and wall cladding with natural texture and color variations. Perfect for both indoor and outdoor applications.</p>
-                            <a href="category-products.html?category=flooring" class="btn">View Collection</a>
+                            <a href="category-products.html?usage=flooring" class="btn">View Collection</a>
                         </div>
                     </div>
                     <div class="product-banner-item">
@@ -1015,7 +1015,7 @@
                         <div class="product-banner-text">
                             <h3>Kota Stone & Marble</h3>
                             <p>Natural kota stone and premium marble known for exceptional strength, durability and beautiful natural patterns. Ideal for luxury projects.</p>
-                            <a href="category-products.html?category=flooring" class="btn">Explore Stones</a>
+                            <a href="category-products.html?usage=countertops" class="btn">Explore Stones</a>
                         </div>
                     </div>
                 </div>
@@ -1074,11 +1074,11 @@
                 <div class="footer-column">
                     <h3>Products</h3>
                     <ul class="footer-links">
-                        <li><a href="category-products.html?category=flooring">Flooring Stones</a></li>
-                        <li><a href="category-products.html?category=wall">Wall Stones</a></li>
-                        <li><a href="category-products.html?category=bathroom">Bathroom Stones</a></li>
-                        <li><a href="category-products.html?category=outdoor">Outdoor Stones</a></li>
-                        <li><a href="category-products.html?category=kitchen">Kitchen Stones</a></li>
+                        <li><a href="category-products.html?usage=flooring">Flooring Stones</a></li>
+                        <li><a href="category-products.html?usage=wall">Wall Stones</a></li>
+                        <li><a href="category-products.html?usage=bathroom">Bathroom Stones</a></li>
+                        <li><a href="category-products.html?usage=outdoor">Outdoor Stones</a></li>
+                        <li><a href="category-products.html?usage=kitchen">Kitchen Stones</a></li>
                     </ul>
                 </div>
                 <div class="footer-column">
@@ -1112,14 +1112,14 @@
     <script type="module" src="./firebase-config.js"></script>
     
     <script type="module">
-        // Import from your existing firebase-config.js - ONLY the exports that are available
+        // Import from your existing firebase-config.js
         import { 
             db, auth, 
             collection, getDocs,
             onAuthStateChanged, signOut
         } from './firebase-config.js';
 
-        // Import onSnapshot separately since it's not in your firebase-config.js
+        // Import onSnapshot separately
         import { onSnapshot } from "https://www.gstatic.com/firebasejs/12.5.0/firebase-firestore.js";
 
         // StoneCraft Application - Main JavaScript
@@ -1144,20 +1144,30 @@
             cart: []
         };
 
+        // PREDEFINED USES + DYNAMIC USES COMBINATION
+        const PREDEFINED_USES = [
+            'Flooring', 'Wall Cladding', 'Countertops', 'Paving', 
+            'Staircase', 'Landscaping', 'Monuments', 'Sculptures',
+            'Interior Design', 'Exterior Design', 'Bathroom', 'Kitchen',
+            'Outdoor', 'Indoor', 'Wall', 'Floor', 'Roofing', 'Patio',
+            'Garden', 'Pathway', 'Driveway', 'Poolside', 'Facade',
+            'Fireplace', 'Tabletops', 'Vanity', 'Shower'
+        ];
+
         // Initialize the main application with Firestore
         async function initializeAppWithFirestore() {
             console.log('📊 Loading data from Firestore...');
             
             try {
-                // Load Products from Firestore - USAGE SE DATA LENA HAI
+                // Load Products from Firestore
                 await loadProductsFromFirestore();
                 
                 console.log('✅ Data loaded successfully from Firestore');
                 console.log('📦 Products: ' + appState.products.length);
                 
-                // Generate dynamic navigation and categories from USAGE data
-                generateUsesNavigationFromUsage();
-                updateCategoriesSectionFromUsage();
+                // Generate dynamic navigation and categories
+                generateUsesNavigation();
+                updateCategoriesSection();
                 
             } catch (error) {
                 console.error('❌ Error loading data from Firestore:', error);
@@ -1168,7 +1178,7 @@
             console.log('✅ StoneCraft Application initialized successfully');
         }
 
-        // Load Products from Firestore - USAGE SE DATA LENA HAI
+        // Load Products from Firestore
         async function loadProductsFromFirestore() {
             try {
                 const querySnapshot = await getDocs(collection(db, "products"));
@@ -1196,8 +1206,8 @@
                     });
                     appState.products = updatedProducts;
                     console.log('🔄 Products updated in real-time');
-                    generateUsesNavigationFromUsage();
-                    updateCategoriesSectionFromUsage();
+                    generateUsesNavigation();
+                    updateCategoriesSection();
                 });
                 
             } catch (error) {
@@ -1206,30 +1216,40 @@
             }
         }
 
-        // Function to generate uses navigation from USAGE data (not category)
-        function generateUsesNavigationFromUsage() {
+        // Function to get ALL USES (Predefined + Dynamic from Firestore)
+        function getAllUses() {
+            // Get unique uses from Firestore products
+            const firestoreUses = [...new Set(appState.products
+                .filter(product => product.uses && product.uses.trim() !== '')
+                .map(product => product.uses)
+            )];
+            
+            // Combine predefined and dynamic uses
+            const allUses = [...new Set([...PREDEFINED_USES, ...firestoreUses])];
+            
+            console.log('🎯 All Uses (Predefined + Dynamic):', allUses);
+            return allUses.sort();
+        }
+
+        // Function to generate uses navigation - COMBINED APPROACH
+        function generateUsesNavigation() {
             const usesContainer = document.getElementById('dynamicUsesContainer');
             if (!usesContainer) return;
             
             usesContainer.innerHTML = '';
             
-            // Extract unique USAGES from products
-            const uniqueUsages = [...new Set(appState.products
-                .filter(product => product.uses) // Only products with uses
-                .map(product => product.uses)
-            )];
+            const allUses = getAllUses();
+            console.log('🔄 Generating navigation for ALL uses:', allUses.length);
             
-            console.log('📊 Unique Usages:', uniqueUsages);
-            
-            // Create navigation items for each usage
-            uniqueUsages.forEach(usage => {
+            // SABHI USES KE LIYE NAVIGATION BANAO
+            allUses.forEach(usage => {
                 const usageKey = usage.toLowerCase().replace(/\s+/g, '-');
                 const useItem = document.createElement('div');
                 useItem.className = 'use-item';
                 
-                // Get unique stone names for this usage
+                // Get products for this usage
                 const usageProducts = appState.products.filter(product => 
-                    product.uses === usage
+                    product.uses && product.uses.toLowerCase() === usage.toLowerCase()
                 );
                 
                 const uniqueStoneNames = [...new Set(usageProducts
@@ -1237,24 +1257,23 @@
                     .map(product => product.stone_name)
                 )];
                 
-                console.log(`📁 ${usage} Stone Names:`, uniqueStoneNames);
+                console.log(`📁 ${usage} - Products: ${usageProducts.length}, Stone Names: ${uniqueStoneNames.length}`);
                 
                 if (uniqueStoneNames.length > 0) {
                     // Usage with stone names - create mega menu
                     useItem.innerHTML = `
-                        <div class="use-link">${usage}</div>
+                        <div class="use-link">${usage} (${usageProducts.length})</div>
                         <div class="mega-menu">
                             <div class="patterns-grid">
                                 ${uniqueStoneNames.map(stoneName => {
                                     const stoneSlug = stoneName.toLowerCase().replace(/\s+/g, '-');
                                     // Find a product image for this stone or use default
                                     const stoneProduct = appState.products.find(p => 
-                                        p.uses === usage && p.stone_name === stoneName
+                                        p.uses && p.uses.toLowerCase() === usage.toLowerCase() && 
+                                        p.stone_name === stoneName
                                     );
                                     const imageUrl = stoneProduct?.images?.[0] || 
                                         'https://images.unsplash.com/photo-1586023492125-27b2c045efd7?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=400&q=80';
-                                    
-                                    console.log(`🖼️ ${usage} - ${stoneName}:`, imageUrl);
                                     
                                     return `
                                         <a href="category-products.html?usage=${usageKey}&stone=${stoneSlug}" class="pattern-item" data-usage="${usage}" data-stone="${stoneName}">
@@ -1267,9 +1286,9 @@
                         </div>
                     `;
                 } else {
-                    // Usage without stone names - simple link
+                    // Usage without products - simple link (still show it)
                     useItem.innerHTML = `
-                        <a href="category-products.html?usage=${usageKey}" class="use-link">${usage}</a>
+                        <a href="category-products.html?usage=${usageKey}" class="use-link">${usage} (0)</a>
                     `;
                 }
                 
@@ -1282,30 +1301,30 @@
             }, 100);
         }
 
-        // Function to update categories section with USAGE data (not category)
-        function updateCategoriesSectionFromUsage() {
+        // Function to update categories section - COMBINED APPROACH
+        function updateCategoriesSection() {
             const categoriesGrid = document.getElementById('dynamicCategories');
             if (!categoriesGrid) return;
             
             categoriesGrid.innerHTML = '';
             
-            // Extract unique USAGES from products
-            const uniqueUsages = [...new Set(appState.products
-                .filter(product => product.uses) // Only products with uses
-                .map(product => product.uses)
-            )];
+            const allUses = getAllUses();
+            console.log('🔄 Updating categories section with ALL uses:', allUses.length);
             
-            uniqueUsages.forEach(usage => {
+            // SABHI USES KE LIYE CATEGORIES BANAO
+            allUses.forEach(usage => {
                 const categoryItem = document.createElement('div');
                 categoryItem.className = 'use-category-item';
                 
                 // Count products in this usage
                 const productCount = appState.products.filter(product => 
-                    product.uses === usage
+                    product.uses && product.uses.toLowerCase() === usage.toLowerCase()
                 ).length;
                 
                 // Find a product image for this usage or use default
-                const usageProduct = appState.products.find(p => p.uses === usage);
+                const usageProduct = appState.products.find(p => 
+                    p.uses && p.uses.toLowerCase() === usage.toLowerCase()
+                );
                 const imageUrl = usageProduct?.images?.[0] || 
                     'https://images.unsplash.com/photo-1586023492125-27b2c045efd7?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=400&q=80';
                 
@@ -1323,7 +1342,7 @@
             });
         }
 
-        // Initialize mega menu functionality - FIXED VERSION
+        // Initialize mega menu functionality
         function initializeMegaMenu() {
             console.log('🔄 Initializing Mega Menu...');
             
@@ -1336,29 +1355,18 @@
                 return;
             }
             
-            console.log('✅ Mega Menu elements found:', {
-                usesTopBar: !!usesTopBar,
-                useItems: useItems.length,
-                container: !!container
-            });
-            
             const containerRect = container.getBoundingClientRect();
             
             useItems.forEach((item, index) => {
                 const megaMenu = item.querySelector('.mega-menu');
-                console.log(`📦 Use Item ${index + 1}:`, {
-                    hasMegaMenu: !!megaMenu,
-                    itemText: item.textContent.trim()
-                });
-
+                
                 if (megaMenu) {
                     // Set mega menu width and position
                     megaMenu.style.width = containerRect.width + 'px';
                     megaMenu.style.left = '0px';
                     
-                    // Fix: Use mouseenter/mouseleave instead of hover
+                    // Mouse events for mega menu
                     item.addEventListener('mouseenter', () => {
-                        console.log('🐭 Mouse entered:', item.textContent.trim());
                         // Hide all other mega menus
                         document.querySelectorAll('.mega-menu').forEach(menu => {
                             if (menu !== megaMenu) {
@@ -1370,8 +1378,6 @@
                     });
                     
                     item.addEventListener('mouseleave', (e) => {
-                        console.log('🐭 Mouse left:', item.textContent.trim());
-                        // Check if mouse is moving to mega menu
                         const relatedTarget = e.relatedTarget;
                         if (!megaMenu.contains(relatedTarget)) {
                             setTimeout(() => {
@@ -1384,12 +1390,10 @@
                     
                     // Also handle mega menu mouse events
                     megaMenu.addEventListener('mouseenter', () => {
-                        console.log('🐭 Mouse entered mega menu');
                         megaMenu.style.display = 'block';
                     });
                     
                     megaMenu.addEventListener('mouseleave', () => {
-                        console.log('🐭 Mouse left mega menu');
                         setTimeout(() => {
                             if (!item.matches(':hover') && !megaMenu.matches(':hover')) {
                                 megaMenu.style.display = 'none';
@@ -1402,7 +1406,6 @@
             // Close all mega menus when clicking outside
             document.addEventListener('click', (event) => {
                 if (!usesTopBar.contains(event.target)) {
-                    console.log('📌 Click outside - closing all mega menus');
                     document.querySelectorAll('.mega-menu').forEach(menu => {
                         menu.style.display = 'none';
                     });
@@ -1465,7 +1468,7 @@
             initializeUserProfile();
         }
 
-        // Initialize search functionality - UPDATED FOR USAGE
+        // Initialize search functionality
         function initializeSearch() {
             const searchInput = document.getElementById('searchInput');
             const searchButton = document.getElementById('searchButton');
@@ -1589,13 +1592,7 @@
         function loadSampleData() {
             console.log('📝 Loading sample data...');
             
-            // Sample usage data
-            const sampleUsages = [
-                'Flooring', 'Wall Cladding', 'Countertops', 'Paving', 
-                'Staircase', 'Landscaping', 'Monuments', 'Sculptures'
-            ];
-            
-            // Sample products with usage data
+            // Sample products with different uses
             const sampleProducts = [
                 {
                     id: '1',
@@ -1620,14 +1617,22 @@
                     type: 'Natural',
                     images: ['https://images.unsplash.com/photo-1586023492125-27b2c045efd7?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80'],
                     price: 35
+                },
+                {
+                    id: '4',
+                    stone_name: 'Black Granite',
+                    uses: 'Wall Cladding',
+                    type: 'Polished',
+                    images: ['https://images.unsplash.com/photo-1586023492125-27b2c045efd7?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80'],
+                    price: 85
                 }
             ];
             
             appState.products = sampleProducts;
             
             // Generate navigation from sample data
-            generateUsesNavigationFromUsage();
-            updateCategoriesSectionFromUsage();
+            generateUsesNavigation();
+            updateCategoriesSection();
         }
 
         // Demo: Show how new types are automatically added
