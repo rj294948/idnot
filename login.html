@@ -3,10 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sign Up - StoneCraft UK</title>
+    <title>Sign In - StoneCraft UK</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Firebase CDN -->
+    <script src="https://www.gstatic.com/firebasejs/12.6.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/12.6.0/firebase-auth.js"></script>
+    
     <style>
-        /* Same CSS as login.html, just different form */
         * {
             margin: 0;
             padding: 0;
@@ -20,12 +24,12 @@
             line-height: 1.6;
         }
         
-        .signup-container {
+        .login-container {
             display: flex;
             min-height: 100vh;
         }
         
-        .signup-left {
+        .login-left {
             flex: 1;
             background: linear-gradient(135deg, #1a1a1a 0%, #333 100%);
             color: white;
@@ -35,7 +39,7 @@
             justify-content: center;
         }
         
-        .signup-right {
+        .login-right {
             flex: 1;
             display: flex;
             align-items: center;
@@ -88,7 +92,7 @@
             font-size: 20px;
         }
         
-        .signup-form-container {
+        .login-form-container {
             width: 100%;
             max-width: 450px;
             background: white;
@@ -97,19 +101,19 @@
             box-shadow: 0 10px 40px rgba(0,0,0,0.1);
         }
         
-        .signup-form-container h2 {
+        .login-form-container h2 {
             font-size: 28px;
             margin-bottom: 10px;
             color: #333;
         }
         
-        .signup-form-container p {
+        .login-form-container p {
             color: #666;
             margin-bottom: 30px;
         }
         
         .form-group {
-            margin-bottom: 20px;
+            margin-bottom: 25px;
         }
         
         .form-group label {
@@ -121,7 +125,7 @@
         
         .form-control {
             width: 100%;
-            padding: 12px;
+            padding: 15px;
             border: 2px solid #e1e5e9;
             border-radius: 8px;
             font-size: 16px;
@@ -134,13 +138,7 @@
             box-shadow: 0 0 0 3px rgba(184, 134, 11, 0.1);
         }
         
-        .name-fields {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 15px;
-        }
-        
-        .signup-btn {
+        .login-btn {
             width: 100%;
             padding: 15px;
             background: #b8860b;
@@ -151,10 +149,10 @@
             font-weight: 600;
             cursor: pointer;
             transition: all 0.3s;
-            margin-top: 10px;
+            margin-bottom: 20px;
         }
         
-        .signup-btn:hover {
+        .login-btn:hover {
             background: #a3780a;
             transform: translateY(-2px);
         }
@@ -204,19 +202,35 @@
             border-color: #b8860b;
         }
         
-        .login-link {
+        .signup-link {
             text-align: center;
             margin-top: 30px;
             color: #666;
         }
         
-        .login-link a {
+        .signup-link a {
             color: #b8860b;
             text-decoration: none;
             font-weight: 600;
         }
         
-        .login-link a:hover {
+        .signup-link a:hover {
+            text-decoration: underline;
+        }
+        
+        .forgot-password {
+            text-align: center;
+            margin-top: 15px;
+        }
+        
+        .forgot-password a {
+            color: #666;
+            text-decoration: none;
+            font-size: 14px;
+        }
+        
+        .forgot-password a:hover {
+            color: #b8860b;
             text-decoration: underline;
         }
         
@@ -240,94 +254,56 @@
             display: block;
         }
         
-        .password-strength {
-            margin-top: 5px;
-            font-size: 12px;
-            display: none;
-        }
-        
-        .password-strength.weak {
-            color: #e74c3c;
-            display: block;
-        }
-        
-        .password-strength.medium {
-            color: #f39c12;
-            display: block;
-        }
-        
-        .password-strength.strong {
-            color: #27ae60;
-            display: block;
-        }
-        
         @media (max-width: 768px) {
-            .signup-container {
+            .login-container {
                 flex-direction: column;
             }
             
-            .signup-left {
+            .login-left {
                 padding: 40px 20px;
             }
             
-            .signup-right {
+            .login-right {
                 padding: 40px 20px;
             }
             
-            .signup-form-container {
+            .login-form-container {
                 padding: 30px;
-            }
-            
-            .name-fields {
-                grid-template-columns: 1fr;
-                gap: 10px;
             }
         }
     </style>
 </head>
 <body>
-    <div class="signup-container">
+    <div class="login-container">
         <!-- Left Side - Welcome Section -->
-        <div class="signup-left">
+        <div class="login-left">
             <div class="logo">
                 <h1>Stone<span>Craft</span></h1>
             </div>
             
             <div class="welcome-text">
-                <h2>Join StoneCraft Today!</h2>
-                <p>Create your account to start listing your stone products and connect with buyers.</p>
+                <h2>Welcome Back!</h2>
+                <p>Sign in to access your StoneCraft account and manage your stone products.</p>
             </div>
             
             <ul class="features-list">
-                <li><i class="fas fa-check-circle"></i> List unlimited products</li>
-                <li><i class="fas fa-check-circle"></i> Reach thousands of buyers</li>
-                <li><i class="fas fa-check-circle"></i> Get direct inquiries</li>
-                <li><i class="fas fa-check-circle"></i> Free product listing</li>
-                <li><i class="fas fa-check-circle"></i> 24/7 customer support</li>
+                <li><i class="fas fa-check-circle"></i> Manage your product listings</li>
+                <li><i class="fas fa-check-circle"></i> Track orders and inquiries</li>
+                <li><i class="fas fa-check-circle"></i> Access exclusive offers</li>
+                <li><i class="fas fa-check-circle"></i> Get expert support</li>
+                <li><i class="fas fa-check-circle"></i> Connect with buyers</li>
             </ul>
         </div>
         
-        <!-- Right Side - Signup Form -->
-        <div class="signup-right">
-            <div class="signup-form-container">
-                <h2>Create Account</h2>
-                <p>Fill in your details to get started</p>
+        <!-- Right Side - Login Form -->
+        <div class="login-right">
+            <div class="login-form-container">
+                <h2>Sign In</h2>
+                <p>Enter your credentials to access your account</p>
                 
-                <div class="message" id="signupMessage"></div>
+                <div class="message" id="loginMessage"></div>
                 
-                <form id="signupForm">
-                    <div class="name-fields">
-                        <div class="form-group">
-                            <label for="firstName">First Name</label>
-                            <input type="text" id="firstName" class="form-control" placeholder="John" required>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label for="lastName">Last Name</label>
-                            <input type="text" id="lastName" class="form-control" placeholder="Doe" required>
-                        </div>
-                    </div>
-                    
+                <form id="loginForm">
                     <div class="form-group">
                         <label for="email">Email Address</label>
                         <input type="email" id="email" class="form-control" placeholder="you@example.com" required>
@@ -335,193 +311,139 @@
                     
                     <div class="form-group">
                         <label for="password">Password</label>
-                        <input type="password" id="password" class="form-control" placeholder="Create a strong password" required>
-                        <div class="password-strength" id="passwordStrength"></div>
+                        <input type="password" id="password" class="form-control" placeholder="Enter your password" required>
                     </div>
                     
-                    <div class="form-group">
-                        <label for="confirmPassword">Confirm Password</label>
-                        <input type="password" id="confirmPassword" class="form-control" placeholder="Confirm your password" required>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label>
-                            <input type="checkbox" id="terms" required>
-                            I agree to the <a href="#" style="color: #b8860b;">Terms of Service</a> and <a href="#" style="color: #b8860b;">Privacy Policy</a>
-                        </label>
-                    </div>
-                    
-                    <button type="submit" class="signup-btn" id="signupSubmitBtn">
-                        <span id="signupBtnText">Create Account</span>
-                        <i class="fas fa-spinner fa-spin" id="signupSpinner" style="display: none;"></i>
+                    <button type="submit" class="login-btn" id="loginSubmitBtn">
+                        <span id="loginBtnText">Sign In</span>
+                        <i class="fas fa-spinner fa-spin" id="loginSpinner" style="display: none;"></i>
                     </button>
                 </form>
                 
-                <div class="divider">
-                    <span>Or sign up with</span>
+                <div class="forgot-password">
+                    <a href="#" id="forgotPasswordLink">Forgot your password?</a>
                 </div>
                 
-                <button class="google-btn" id="googleSignUpBtn">
+                <div class="divider">
+                    <span>Or continue with</span>
+                </div>
+                
+                <button class="google-btn" id="googleSignInBtn">
                     <i class="fab fa-google"></i>
-                    Sign up with Google
+                    Sign in with Google
                 </button>
                 
-                <div class="login-link">
-                    Already have an account? <a href="login.html">Sign in here</a>
+                <div class="signup-link">
+                    Don't have an account? <a href="signup.html">Sign up now</a>
                 </div>
             </div>
         </div>
     </div>
     
-    <!-- Firebase Configuration -->
-    <script type="module" src="./firebase-config.js"></script>
-    
-    <script type="module">
-        import { 
-           import { 
-        auth,
-        signInWithEmailAndPassword,
-        signInWithPopup,
-        googleProvider,
-        sendPasswordResetEmail,
-        onAuthStateChanged
-    } from './firebase-config.js';
-        
+    <script>
+        // Firebase Configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyDNwzhOkQQLAQbkiNFTFEGSpWJdKaxbTRk",
+            authDomain: "iryastone-uk.firebaseapp.com",
+            projectId: "iryastone-uk",
+            storageBucket: "iryastone-uk.firebasestorage.app",
+            messagingSenderId: "110940910896",
+            appId: "1:110940910896:web:b25e92127118665e5c84f5",
+            measurementId: "G-6YM1FLYN48"
+        };
+
+        // Initialize Firebase
+        const app = firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+
         document.addEventListener('DOMContentLoaded', function() {
-            console.log('Signup page initialized');
+            console.log('✅ Login page initialized');
             
-            const signupForm = document.getElementById('signupForm');
-            const signupSubmitBtn = document.getElementById('signupSubmitBtn');
-            const signupBtnText = document.getElementById('signupBtnText');
-            const signupSpinner = document.getElementById('signupSpinner');
-            const signupMessage = document.getElementById('signupMessage');
-            const googleSignUpBtn = document.getElementById('googleSignUpBtn');
-            const passwordInput = document.getElementById('password');
-            const passwordStrength = document.getElementById('passwordStrength');
-            const confirmPasswordInput = document.getElementById('confirmPassword');
+            const loginForm = document.getElementById('loginForm');
+            const loginSubmitBtn = document.getElementById('loginSubmitBtn');
+            const loginBtnText = document.getElementById('loginBtnText');
+            const loginSpinner = document.getElementById('loginSpinner');
+            const loginMessage = document.getElementById('loginMessage');
+            const googleSignInBtn = document.getElementById('googleSignInBtn');
+            const forgotPasswordLink = document.getElementById('forgotPasswordLink');
             
-            // Check password strength
-            passwordInput.addEventListener('input', function() {
-                const password = passwordInput.value;
-                let strength = '';
-                
-                if (password.length === 0) {
-                    passwordStrength.style.display = 'none';
-                    return;
-                }
-                
-                if (password.length < 6) {
-                    strength = 'weak';
-                    passwordStrength.textContent = 'Password is too weak';
-                } else if (password.length < 10) {
-                    strength = 'medium';
-                    passwordStrength.textContent = 'Password is medium strength';
-                } else {
-                    strength = 'strong';
-                    passwordStrength.textContent = 'Password is strong';
-                }
-                
-                passwordStrength.className = 'password-strength ' + strength;
-                passwordStrength.style.display = 'block';
-            });
-            
-            // Check password confirmation
-            confirmPasswordInput.addEventListener('input', function() {
-                const password = passwordInput.value;
-                const confirmPassword = confirmPasswordInput.value;
-                
-                if (confirmPassword && password !== confirmPassword) {
-                    confirmPasswordInput.style.borderColor = '#e74c3c';
-                } else {
-                    confirmPasswordInput.style.borderColor = '#e1e5e9';
+            // Check if user is already logged in
+            auth.onAuthStateChanged((user) => {
+                if (user) {
+                    // User is already signed in, redirect to index
+                    console.log('User already signed in, redirecting...');
+                    window.location.href = 'index.html';
                 }
             });
             
-            // Handle signup form submission
-            signupForm.addEventListener('submit', async function(e) {
+            // Handle login form submission
+            loginForm.addEventListener('submit', async function(e) {
                 e.preventDefault();
                 
-                const firstName = document.getElementById('firstName').value;
-                const lastName = document.getElementById('lastName').value;
                 const email = document.getElementById('email').value;
                 const password = document.getElementById('password').value;
-                const confirmPassword = document.getElementById('confirmPassword').value;
-                
-                // Validate passwords match
-                if (password !== confirmPassword) {
-                    showMessage('Passwords do not match', 'error');
-                    return;
-                }
-                
-                // Validate password strength
-                if (password.length < 6) {
-                    showMessage('Password must be at least 6 characters long', 'error');
-                    return;
-                }
                 
                 // Show loading state
-                signupBtnText.textContent = 'Creating account...';
-                signupSpinner.style.display = 'inline-block';
-                signupSubmitBtn.disabled = true;
+                loginBtnText.textContent = 'Signing in...';
+                loginSpinner.style.display = 'inline-block';
+                loginSubmitBtn.disabled = true;
                 
                 try {
-                    // Create user with email and password
-                    const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+                    // Sign in with email and password
+                    const userCredential = await auth.signInWithEmailAndPassword(email, password);
                     const user = userCredential.user;
                     
-                    // Update user profile with name
-                    await updateProfile(user, {
-                        displayName: `${firstName} ${lastName}`
-                    });
-                    
-                    console.log('User created:', user.email);
+                    console.log('✅ User signed in:', user.email);
                     
                     // Show success message
-                    showMessage('Account created successfully! Redirecting...', 'success');
+                    showMessage('Successfully signed in! Redirecting...', 'success');
                     
-                    // Redirect to index page after 2 seconds
+                    // Redirect to index page after 1 second
                     setTimeout(() => {
                         window.location.href = 'index.html';
-                    }, 2000);
+                    }, 1000);
                     
                 } catch (error) {
-                    console.error('Signup error:', error);
+                    console.error('❌ Login error:', error);
                     
-                    let errorMessage = 'Signup failed. Please try again.';
+                    let errorMessage = 'Login failed. Please try again.';
                     
                     switch(error.code) {
-                        case 'auth/email-already-in-use':
-                            errorMessage = 'This email is already registered.';
-                            break;
                         case 'auth/invalid-email':
                             errorMessage = 'Invalid email address.';
                             break;
-                        case 'auth/operation-not-allowed':
-                            errorMessage = 'Email/password accounts are not enabled.';
+                        case 'auth/user-disabled':
+                            errorMessage = 'This account has been disabled.';
                             break;
-                        case 'auth/weak-password':
-                            errorMessage = 'Password is too weak.';
+                        case 'auth/user-not-found':
+                            errorMessage = 'No account found with this email.';
+                            break;
+                        case 'auth/wrong-password':
+                            errorMessage = 'Incorrect password.';
+                            break;
+                        case 'auth/too-many-requests':
+                            errorMessage = 'Too many failed attempts. Please try again later.';
                             break;
                     }
                     
                     showMessage(errorMessage, 'error');
                     
                     // Reset button state
-                    signupBtnText.textContent = 'Create Account';
-                    signupSpinner.style.display = 'none';
-                    signupSubmitBtn.disabled = false;
+                    loginBtnText.textContent = 'Sign In';
+                    loginSpinner.style.display = 'none';
+                    loginSubmitBtn.disabled = false;
                 }
             });
             
-            // Google Sign Up
-            googleSignUpBtn.addEventListener('click', async function() {
+            // Google Sign In
+            googleSignInBtn.addEventListener('click', async function() {
                 try {
-                    const provider = new GoogleAuthProvider();
-                    const result = await signInWithPopup(auth, provider);
+                    const provider = new firebase.auth.GoogleAuthProvider();
+                    const result = await auth.signInWithPopup(provider);
                     const user = result.user;
                     
-                    console.log('Google sign up successful:', user.email);
-                    showMessage('Account created with Google! Redirecting...', 'success');
+                    console.log('✅ Google sign in successful:', user.email);
+                    showMessage('Successfully signed in with Google! Redirecting...', 'success');
                     
                     // Redirect to index page
                     setTimeout(() => {
@@ -529,33 +451,42 @@
                     }, 1000);
                     
                 } catch (error) {
-                    console.error('Google sign up error:', error);
-                    showMessage('Google sign up failed. Please try again.', 'error');
+                    console.error('❌ Google sign in error:', error);
+                    showMessage('Google sign in failed. Please try again.', 'error');
+                }
+            });
+            
+            // Forgot password
+            forgotPasswordLink.addEventListener('click', async function(e) {
+                e.preventDefault();
+                
+                const email = document.getElementById('email').value;
+                
+                if (!email) {
+                    showMessage('Please enter your email address first.', 'error');
+                    return;
+                }
+                
+                try {
+                    await auth.sendPasswordResetEmail(email);
+                    showMessage('Password reset email sent! Check your inbox.', 'success');
+                } catch (error) {
+                    console.error('❌ Password reset error:', error);
+                    showMessage('Failed to send reset email. Please check your email address.', 'error');
                 }
             });
             
             // Helper function to show messages
             function showMessage(text, type) {
-                signupMessage.textContent = text;
-                signupMessage.className = 'message ' + type;
-                signupMessage.style.display = 'block';
+                loginMessage.textContent = text;
+                loginMessage.className = 'message ' + type;
+                loginMessage.style.display = 'block';
                 
                 // Auto hide after 5 seconds
                 setTimeout(() => {
-                    signupMessage.style.display = 'none';
+                    loginMessage.style.display = 'none';
                 }, 5000);
             }
-            
-            // Check if user is already logged in
-            import { onAuthStateChanged } from './firebase-config.js';
-            
-            onAuthStateChanged(auth, (user) => {
-                if (user) {
-                    // User is already signed in, redirect to index
-                    console.log('User already signed in, redirecting...');
-                    window.location.href = 'index.html';
-                }
-            });
         });
     </script>
 </body>
