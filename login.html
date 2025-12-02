@@ -378,12 +378,14 @@
     
     <script type="module">
         import { 
-            auth, 
-            createUserWithEmailAndPassword, 
-            GoogleAuthProvider, 
-            signInWithPopup,
-            updateProfile
-        } from './firebase-config.js';
+           import { 
+        auth,
+        signInWithEmailAndPassword,
+        signInWithPopup,
+        googleProvider,
+        sendPasswordResetEmail,
+        onAuthStateChanged
+    } from './firebase-config.js';
         
         document.addEventListener('DOMContentLoaded', function() {
             console.log('Signup page initialized');
