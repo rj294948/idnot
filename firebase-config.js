@@ -1,44 +1,48 @@
-// firebase-config.js - Correct version for Firebase JS SDK v12.6.0
+// firebase-config.js - Complete and Working Firebase Configuration
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-app.js";
 import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-analytics.js";
 
-// Import Firestore functions
+// Firestore imports
 import { 
-    getFirestore, 
-    collection, 
-    addDoc, 
-    getDocs, 
-    query, 
-    orderBy, 
-    doc, 
-    deleteDoc, 
-    updateDoc, 
-    where, 
+    getFirestore,
+    collection,
+    addDoc,
+    getDocs,
+    getDoc,
+    query,
+    orderBy,
+    doc,
+    deleteDoc,
+    updateDoc,
+    where,
     serverTimestamp,
-    onSnapshot 
+    onSnapshot
 } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-firestore.js";
 
-// Import Authentication functions
+// Authentication imports
 import { 
-    getAuth, 
-    createUserWithEmailAndPassword, 
-    signInWithEmailAndPassword, 
-    signOut, 
-    GoogleAuthProvider, 
-    signInWithPopup, 
-    onAuthStateChanged, 
-    updateProfile 
+    getAuth,
+    createUserWithEmailAndPassword,
+    signInWithEmailAndPassword,
+    signOut,
+    GoogleAuthProvider,
+    signInWithPopup,
+    onAuthStateChanged,
+    updateProfile,
+    sendPasswordResetEmail
 } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-auth.js";
 
-// Import Storage functions
+// Storage imports
 import { 
     getStorage,
     ref,
     uploadBytes,
-    getDownloadURL 
+    getDownloadURL,
+    uploadBytesResumable,
+    deleteObject
 } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-storage.js";
 
-// Your web app's Firebase configuration
+// Firebase configuration
 const firebaseConfig = {
     apiKey: "AIzaSyDNwzhOkQQLAQbkiNFTFEGSpWJdKaxbTRk",
     authDomain: "iryastone-uk.firebaseapp.com",
@@ -51,25 +55,37 @@ const firebaseConfig = {
 
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
+
+// Initialize services
 const analytics = getAnalytics(app);
 const db = getFirestore(app);
 const auth = getAuth(app);
 const storage = getStorage(app);
+
+// Create Google Provider instance
 const googleProvider = new GoogleAuthProvider();
 
-// Export everything as a single object
-export { 
-    app, 
+// Set custom parameters for Google provider (optional)
+googleProvider.setCustomParameters({
+    prompt: 'select_account'
+});
+
+// Export everything
+export {
+    // Core Firebase instances
+    app,
     analytics,
-    db, 
-    auth, 
-    storage, 
+    db,
+    auth,
+    storage,
     googleProvider,
-    // Firestore
+    
+    // Firestore functions
     getFirestore,
     collection,
     addDoc,
     getDocs,
+    getDoc,
     query,
     orderBy,
     doc,
@@ -78,7 +94,8 @@ export {
     where,
     serverTimestamp,
     onSnapshot,
-    // Auth
+    
+    // Authentication functions
     getAuth,
     createUserWithEmailAndPassword,
     signInWithEmailAndPassword,
@@ -87,9 +104,13 @@ export {
     signInWithPopup,
     onAuthStateChanged,
     updateProfile,
-    // Storage
+    sendPasswordResetEmail,
+    
+    // Storage functions
     getStorage,
     ref,
     uploadBytes,
-    getDownloadURL
+    getDownloadURL,
+    uploadBytesResumable,
+    deleteObject
 };
