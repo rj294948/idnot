@@ -1,6 +1,7 @@
 // firebase-config.js - Full and Correct Export Setup for iryastone-uk
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-app.js";
-import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-analytics.js"; // Analytics को भी शामिल किया गया
+import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-analytics.js";
+
 import { 
     getFirestore, 
     collection, 
@@ -13,8 +14,9 @@ import {
     updateDoc, 
     where, 
     serverTimestamp,
-    onSnapshot // Firestore functions
+    onSnapshot // Firestore functions (Includes query and orderBy for robust data fetching)
 } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-firestore.js";
+
 import { 
     getAuth, 
     createUserWithEmailAndPassword, 
@@ -25,6 +27,7 @@ import {
     onAuthStateChanged, 
     updateProfile // Auth functions
 } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-auth.js";
+
 import { 
     getStorage,
     ref,
@@ -33,6 +36,7 @@ import {
 } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-storage.js";
 
 // Your web app's Firebase configuration (iryastone-uk project details)
+// NOTE: Ensure these credentials are correct for your Firebase project
 const firebaseConfig = {
     apiKey: "AIzaSyDNwzhOkQQLAQbkiNFTFEGSpWJdKaxbTRk",
     authDomain: "iryastone-uk.firebaseapp.com",
@@ -45,7 +49,7 @@ const firebaseConfig = {
 
 // Initialize Firebase services
 const app = initializeApp(firebaseConfig);
-const analytics = getAnalytics(app); // Analytics initialization
+const analytics = getAnalytics(app); 
 const db = getFirestore(app);
 const auth = getAuth(app);
 const storage = getStorage(app);
@@ -55,7 +59,7 @@ const googleProvider = new GoogleAuthProvider();
 export { 
     app, db, auth, storage, googleProvider, analytics, // Core services
 
-    // Firestore exports
+    // Firestore exports (All necessary functions for querying are available)
     collection, addDoc, getDocs, query, orderBy, doc, deleteDoc, updateDoc, where, serverTimestamp, onSnapshot,
     
     // Auth exports
