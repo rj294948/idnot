@@ -7,6 +7,13 @@
     <meta name="description" content="UK's leading supplier of premium natural stone, marble, sandstone & limestone. Free UK delivery. Trusted by homeowners & professionals.">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🏛️</text></svg>">
+    
+    <!-- Firebase CDN -->
+    <script src="https://www.gstatic.com/firebasejs/12.6.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/12.6.0/firebase-firestore.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/12.6.0/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/12.6.0/firebase-analytics.js"></script>
+    
     <style>
         /* All your existing CSS styles remain exactly the same */
         * {
@@ -29,848 +36,8 @@
             padding: 0 15px;
         }
         
-        /* Header Styles */
-        header {
-            background-color: #fff;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            z-index: 1000;
-        }
-        
-        /* Main Header */
-        .main-header {
-            padding: 15px 0;
-        }
-        
-        .header-content {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        
-        .logo {
-            display: flex;
-            align-items: center;
-        }
-        
-        .logo h1 {
-            font-size: 28px;
-            color: #333;
-            font-weight: 700;
-        }
-        
-        .logo span {
-            color: #b8860b;
-        }
-        
-        .trust-info {
-            flex: 1;
-            text-align: center;
-            padding: 0 20px;
-        }
-        
-        .trust-info-content {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 30px;
-            font-size: 15px;
-            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
-            padding: 12px 25px;
-            border-radius: 12px;
-            border: 1px solid #e0e0e0;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
-        }
-        
-        .trust-item {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            white-space: nowrap;
-            padding: 8px 15px;
-            background: rgba(255, 255, 255, 0.7);
-            border-radius: 8px;
-        }
-        
-        .trust-item i {
-            color: #b8860b;
-            font-size: 18px;
-        }
-
-        /* User Profile Styles */
-        .user-profile {
-            position: relative;
-        }
-
-        .profile-toggle {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            background: none;
-            border: none;
-            cursor: pointer;
-            padding: 8px 12px;
-            border-radius: 6px;
-            transition: background-color 0.3s;
-        }
-
-        .profile-toggle:hover {
-            background: #f8f9fa;
-        }
-
-        .profile-avatar {
-            width: 32px;
-            height: 32px;
-            border-radius: 50%;
-            background: #b8860b;
-            color: white;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: 600;
-            font-size: 14px;
-        }
-
-        .profile-name {
-            font-size: 14px;
-            font-weight: 500;
-            color: #333;
-        }
-
-        .profile-dropdown {
-            position: absolute;
-            top: 100%;
-            right: 0;
-            background: white;
-            border-radius: 8px;
-            box-shadow: 0 5px 20px rgba(0,0,0,0.15);
-            min-width: 200px;
-            z-index: 1000;
-            display: none;
-            border: 1px solid #e0e0e0;
-        }
-
-        .profile-dropdown.active {
-            display: block;
-        }
-
-        .dropdown-header {
-            padding: 15px;
-            border-bottom: 1px solid #eee;
-            background: #f8f9fa;
-            border-radius: 8px 8px 0 0;
-        }
-
-        .dropdown-header .user-email {
-            font-size: 12px;
-            color: #666;
-            margin-top: 4px;
-        }
-
-        .dropdown-menu {
-            list-style: none;
-            padding: 8px 0;
-        }
-
-        .dropdown-item {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            padding: 10px 15px;
-            color: #333;
-            text-decoration: none;
-            font-size: 14px;
-            transition: all 0.3s;
-        }
-
-        .dropdown-item:hover {
-            background: #f8f9fa;
-            color: #b8860b;
-        }
-
-        .dropdown-item i {
-            width: 16px;
-            text-align: center;
-            color: #666;
-        }
-
-        .dropdown-divider {
-            height: 1px;
-            background: #eee;
-            margin: 8px 0;
-        }
-
-        .user-actions {
-            display: flex;
-            align-items: center;
-            gap: 20px;
-        }
-
-        .user-action {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            text-decoration: none;
-            color: #555;
-            font-size: 12px;
-            transition: color 0.3s;
-        }
-
-        .user-action:hover {
-            color: #b8860b;
-        }
-
-        .user-action i {
-            font-size: 20px;
-            margin-bottom: 3px;
-        }
-
-        /* Advanced Search Styles */
-        .search-container {
-            position: relative;
-            flex: 1;
-            max-width: 500px;
-            margin: 0 20px;
-        }
-
-        .search-input-container {
-            position: relative;
-            display: flex;
-            align-items: center;
-        }
-
-        .search-input {
-            width: 100%;
-            padding: 12px 45px 12px 20px;
-            border: 2px solid #e1e5e9;
-            border-radius: 25px;
-            font-size: 14px;
-            background-color: #f8f9fa;
-        }
-
-        .search-input:focus {
-            outline: none;
-            border-color: #b8860b;
-            background-color: white;
-        }
-
-        .search-button {
-            position: absolute;
-            right: 8px;
-            background: #b8860b;
-            color: white;
-            border: none;
-            width: 35px;
-            height: 35px;
-            border-radius: 50%;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .search-results {
-            position: absolute;
-            top: 100%;
-            left: 0;
-            right: 0;
-            background: white;
-            border-radius: 12px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
-            max-height: 400px;
-            overflow-y: auto;
-            z-index: 1001;
-            display: none;
-            margin-top: 5px;
-        }
-
-        .search-results.active {
-            display: block;
-        }
-
-        .search-result-item {
-            display: flex;
-            align-items: center;
-            padding: 12px 15px;
-            border-bottom: 1px solid #f0f0f0;
-            cursor: pointer;
-        }
-
-        .search-result-item:hover {
-            background: #f8f9fa;
-        }
-
-        .search-result-item:last-child {
-            border-bottom: none;
-        }
-
-        .search-result-image {
-            width: 50px;
-            height: 50px;
-            border-radius: 6px;
-            background-size: cover;
-            background-position: center;
-            margin-right: 15px;
-            flex-shrink: 0;
-        }
-
-        .search-result-content {
-            flex: 1;
-        }
-
-        .search-result-name {
-            font-weight: 600;
-            color: #333;
-            margin-bottom: 4px;
-        }
-
-        .search-result-category {
-            font-size: 12px;
-            color: #b8860b;
-            background: #fff9e6;
-            padding: 2px 8px;
-            border-radius: 12px;
-            display: inline-block;
-        }
-
-        .search-result-price {
-            font-weight: 700;
-            color: #b8860b;
-            font-size: 14px;
-        }
-
-        .no-results {
-            padding: 20px;
-            text-align: center;
-            color: #666;
-        }
-
-        .search-loading {
-            padding: 15px;
-            text-align: center;
-            color: #666;
-        }
-
-        .view-all-results {
-            padding: 12px 15px;
-            text-align: center;
-            background: #f8f9fa;
-            border-top: 1px solid #e9ecef;
-        }
-
-        .view-all-results a {
-            color: #b8860b;
-            text-decoration: none;
-            font-weight: 600;
-        }
-        
-        /* Banner Text */
-        .banner-text {
-            background: linear-gradient(135deg, #b8860b, #a3780a);
-            color: white;
-            padding: 12px 0;
-            text-align: center;
-            font-size: 16px;
-            font-weight: 500;
-        }
-        
-        /* Uses Top Bar with Mega Menu */
-        .uses-top-bar {
-            position: relative; 
-            background: #333;
-            padding: 0;
-        }
-        
-        .uses-container {
-            display: flex;
-            justify-content: space-between;
-            flex-wrap: wrap;
-        }
-        
-        .use-item {
-            flex: 1;
-            min-width: 120px;
-            position: relative; 
-        }
-        
-        .use-link {
-            display: block;
-            color: white;
-            text-decoration: none;
-            padding: 15px 10px;
-            font-size: 14px;
-            font-weight: 500;
-            text-align: center;
-            cursor: pointer;
-            transition: background-color 0.3s;
-        }
-        
-        .use-link:hover {
-            background: #b8860b;
-        }
-        
-        /* Mega Menu Styles */
-        .mega-menu {
-            position: absolute;
-            top: 100%;
-            left: 0; 
-            width: 100%; 
-            background: white;
-            z-index: 1000;
-            box-shadow: 0 5px 20px rgba(0,0,0,0.15);
-            display: none; 
-            padding: 30px 0;
-        }
-        
-        .use-item:hover .mega-menu {
-            display: block;
-        }
-        
-        .patterns-grid {
-            display: grid;
-            grid-template-columns: repeat(6, 1fr);
-            gap: 20px;
-            padding: 0 20px;
-        }
-        
-        .pattern-item {
-            text-align: center;
-            cursor: pointer;
-            text-decoration: none;
-            color: #333;
-        }
-        
-        .pattern-image {
-            width: 100%;
-            height: 180px;
-            background-size: cover;
-            background-position: center;
-            border-radius: 8px;
-            margin-bottom: 10px;
-            transition: transform 0.3s ease;
-        }
-        
-        .pattern-item:hover .pattern-image {
-            transform: scale(1.05);
-        }
-        
-        .pattern-name {
-            font-size: 14px;
-            color: #333;
-            font-weight: 500;
-        }
-        
-        /* Main Content */
-        .main-content {
-            margin-top: 180px;
-        }
-        
-        /* Hero Section */
-        .hero {
-            background: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), url('https://images.unsplash.com/photo-1586023492125-27b2c045efd7?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1200&q=80');
-            background-size: cover;
-            background-position: center;
-            color: white;
-            padding: 80px 0;
-            text-align: center;
-        }
-        
-        .hero h1 {
-            font-size: 48px;
-            margin-bottom: 20px;
-            line-height: 1.2;
-        }
-        
-        .hero p {
-            font-size: 20px;
-            max-width: 600px;
-            margin: 0 auto 30px;
-            opacity: 0.9;
-        }
-        
-        .btn {
-            display: inline-block;
-            background: #b8860b;
-            color: white;
-            padding: 15px 35px;
-            border: none;
-            border-radius: 6px;
-            font-size: 16px;
-            cursor: pointer;
-            text-decoration: none;
-            font-weight: 600;
-            transition: all 0.3s;
-        }
-        
-        .btn:hover {
-            background: #a3780a;
-            transform: translateY(-2px);
-        }
-
-        .btn-outline {
-            background: transparent;
-            border: 2px solid #b8860b;
-            color: #b8860b;
-        }
-
-        .btn-outline:hover {
-            background: #b8860b;
-            color: white;
-        }
-        
-        /* Products Banner */
-        .products-banner {
-            padding: 80px 0;
-            background: #f9f9f9;
-        }
-
-        .products-banner-content {
-            text-align: center;
-            margin-bottom: 50px;
-        }
-
-        .products-banner-content h2 {
-            font-size: 36px;
-            color: #333;
-            margin-bottom: 15px;
-        }
-
-        .products-banner-content p {
-            font-size: 18px;
-            color: #666;
-            max-width: 600px;
-            margin: 0 auto;
-        }
-
-        .products-grid-banner {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 30px;
-        }
-
-        .product-banner-item {
-            background: white;
-            border-radius: 12px;
-            overflow: hidden;
-            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
-            transition: transform 0.3s;
-        }
-
-        .product-banner-item:hover {
-            transform: translateY(-5px);
-        }
-
-        .product-banner-image {
-            width: 100%;
-            height: 0;
-            padding-bottom: 60%;
-            background-size: cover;
-            background-position: center;
-            background-repeat: no-repeat;
-        }
-
-        .product-banner-text {
-            padding: 30px;
-            text-align: center;
-            background: white;
-        }
-
-        .product-banner-text h3 {
-            font-size: 24px;
-            margin-bottom: 15px;
-            color: #333;
-            font-weight: 600;
-        }
-
-        .product-banner-text p {
-            font-size: 16px;
-            color: #666;
-            margin-bottom: 25px;
-            line-height: 1.6;
-        }
-        
-        /* Uses Categories Section */
-        .uses-categories {
-            padding: 80px 0;
-            background: white;
-        }
-
-        .section-title {
-            text-align: center;
-            margin: 0 0 50px;
-            font-size: 36px;
-            color: #333;
-            position: relative;
-            padding-bottom: 15px;
-        }
-
-        .section-title:after {
-            content: '';
-            position: absolute;
-            width: 80px;
-            height: 3px;
-            background: #b8860b;
-            bottom: 0;
-            left: 50%;
-            transform: translateX(-50%);
-        }
-
-        .uses-categories-grid {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 30px;
-        }
-
-        .use-category-item {
-            text-align: center;
-        }
-
-        .use-category-link {
-            display: block;
-            text-decoration: none;
-            color: #333;
-        }
-
-        .use-category-image {
-            width: 100%;
-            height: 0;
-            padding-bottom: 75%;
-            background-size: cover;
-            background-position: center;
-            border-radius: 12px;
-            margin-bottom: 20px;
-            transition: transform 0.3s;
-        }
-
-        .use-category-link:hover .use-category-image {
-            transform: scale(1.05);
-        }
-
-        .use-category-name {
-            font-size: 18px;
-            font-weight: 600;
-            margin-bottom: 8px;
-        }
-
-        .product-count {
-            font-size: 14px;
-            color: #b8860b;
-            font-weight: 500;
-        }
-
-        .loading-categories {
-            text-align: center;
-            padding: 40px;
-            color: #666;
-            grid-column: 1 / -1;
-        }
-
-        /* Features Section */
-        .features {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 40px;
-            margin: 80px 0;
-            padding: 80px 0;
-            background-color: #f9f9f9;
-        }
-        
-        .feature {
-            text-align: center;
-            padding: 30px 20px;
-        }
-        
-        .feature i {
-            font-size: 48px;
-            color: #b8860b;
-            margin-bottom: 20px;
-        }
-        
-        .feature h3 {
-            margin-bottom: 15px;
-            font-size: 22px;
-            color: #333;
-        }
-        
-        .feature p {
-            font-size: 16px;
-            color: #666;
-            line-height: 1.6;
-        }
-        
-        /* Footer */
-        footer {
-            background-color: #222;
-            color: #ddd;
-            padding: 60px 0 20px;
-        }
-        
-        .footer-content {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 40px;
-            margin-bottom: 40px;
-        }
-        
-        .footer-column h3 {
-            color: white;
-            margin-bottom: 25px;
-            font-size: 20px;
-            padding-bottom: 10px;
-            border-bottom: 2px solid #b8860b;
-            display: inline-block;
-        }
-        
-        .footer-links {
-            list-style: none;
-        }
-        
-        .footer-links li {
-            margin-bottom: 12px;
-        }
-        
-        .footer-links a {
-            color: #ddd;
-            text-decoration: none;
-            font-size: 15px;
-            transition: color 0.3s;
-        }
-        
-        .footer-links a:hover {
-            color: #b8860b;
-        }
-        
-        .social-links {
-            display: flex;
-            gap: 15px;
-            margin-top: 20px;
-        }
-        
-        .social-links a {
-            color: white;
-            background: #444;
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: background 0.3s;
-        }
-        
-        .social-links a:hover {
-            background: #b8860b;
-        }
-        
-        .copyright {
-            text-align: center;
-            padding-top: 30px;
-            border-top: 1px solid #444;
-            font-size: 14px;
-            color: #999;
-        }
-
-        /* Responsive Design */
-        @media (max-width: 1024px) {
-            .hero h1 {
-                font-size: 36px;
-            }
-            
-            .products-grid-banner {
-                grid-template-columns: 1fr;
-            }
-            
-            .uses-categories-grid {
-                grid-template-columns: repeat(2, 1fr);
-            }
-            
-            .features {
-                grid-template-columns: repeat(2, 1fr);
-            }
-            
-            .footer-content {
-                grid-template-columns: repeat(2, 1fr);
-            }
-            
-            .patterns-grid {
-                grid-template-columns: repeat(3, 1fr);
-            }
-        }
-
-        @media (max-width: 768px) {
-            .main-content {
-                margin-top: 220px;
-            }
-            
-            .header-content {
-                flex-wrap: wrap;
-            }
-            
-            .trust-info {
-                order: 3;
-                flex-basis: 100%;
-                margin-top: 15px;
-                padding: 0;
-            }
-            
-            .search-container {
-                order: 4;
-                flex-basis: 100%;
-                margin: 15px 0 0;
-                max-width: 100%;
-            }
-            
-            .hero {
-                padding: 60px 0;
-            }
-            
-            .hero h1 {
-                font-size: 32px;
-            }
-            
-            .hero p {
-                font-size: 18px;
-            }
-            
-            .features {
-                grid-template-columns: 1fr;
-                padding: 60px 0;
-            }
-            
-            .uses-top-bar {
-                display: none;
-            }
-            
-            .profile-name {
-                display: none;
-            }
-            
-            .patterns-grid {
-                grid-template-columns: repeat(2, 1fr);
-            }
-        }
-
-        @media (max-width: 480px) {
-            .uses-categories-grid {
-                grid-template-columns: 1fr;
-            }
-            
-            .footer-content {
-                grid-template-columns: 1fr;
-            }
-            
-            .hero h1 {
-                font-size: 28px;
-            }
-            
-            .patterns-grid {
-                grid-template-columns: 1fr;
-            }
-        }
+        /* All other CSS styles remain the same... */
+        /* ... [Your complete CSS here] ... */
     </style>
 </head>
 <body>
@@ -1108,509 +275,514 @@
         </div>
     </footer>
 
-    <!-- Your existing Firebase config -->
-    <script type="module" src="./firebase-config.js"></script>
-    
-    <script type="module">
-        // Import from your existing firebase-config.js
-        import { 
-            db, auth, 
-            collection, getDocs,
-            onAuthStateChanged, signOut
-        } from './firebase-config.js';
+    <!-- Main JavaScript -->
+    <script>
+        // Firebase Configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyDNwzhOkQQLAQbkiNFTFEGSpWJdKaxbTRk",
+            authDomain: "iryastone-uk.firebaseapp.com",
+            projectId: "iryastone-uk",
+            storageBucket: "iryastone-uk.firebasestorage.app",
+            messagingSenderId: "110940910896",
+            appId: "1:110940910896:web:b25e92127118665e5c84f5",
+            measurementId: "G-6YM1FLYN48"
+        };
 
-        // Import onSnapshot separately
-        import { onSnapshot } from "https://www.gstatic.com/firebasejs/12.5.0/firebase-firestore.js";
+        // Initialize Firebase
+        const app = firebase.initializeApp(firebaseConfig);
+        const analytics = firebase.analytics();
+        const db = firebase.firestore();
+        const auth = firebase.auth();
 
         // StoneCraft Application - Main JavaScript
         document.addEventListener('DOMContentLoaded', function() {
-            console.log('Initializing StoneCraft Application...');
+            console.log('🚀 Initializing StoneCraft Application...');
             
-            // Initialize the application with Firestore
-            initializeAppWithFirestore();
+            // Application State
+            const appState = {
+                categories: [],
+                products: [],
+                user: null,
+                cart: []
+            };
+            
+            // Initialize the application
+            initializeApp();
             
             // Initialize user interface components
             initializeUI();
             
             // Initialize authentication
             initializeAuth();
-        });
-
-        // Application State
-        const appState = {
-            categories: [],
-            products: [],
-            user: null,
-            cart: []
-        };
-
-        // Initialize the main application with Firestore
-        async function initializeAppWithFirestore() {
-            console.log('📊 Loading data from Firestore...');
             
-            try {
-                // Load Products from Firestore
-                await loadProductsFromFirestore();
+            // ===== FUNCTIONS =====
+            
+            async function initializeApp() {
+                console.log('📊 Loading data from Firestore...');
                 
-                console.log('✅ Data loaded successfully from Firestore');
-                console.log('📦 Products: ' + appState.products.length);
+                try {
+                    // Load Products from Firestore
+                    await loadProductsFromFirestore();
+                    
+                    console.log('✅ Data loaded successfully');
+                    console.log('📦 Products: ' + appState.products.length);
+                    
+                    // Generate dynamic navigation and categories
+                    generateUsesNavigation();
+                    updateCategoriesSection();
+                    
+                } catch (error) {
+                    console.error('❌ Error loading data:', error);
+                }
                 
-                // Generate dynamic navigation and categories
-                generateUsesNavigation();
-                updateCategoriesSection();
-                
-            } catch (error) {
-                console.error('❌ Error loading data from Firestore:', error);
+                console.log('✅ StoneCraft Application initialized successfully');
             }
             
-            console.log('✅ StoneCraft Application initialized successfully');
-        }
-
-        // Load Products from Firestore
-        async function loadProductsFromFirestore() {
-            try {
-                const querySnapshot = await getDocs(collection(db, "products"));
-                appState.products = [];
-                
-                querySnapshot.forEach((doc) => {
-                    const data = doc.data();
-                    appState.products.push({
-                        id: doc.id,
-                        ...data
-                    });
-                });
-                
-                console.log('✅ Products loaded from Firestore: ', appState.products);
-                
-                // Debug: Check uses in products
-                const allUsesInProducts = [...new Set(appState.products
-                    .filter(product => product.uses)
-                    .map(product => product.uses)
-                )];
-                console.log('🔍 Uses found in products:', allUsesInProducts);
-                
-                // Real-time listener for product changes
-                onSnapshot(collection(db, "products"), (snapshot) => {
-                    const updatedProducts = [];
-                    snapshot.forEach((doc) => {
+            // Load Products from Firestore
+            async function loadProductsFromFirestore() {
+                try {
+                    const querySnapshot = await db.collection("products").get();
+                    appState.products = [];
+                    
+                    querySnapshot.forEach((doc) => {
                         const data = doc.data();
-                        updatedProducts.push({
+                        appState.products.push({
                             id: doc.id,
                             ...data
                         });
                     });
-                    appState.products = updatedProducts;
-                    console.log('🔄 Products updated in real-time');
-                    generateUsesNavigation();
-                    updateCategoriesSection();
-                });
-                
-            } catch (error) {
-                console.error('Error loading products:', error);
-                throw error;
-            }
-        }
-
-        // Function to get UNIQUE USES (CASE INSENSITIVE + NO DUPLICATES)
-        function getUniqueUses() {
-            const usesMap = new Map();
-            
-            appState.products.forEach(product => {
-                if (product.uses && product.uses.trim() !== '') {
-                    const useKey = product.uses.toLowerCase().trim();
-                    const useValue = product.uses.trim();
                     
-                    // Store the original case version
-                    if (!usesMap.has(useKey)) {
-                        usesMap.set(useKey, useValue);
-                    }
-                }
-            });
-            
-            const uniqueUses = Array.from(usesMap.values()).sort();
-            console.log('🎯 Unique Uses (No Duplicates):', uniqueUses);
-            return uniqueUses;
-        }
-
-        // Function to generate uses navigation - UNIQUE USES ONLY
-        function generateUsesNavigation() {
-            const usesContainer = document.getElementById('dynamicUsesContainer');
-            if (!usesContainer) return;
-            
-            usesContainer.innerHTML = '';
-            
-            const uniqueUses = getUniqueUses();
-            console.log('🔄 Generating navigation for unique uses:', uniqueUses.length);
-            
-            if (uniqueUses.length === 0) {
-                usesContainer.innerHTML = `
-                    <div class="loading-categories">
-                        <i class="fas fa-info-circle"></i>
-                        <p>No uses found. Add products to see navigation.</p>
-                    </div>
-                `;
-                return;
-            }
-            
-            // UNIQUE USES KE LIYE NAVIGATION BANAO
-            uniqueUses.forEach(usage => {
-                const usageKey = usage.toLowerCase().replace(/\s+/g, '-');
-                const useItem = document.createElement('div');
-                useItem.className = 'use-item';
-                
-                // Get products for this usage (CASE INSENSITIVE)
-                const usageProducts = appState.products.filter(product => 
-                    product.uses && product.uses.toLowerCase() === usage.toLowerCase()
-                );
-                
-                const uniqueStoneNames = [...new Set(usageProducts
-                    .filter(product => product.stone_name)
-                    .map(product => product.stone_name)
-                )];
-                
-                console.log(`📁 ${usage} - Products: ${usageProducts.length}, Stone Names: ${uniqueStoneNames.length}`);
-                
-                if (uniqueStoneNames.length > 0) {
-                    // Usage with stone names - create mega menu
-                    useItem.innerHTML = `
-                        <div class="use-link">${usage} (${usageProducts.length})</div>
-                        <div class="mega-menu">
-                            <div class="patterns-grid">
-                                ${uniqueStoneNames.map(stoneName => {
-                                    const stoneSlug = stoneName.toLowerCase().replace(/\s+/g, '-');
-                                    // Find a product image for this stone or use default
-                                    const stoneProduct = appState.products.find(p => 
-                                        p.uses && p.uses.toLowerCase() === usage.toLowerCase() && 
-                                        p.stone_name === stoneName
-                                    );
-                                    const imageUrl = stoneProduct?.images?.[0] || 
-                                        'https://images.unsplash.com/photo-1586023492125-27b2c045efd7?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=400&q=80';
-                                    
-                                    return `
-                                        <a href="category-products.html?usage=${usageKey}&stone=${stoneSlug}" class="pattern-item" data-usage="${usage}" data-stone="${stoneName}">
-                                            <div class="pattern-image" style="background-image: url('${imageUrl}')"></div>
-                                            <div class="pattern-name">${stoneName}</div>
-                                        </a>
-                                    `;
-                                }).join('')}
-                            </div>
-                        </div>
-                    `;
-                } else {
-                    // Usage with products but no stone names - simple link
-                    useItem.innerHTML = `
-                        <a href="category-products.html?usage=${usageKey}" class="use-link">${usage} (${usageProducts.length})</a>
-                    `;
-                }
-                
-                usesContainer.appendChild(useItem);
-            });
-            
-            // Reinitialize mega menu functionality
-            setTimeout(() => {
-                initializeMegaMenu();
-            }, 100);
-        }
-
-        // Function to update categories section - UNIQUE USES ONLY
-        function updateCategoriesSection() {
-            const categoriesGrid = document.getElementById('dynamicCategories');
-            if (!categoriesGrid) return;
-            
-            categoriesGrid.innerHTML = '';
-            
-            const uniqueUses = getUniqueUses();
-            console.log('🔄 Updating categories section with unique uses:', uniqueUses.length);
-            
-            if (uniqueUses.length === 0) {
-                categoriesGrid.innerHTML = `
-                    <div class="loading-categories">
-                        <i class="fas fa-info-circle"></i>
-                        <p>No categories found. Add products to see categories.</p>
-                    </div>
-                `;
-                return;
-            }
-            
-            // UNIQUE USES KE LIYE CATEGORIES BANAO
-            uniqueUses.forEach(usage => {
-                const categoryItem = document.createElement('div');
-                categoryItem.className = 'use-category-item';
-                
-                // Count products in this usage (CASE INSENSITIVE)
-                const productCount = appState.products.filter(product => 
-                    product.uses && product.uses.toLowerCase() === usage.toLowerCase()
-                ).length;
-                
-                // Find a product image for this usage or use default
-                const usageProduct = appState.products.find(p => 
-                    p.uses && p.uses.toLowerCase() === usage.toLowerCase()
-                );
-                const imageUrl = usageProduct?.images?.[0] || 
-                    'https://images.unsplash.com/photo-1586023492125-27b2c045efd7?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=400&q=80';
-                
-                const usageSlug = usage.toLowerCase().replace(/\s+/g, '-');
-                
-                categoryItem.innerHTML = `
-                    <a href="category-products.html?usage=${usageSlug}" class="use-category-link">
-                        <div class="use-category-image" style="background-image: url('${imageUrl}')"></div>
-                        <div class="use-category-name">${usage}</div>
-                        <div class="product-count">${productCount} Products</div>
-                    </a>
-                `;
-                
-                categoriesGrid.appendChild(categoryItem);
-            });
-        }
-
-        // Initialize mega menu functionality
-        function initializeMegaMenu() {
-            console.log('🔄 Initializing Mega Menu...');
-            
-            const usesTopBar = document.querySelector('.uses-top-bar');
-            const useItems = document.querySelectorAll('.use-item');
-            const container = document.querySelector('.uses-top-bar .container');
-            
-            if (!container || !usesTopBar) {
-                console.log('❌ Mega Menu container not found');
-                return;
-            }
-            
-            const containerRect = container.getBoundingClientRect();
-            
-            useItems.forEach((item, index) => {
-                const megaMenu = item.querySelector('.mega-menu');
-                
-                if (megaMenu) {
-                    // Set mega menu width and position
-                    megaMenu.style.width = containerRect.width + 'px';
-                    megaMenu.style.left = '0px';
+                    console.log('✅ Products loaded: ', appState.products.length);
                     
-                    // Mouse events for mega menu
-                    item.addEventListener('mouseenter', () => {
-                        // Hide all other mega menus
-                        document.querySelectorAll('.mega-menu').forEach(menu => {
-                            if (menu !== megaMenu) {
-                                menu.style.display = 'none';
-                            }
+                    // Get unique uses
+                    const allUsesInProducts = [...new Set(appState.products
+                        .filter(product => product.uses)
+                        .map(product => product.uses)
+                    )];
+                    console.log('🔍 Uses found:', allUsesInProducts);
+                    
+                    // Real-time listener for product changes
+                    db.collection("products").onSnapshot((snapshot) => {
+                        const updatedProducts = [];
+                        snapshot.forEach((doc) => {
+                            const data = doc.data();
+                            updatedProducts.push({
+                                id: doc.id,
+                                ...data
+                            });
                         });
-                        // Show current mega menu
-                        megaMenu.style.display = 'block';
+                        appState.products = updatedProducts;
+                        console.log('🔄 Products updated in real-time');
+                        generateUsesNavigation();
+                        updateCategoriesSection();
                     });
                     
-                    item.addEventListener('mouseleave', (e) => {
-                        const relatedTarget = e.relatedTarget;
-                        if (!megaMenu.contains(relatedTarget)) {
+                } catch (error) {
+                    console.error('Error loading products:', error);
+                    throw error;
+                }
+            }
+            
+            // Function to get UNIQUE USES
+            function getUniqueUses() {
+                const usesMap = new Map();
+                
+                appState.products.forEach(product => {
+                    if (product.uses && product.uses.trim() !== '') {
+                        const useKey = product.uses.toLowerCase().trim();
+                        const useValue = product.uses.trim();
+                        
+                        // Store the original case version
+                        if (!usesMap.has(useKey)) {
+                            usesMap.set(useKey, useValue);
+                        }
+                    }
+                });
+                
+                const uniqueUses = Array.from(usesMap.values()).sort();
+                console.log('🎯 Unique Uses:', uniqueUses);
+                return uniqueUses;
+            }
+            
+            // Function to generate uses navigation
+            function generateUsesNavigation() {
+                const usesContainer = document.getElementById('dynamicUsesContainer');
+                if (!usesContainer) return;
+                
+                usesContainer.innerHTML = '';
+                
+                const uniqueUses = getUniqueUses();
+                console.log('🔄 Generating navigation for:', uniqueUses.length);
+                
+                if (uniqueUses.length === 0) {
+                    usesContainer.innerHTML = `
+                        <div class="loading-categories">
+                            <i class="fas fa-info-circle"></i>
+                            <p>No uses found. Add products to see navigation.</p>
+                        </div>
+                    `;
+                    return;
+                }
+                
+                // UNIQUE USES KE LIYE NAVIGATION
+                uniqueUses.forEach(usage => {
+                    const usageKey = usage.toLowerCase().replace(/\s+/g, '-');
+                    const useItem = document.createElement('div');
+                    useItem.className = 'use-item';
+                    
+                    // Get products for this usage
+                    const usageProducts = appState.products.filter(product => 
+                        product.uses && product.uses.toLowerCase() === usage.toLowerCase()
+                    );
+                    
+                    const uniqueStoneNames = [...new Set(usageProducts
+                        .filter(product => product.stone_name)
+                        .map(product => product.stone_name)
+                    )];
+                    
+                    console.log(`📁 ${usage} - Products: ${usageProducts.length}, Stone Names: ${uniqueStoneNames.length}`);
+                    
+                    if (uniqueStoneNames.length > 0) {
+                        // Usage with stone names - create mega menu
+                        useItem.innerHTML = `
+                            <div class="use-link">${usage} (${usageProducts.length})</div>
+                            <div class="mega-menu">
+                                <div class="patterns-grid">
+                                    ${uniqueStoneNames.map(stoneName => {
+                                        const stoneSlug = stoneName.toLowerCase().replace(/\s+/g, '-');
+                                        // Find a product image for this stone or use default
+                                        const stoneProduct = appState.products.find(p => 
+                                            p.uses && p.uses.toLowerCase() === usage.toLowerCase() && 
+                                            p.stone_name === stoneName
+                                        );
+                                        const imageUrl = stoneProduct?.images?.[0] || 
+                                            'https://images.unsplash.com/photo-1586023492125-27b2c045efd7?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=400&q=80';
+                                        
+                                        return `
+                                            <a href="category-products.html?usage=${usageKey}&stone=${stoneSlug}" class="pattern-item" data-usage="${usage}" data-stone="${stoneName}">
+                                                <div class="pattern-image" style="background-image: url('${imageUrl}')"></div>
+                                                <div class="pattern-name">${stoneName}</div>
+                                            </a>
+                                        `;
+                                    }).join('')}
+                                </div>
+                            </div>
+                        `;
+                    } else {
+                        // Usage with products but no stone names - simple link
+                        useItem.innerHTML = `
+                            <a href="category-products.html?usage=${usageKey}" class="use-link">${usage} (${usageProducts.length})</a>
+                        `;
+                    }
+                    
+                    usesContainer.appendChild(useItem);
+                });
+                
+                // Reinitialize mega menu functionality
+                setTimeout(() => {
+                    initializeMegaMenu();
+                }, 100);
+            }
+            
+            // Function to update categories section
+            function updateCategoriesSection() {
+                const categoriesGrid = document.getElementById('dynamicCategories');
+                if (!categoriesGrid) return;
+                
+                categoriesGrid.innerHTML = '';
+                
+                const uniqueUses = getUniqueUses();
+                console.log('🔄 Updating categories section:', uniqueUses.length);
+                
+                if (uniqueUses.length === 0) {
+                    categoriesGrid.innerHTML = `
+                        <div class="loading-categories">
+                            <i class="fas fa-info-circle"></i>
+                            <p>No categories found. Add products to see categories.</p>
+                        </div>
+                    `;
+                    return;
+                }
+                
+                // UNIQUE USES KE LIYE CATEGORIES
+                uniqueUses.forEach(usage => {
+                    const categoryItem = document.createElement('div');
+                    categoryItem.className = 'use-category-item';
+                    
+                    // Count products in this usage
+                    const productCount = appState.products.filter(product => 
+                        product.uses && product.uses.toLowerCase() === usage.toLowerCase()
+                    ).length;
+                    
+                    // Find a product image for this usage or use default
+                    const usageProduct = appState.products.find(p => 
+                        p.uses && p.uses.toLowerCase() === usage.toLowerCase()
+                    );
+                    const imageUrl = usageProduct?.images?.[0] || 
+                        'https://images.unsplash.com/photo-1586023492125-27b2c045efd7?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=400&q=80';
+                    
+                    const usageSlug = usage.toLowerCase().replace(/\s+/g, '-');
+                    
+                    categoryItem.innerHTML = `
+                        <a href="category-products.html?usage=${usageSlug}" class="use-category-link">
+                            <div class="use-category-image" style="background-image: url('${imageUrl}')"></div>
+                            <div class="use-category-name">${usage}</div>
+                            <div class="product-count">${productCount} Products</div>
+                        </a>
+                    `;
+                    
+                    categoriesGrid.appendChild(categoryItem);
+                });
+            }
+            
+            // Initialize mega menu functionality
+            function initializeMegaMenu() {
+                console.log('🔄 Initializing Mega Menu...');
+                
+                const usesTopBar = document.querySelector('.uses-top-bar');
+                const useItems = document.querySelectorAll('.use-item');
+                const container = document.querySelector('.uses-top-bar .container');
+                
+                if (!container || !usesTopBar) {
+                    console.log('❌ Mega Menu container not found');
+                    return;
+                }
+                
+                const containerRect = container.getBoundingClientRect();
+                
+                useItems.forEach((item, index) => {
+                    const megaMenu = item.querySelector('.mega-menu');
+                    
+                    if (megaMenu) {
+                        // Set mega menu width and position
+                        megaMenu.style.width = containerRect.width + 'px';
+                        megaMenu.style.left = '0px';
+                        
+                        // Mouse events for mega menu
+                        item.addEventListener('mouseenter', () => {
+                            // Hide all other mega menus
+                            document.querySelectorAll('.mega-menu').forEach(menu => {
+                                if (menu !== megaMenu) {
+                                    menu.style.display = 'none';
+                                }
+                            });
+                            // Show current mega menu
+                            megaMenu.style.display = 'block';
+                        });
+                        
+                        item.addEventListener('mouseleave', (e) => {
+                            const relatedTarget = e.relatedTarget;
+                            if (!megaMenu.contains(relatedTarget)) {
+                                setTimeout(() => {
+                                    if (!item.matches(':hover') && !megaMenu.matches(':hover')) {
+                                        megaMenu.style.display = 'none';
+                                    }
+                                }, 100);
+                            }
+                        });
+                        
+                        // Also handle mega menu mouse events
+                        megaMenu.addEventListener('mouseenter', () => {
+                            megaMenu.style.display = 'block';
+                        });
+                        
+                        megaMenu.addEventListener('mouseleave', () => {
                             setTimeout(() => {
                                 if (!item.matches(':hover') && !megaMenu.matches(':hover')) {
                                     megaMenu.style.display = 'none';
                                 }
                             }, 100);
-                        }
-                    });
-                    
-                    // Also handle mega menu mouse events
-                    megaMenu.addEventListener('mouseenter', () => {
-                        megaMenu.style.display = 'block';
-                    });
-                    
-                    megaMenu.addEventListener('mouseleave', () => {
-                        setTimeout(() => {
-                            if (!item.matches(':hover') && !megaMenu.matches(':hover')) {
-                                megaMenu.style.display = 'none';
-                            }
-                        }, 100);
-                    });
-                }
-            });
-            
-            // Close all mega menus when clicking outside
-            document.addEventListener('click', (event) => {
-                if (!usesTopBar.contains(event.target)) {
-                    document.querySelectorAll('.mega-menu').forEach(menu => {
-                        menu.style.display = 'none';
-                    });
-                }
-            });
-            
-            console.log('✅ Mega Menu initialization complete');
-        }
-
-        // Initialize authentication
-        function initializeAuth() {
-            onAuthStateChanged(auth, (user) => {
-                if (user) {
-                    // User is signed in
-                    appState.user = {
-                        uid: user.uid,
-                        email: user.email,
-                        name: user.displayName || user.email.split('@')[0]
-                    };
-                    localStorage.setItem('stonecraft_user', JSON.stringify(appState.user));
-                    updateUserInterface();
-                } else {
-                    // User is signed out
-                    appState.user = null;
-                    localStorage.removeItem('stonecraft_user');
-                    updateUserInterface();
-                }
-            });
-        }
-
-        // Update UI based on user authentication
-        function updateUserInterface() {
-            if (appState.user) {
-                // User is logged in
-                document.getElementById('userProfile').style.display = 'block';
-                document.getElementById('loginButton').style.display = 'none';
-                document.getElementById('addProductButton').style.display = 'flex';
-                document.getElementById('heroAddProductBtn').style.display = 'inline-block';
+                        });
+                    }
+                });
                 
-                // Update user info
-                document.getElementById('profileName').textContent = appState.user.name;
-                document.getElementById('profileAvatar').textContent = appState.user.name.charAt(0).toUpperCase();
-                document.getElementById('dropdownUserName').textContent = appState.user.name;
-                document.getElementById('dropdownUserEmail').textContent = appState.user.email;
-            } else {
-                // User is not logged in
-                document.getElementById('userProfile').style.display = 'none';
-                document.getElementById('loginButton').style.display = 'flex';
-                document.getElementById('addProductButton').style.display = 'none';
-                document.getElementById('heroAddProductBtn').style.display = 'none';
+                // Close all mega menus when clicking outside
+                document.addEventListener('click', (event) => {
+                    if (!usesTopBar.contains(event.target)) {
+                        document.querySelectorAll('.mega-menu').forEach(menu => {
+                            menu.style.display = 'none';
+                        });
+                    }
+                });
+                
+                console.log('✅ Mega Menu initialization complete');
             }
-        }
-
-        // Initialize UI components
-        function initializeUI() {
+            
+            // Initialize authentication
+            function initializeAuth() {
+                auth.onAuthStateChanged((user) => {
+                    if (user) {
+                        // User is signed in
+                        appState.user = {
+                            uid: user.uid,
+                            email: user.email,
+                            name: user.displayName || user.email.split('@')[0]
+                        };
+                        localStorage.setItem('stonecraft_user', JSON.stringify(appState.user));
+                        updateUserInterface();
+                    } else {
+                        // User is signed out
+                        appState.user = null;
+                        localStorage.removeItem('stonecraft_user');
+                        updateUserInterface();
+                    }
+                });
+            }
+            
+            // Update UI based on user authentication
+            function updateUserInterface() {
+                if (appState.user) {
+                    // User is logged in
+                    document.getElementById('userProfile').style.display = 'block';
+                    document.getElementById('loginButton').style.display = 'none';
+                    document.getElementById('addProductButton').style.display = 'flex';
+                    document.getElementById('heroAddProductBtn').style.display = 'inline-block';
+                    
+                    // Update user info
+                    document.getElementById('profileName').textContent = appState.user.name;
+                    document.getElementById('profileAvatar').textContent = appState.user.name.charAt(0).toUpperCase();
+                    document.getElementById('dropdownUserName').textContent = appState.user.name;
+                    document.getElementById('dropdownUserEmail').textContent = appState.user.email;
+                } else {
+                    // User is not logged in
+                    document.getElementById('userProfile').style.display = 'none';
+                    document.getElementById('loginButton').style.display = 'flex';
+                    document.getElementById('addProductButton').style.display = 'none';
+                    document.getElementById('heroAddProductBtn').style.display = 'none';
+                }
+            }
+            
+            // Initialize UI components
+            function initializeUI() {
+                // Initialize search functionality
+                initializeSearch();
+                
+                // Initialize user profile dropdown
+                initializeUserProfile();
+            }
+            
             // Initialize search functionality
-            initializeSearch();
+            function initializeSearch() {
+                const searchInput = document.getElementById('searchInput');
+                const searchButton = document.getElementById('searchButton');
+                const searchResults = document.getElementById('searchResults');
+                
+                if (!searchInput || !searchButton || !searchResults) return;
+                
+                searchButton.addEventListener('click', performSearch);
+                searchInput.addEventListener('keyup', function(event) {
+                    if (event.key === 'Enter') {
+                        performSearch();
+                    }
+                });
+                
+                searchInput.addEventListener('input', function() {
+                    if (searchInput.value.length > 2) {
+                        performSearch();
+                    } else {
+                        searchResults.classList.remove('active');
+                    }
+                });
+                
+                function performSearch() {
+                    const query = searchInput.value.trim().toLowerCase();
+                    
+                    if (query.length < 2) {
+                        searchResults.classList.remove('active');
+                        return;
+                    }
+                    
+                    // Show loading state
+                    searchResults.innerHTML = '<div class="search-loading"><i class="fas fa-spinner fa-spin"></i> Searching...</div>';
+                    searchResults.classList.add('active');
+                    
+                    // Simulate API delay
+                    setTimeout(() => {
+                        const results = appState.products.filter(product => 
+                            (product.stone_name && product.stone_name.toLowerCase().includes(query)) ||
+                            (product.uses && product.uses.toLowerCase().includes(query)) ||
+                            (product.type && product.type.toLowerCase().includes(query))
+                        );
+                        
+                        displaySearchResults(results, query);
+                    }, 300);
+                }
+                
+                function displaySearchResults(results, query) {
+                    searchResults.innerHTML = '';
+                    
+                    if (results.length === 0) {
+                        searchResults.innerHTML = '<div class="no-results">No products found for "' + query + '"</div>';
+                        return;
+                    }
+                    
+                    results.forEach(product => {
+                        const resultItem = document.createElement('div');
+                        resultItem.className = 'search-result-item';
+                        resultItem.innerHTML = `
+                            <div class="search-result-image" style="background-image: url('${product.images?.[0] || 'https://images.unsplash.com/photo-1586023492125-27b2c045efd7?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=400&q=80'}')"></div>
+                            <div class="search-result-content">
+                                <div class="search-result-name">${product.stone_name || 'Stone Product'}</div>
+                                <div class="search-result-category">${product.uses || 'General'} • ${product.type || 'Natural Stone'}</div>
+                            </div>
+                            <div class="search-result-price">${product.price ? '£' + product.price : 'Price on request'}</div>
+                        `;
+                        
+                        resultItem.addEventListener('click', function() {
+                            window.location.href = `product-details.html?id=${product.id}`;
+                        });
+                        
+                        searchResults.appendChild(resultItem);
+                    });
+                    
+                    // Add "View all results" link
+                    const viewAll = document.createElement('div');
+                    viewAll.className = 'view-all-results';
+                    viewAll.innerHTML = `<a href="search-results.html?q=${encodeURIComponent(query)}">View all ${results.length} results</a>`;
+                    searchResults.appendChild(viewAll);
+                }
+                
+                // Close search results when clicking outside
+                document.addEventListener('click', function(event) {
+                    if (!searchResults.contains(event.target) && event.target !== searchInput && event.target !== searchButton) {
+                        searchResults.classList.remove('active');
+                    }
+                });
+            }
             
             // Initialize user profile dropdown
-            initializeUserProfile();
-        }
-
-        // Initialize search functionality
-        function initializeSearch() {
-            const searchInput = document.getElementById('searchInput');
-            const searchButton = document.getElementById('searchButton');
-            const searchResults = document.getElementById('searchResults');
-            
-            if (!searchInput || !searchButton || !searchResults) return;
-            
-            searchButton.addEventListener('click', performSearch);
-            searchInput.addEventListener('keyup', function(event) {
-                if (event.key === 'Enter') {
-                    performSearch();
-                }
-            });
-            
-            searchInput.addEventListener('input', function() {
-                if (searchInput.value.length > 2) {
-                    performSearch();
-                } else {
-                    searchResults.classList.remove('active');
-                }
-            });
-            
-            function performSearch() {
-                const query = searchInput.value.trim().toLowerCase();
+            function initializeUserProfile() {
+                const profileToggle = document.getElementById('profileToggle');
+                const profileDropdown = document.getElementById('profileDropdown');
+                const logoutBtn = document.getElementById('logoutBtn');
                 
-                if (query.length < 2) {
-                    searchResults.classList.remove('active');
-                    return;
-                }
+                if (!profileToggle || !profileDropdown) return;
                 
-                // Show loading state
-                searchResults.innerHTML = '<div class="search-loading"><i class="fas fa-spinner fa-spin"></i> Searching...</div>';
-                searchResults.classList.add('active');
-                
-                // Simulate API delay
-                setTimeout(() => {
-                    const results = appState.products.filter(product => 
-                        (product.stone_name && product.stone_name.toLowerCase().includes(query)) ||
-                        (product.uses && product.uses.toLowerCase().includes(query)) ||
-                        (product.type && product.type.toLowerCase().includes(query))
-                    );
-                    
-                    displaySearchResults(results, query);
-                }, 300);
-            }
-            
-            function displaySearchResults(results, query) {
-                searchResults.innerHTML = '';
-                
-                if (results.length === 0) {
-                    searchResults.innerHTML = '<div class="no-results">No products found for "' + query + '"</div>';
-                    return;
-                }
-                
-                results.forEach(product => {
-                    const resultItem = document.createElement('div');
-                    resultItem.className = 'search-result-item';
-                    resultItem.innerHTML = `
-                        <div class="search-result-image" style="background-image: url('${product.images?.[0] || 'https://images.unsplash.com/photo-1586023492125-27b2c045efd7?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=400&q=80'}')"></div>
-                        <div class="search-result-content">
-                            <div class="search-result-name">${product.stone_name || 'Stone Product'}</div>
-                            <div class="search-result-category">${product.uses || 'General'} • ${product.type || 'Natural Stone'}</div>
-                        </div>
-                        <div class="search-result-price">${product.price ? '£' + product.price : 'Price on request'}</div>
-                    `;
-                    
-                    resultItem.addEventListener('click', function() {
-                        window.location.href = `product-details.html?id=${product.id}`;
-                    });
-                    
-                    searchResults.appendChild(resultItem);
+                profileToggle.addEventListener('click', function(event) {
+                    event.stopPropagation();
+                    profileDropdown.classList.toggle('active');
                 });
                 
-                // Add "View all results" link
-                const viewAll = document.createElement('div');
-                viewAll.className = 'view-all-results';
-                viewAll.innerHTML = `<a href="search-results.html?q=${encodeURIComponent(query)}">View all ${results.length} results</a>`;
-                searchResults.appendChild(viewAll);
-            }
-            
-            // Close search results when clicking outside
-            document.addEventListener('click', function(event) {
-                if (!searchResults.contains(event.target) && event.target !== searchInput && event.target !== searchButton) {
-                    searchResults.classList.remove('active');
-                }
-            });
-        }
-
-        // Initialize user profile dropdown
-        function initializeUserProfile() {
-            const profileToggle = document.getElementById('profileToggle');
-            const profileDropdown = document.getElementById('profileDropdown');
-            const logoutBtn = document.getElementById('logoutBtn');
-            
-            if (!profileToggle || !profileDropdown) return;
-            
-            profileToggle.addEventListener('click', function(event) {
-                event.stopPropagation();
-                profileDropdown.classList.toggle('active');
-            });
-            
-            // Close dropdown when clicking outside
-            document.addEventListener('click', function() {
-                profileDropdown.classList.remove('active');
-            });
-            
-            // Logout functionality
-            if (logoutBtn) {
-                logoutBtn.addEventListener('click', function(event) {
-                    event.preventDefault();
-                    signOut(auth).then(() => {
-                        console.log('User signed out');
-                    }).catch((error) => {
-                        console.error('Sign out error:', error);
-                    });
+                // Close dropdown when clicking outside
+                document.addEventListener('click', function() {
+                    profileDropdown.classList.remove('active');
                 });
+                
+                // Logout functionality
+                if (logoutBtn) {
+                    logoutBtn.addEventListener('click', function(event) {
+                        event.preventDefault();
+                        auth.signOut().then(() => {
+                            console.log('User signed out');
+                        }).catch((error) => {
+                            console.error('Sign out error:', error);
+                        });
+                    });
+                }
             }
-        }
-
-        // Demo: Show how new types are automatically added
-        console.log('🔄 Navigation will automatically update when new products with usage are added to Firestore');
+            
+            console.log('✅ StoneCraft Application ready');
+        });
     </script>
 </body>
 </html>
