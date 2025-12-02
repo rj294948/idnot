@@ -1,7 +1,8 @@
-// firebase-config.js - Full and Correct Export Setup for iryastone-uk
+// firebase-config.js - Correct version for Firebase JS SDK v12.6.0
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-app.js";
 import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-analytics.js";
 
+// Import Firestore functions
 import { 
     getFirestore, 
     collection, 
@@ -14,9 +15,10 @@ import {
     updateDoc, 
     where, 
     serverTimestamp,
-    onSnapshot // Firestore functions (Includes query and orderBy for robust data fetching)
+    onSnapshot 
 } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-firestore.js";
 
+// Import Authentication functions
 import { 
     getAuth, 
     createUserWithEmailAndPassword, 
@@ -25,18 +27,18 @@ import {
     GoogleAuthProvider, 
     signInWithPopup, 
     onAuthStateChanged, 
-    updateProfile // Auth functions
+    updateProfile 
 } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-auth.js";
 
+// Import Storage functions
 import { 
     getStorage,
     ref,
     uploadBytes,
-    getDownloadURL // Storage functions
+    getDownloadURL 
 } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-storage.js";
 
-// Your web app's Firebase configuration (iryastone-uk project details)
-// NOTE: Ensure these credentials are correct for your Firebase project
+// Your web app's Firebase configuration
 const firebaseConfig = {
     apiKey: "AIzaSyDNwzhOkQQLAQbkiNFTFEGSpWJdKaxbTRk",
     authDomain: "iryastone-uk.firebaseapp.com",
@@ -47,24 +49,47 @@ const firebaseConfig = {
     measurementId: "G-6YM1FLYN48"
 };
 
-// Initialize Firebase services
+// Initialize Firebase
 const app = initializeApp(firebaseConfig);
-const analytics = getAnalytics(app); 
+const analytics = getAnalytics(app);
 const db = getFirestore(app);
 const auth = getAuth(app);
 const storage = getStorage(app);
 const googleProvider = new GoogleAuthProvider();
 
-// Export everything for use in other modules
+// Export everything as a single object
 export { 
-    app, db, auth, storage, googleProvider, analytics, // Core services
-
-    // Firestore exports (All necessary functions for querying are available)
-    collection, addDoc, getDocs, query, orderBy, doc, deleteDoc, updateDoc, where, serverTimestamp, onSnapshot,
-    
-    // Auth exports
-    createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, signInWithPopup, onAuthStateChanged, updateProfile,
-    
-    // Storage exports
-    ref, uploadBytes, getDownloadURL
+    app, 
+    analytics,
+    db, 
+    auth, 
+    storage, 
+    googleProvider,
+    // Firestore
+    getFirestore,
+    collection,
+    addDoc,
+    getDocs,
+    query,
+    orderBy,
+    doc,
+    deleteDoc,
+    updateDoc,
+    where,
+    serverTimestamp,
+    onSnapshot,
+    // Auth
+    getAuth,
+    createUserWithEmailAndPassword,
+    signInWithEmailAndPassword,
+    signOut,
+    GoogleAuthProvider,
+    signInWithPopup,
+    onAuthStateChanged,
+    updateProfile,
+    // Storage
+    getStorage,
+    ref,
+    uploadBytes,
+    getDownloadURL
 };
