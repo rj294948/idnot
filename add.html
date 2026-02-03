@@ -433,6 +433,113 @@ select:focus, input:focus, textarea:focus {
   transform: scale(1.1);
 }
 
+/* ===== URL Image Input Section ===== */
+.url-input-section {
+  margin: 20px 0;
+  padding: 20px;
+  background: #f9f9f9;
+  border-radius: var(--radius);
+  border: 2px dashed #ddd;
+}
+
+.url-input-group {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 15px;
+}
+
+.url-input-group input {
+  flex: 1;
+}
+
+.url-add-btn {
+  background: var(--success);
+  color: white;
+  border: none;
+  padding: 12px 20px;
+  border-radius: var(--radius);
+  cursor: pointer;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: var(--transition);
+}
+
+.url-add-btn:hover {
+  background: #218838;
+  transform: translateY(-2px);
+}
+
+.url-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 15px;
+}
+
+.url-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px;
+  background: white;
+  border-radius: var(--radius);
+  border: 1px solid var(--gray);
+}
+
+.url-text {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 0.9rem;
+}
+
+.url-remove-btn {
+  background: var(--danger);
+  color: white;
+  border: none;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: var(--transition);
+}
+
+.url-remove-btn:hover {
+  background: #c82333;
+  transform: scale(1.1);
+}
+
+/* ===== Usage Checkboxes ===== */
+.checkbox-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 15px;
+  margin-top: 10px;
+}
+
+.checkbox-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.checkbox-item input[type="checkbox"] {
+  width: auto;
+  margin: 0;
+}
+
+.checkbox-item label {
+  margin: 0;
+  font-weight: normal;
+  cursor: pointer;
+}
+
 /* ===== Camera Modal ===== */
 .camera-modal {
   display: none;
@@ -604,6 +711,10 @@ footer a:hover {
     flex-direction: column;
     gap: 0;
   }
+  
+  .url-input-group {
+    flex-direction: column;
+  }
 }
 
 @media (max-width: 768px) {
@@ -635,6 +746,11 @@ footer a:hover {
   .preview img {
     width: 120px;
     height: 120px;
+  }
+  
+  .checkbox-group {
+    flex-direction: column;
+    gap: 10px;
   }
 }
 
@@ -904,10 +1020,63 @@ footer a:hover {
           <span class="field-hint">Optional: Natural, Polished, Honed, Calibrated, etc.</span>
         </div>
 
+        <!-- UPDATED: Usage Field as Multi-Select Checkboxes -->
         <div class="form-group">
           <label for="usage">Usage</label>
-          <input type="text" id="usage" placeholder="Enter usage">
-          <span class="field-hint">Optional: Flooring, Wall Cladding, Countertops, etc.</span>
+          <div class="checkbox-group" id="usage-checkboxes">
+            <div class="checkbox-item">
+              <input type="checkbox" id="usage_floor" name="usage" value="Floor">
+              <label for="usage_floor">Floor</label>
+            </div>
+            <div class="checkbox-item">
+              <input type="checkbox" id="usage_wall" name="usage" value="Wall">
+              <label for="usage_wall">Wall</label>
+            </div>
+            <div class="checkbox-item">
+              <input type="checkbox" id="usage_countertop" name="usage" value="Countertop">
+              <label for="usage_countertop">Countertop</label>
+            </div>
+            <div class="checkbox-item">
+              <input type="checkbox" id="usage_exterior" name="usage" value="Exterior">
+              <label for="usage_exterior">Exterior</label>
+            </div>
+            <div class="checkbox-item">
+              <input type="checkbox" id="usage_interior" name="usage" value="Interior">
+              <label for="usage_interior">Interior</label>
+            </div>
+            <div class="checkbox-item">
+              <input type="checkbox" id="usage_paving" name="usage" value="Paving">
+              <label for="usage_paving">Paving</label>
+            </div>
+            <div class="checkbox-item">
+              <input type="checkbox" id="usage_cladding" name="usage" value="Cladding">
+              <label for="usage_cladding">Cladding</label>
+            </div>
+            <div class="checkbox-item">
+              <input type="checkbox" id="usage_landscaping" name="usage" value="Landscaping">
+              <label for="usage_landscaping">Landscaping</label>
+            </div>
+            <div class="checkbox-item">
+              <input type="checkbox" id="usage_other" name="usage" value="Other">
+              <label for="usage_other">Other</label>
+            </div>
+          </div>
+          <div id="usage-other-container" style="display: none; margin-top: 10px;">
+            <input type="text" id="usage_other_text" placeholder="Specify other usage">
+          </div>
+          <span class="field-hint">Select one or more usages for this stone product</span>
+        </div>
+
+        <!-- NEW: Latest Field as Dropdown -->
+        <div class="form-group">
+          <label for="latest">Latest</label>
+          <select id="latest">
+            <option value="">Select Status</option>
+            <option value="Trending">Trending</option>
+            <option value="New">New</option>
+            <option value="None">None</option>
+          </select>
+          <span class="field-hint">Select if this product is trending or new</span>
         </div>
       </div>
 
@@ -918,9 +1087,9 @@ footer a:hover {
         <div class="form-row">
           <div class="form-col">
             <div class="form-group">
-              <label for="price">Price</label>
-              <input type="number" id="price" placeholder="Enter price">
-              <span class="field-hint">Optional: Price of the product</span>
+              <label for="price" class="required">Price</label>
+              <input type="number" id="price" placeholder="Enter price" required step="0.01">
+              <span class="field-hint">Price of the product</span>
             </div>
           </div>
           <div class="form-col">
@@ -1044,12 +1213,14 @@ footer a:hover {
         </button>
       </div>
 
-      <!-- ===== Image Upload Section with Camera ===== -->
+      <!-- ===== Image Upload Section with Camera AND URL Input ===== -->
       <div class="form-section">
         <h3 class="section-title"><i class="fas fa-images"></i> Product Images</h3>
         
         <div class="form-group">
           <label class="required">Upload Product Images</label>
+          
+          <!-- EXISTING: Upload Buttons (Gallery + Camera) -->
           <div class="image-upload-section">
             <div class="upload-options">
               <div class="upload-btn" onclick="document.getElementById('imageInput').click()">
@@ -1064,6 +1235,23 @@ footer a:hover {
             </div>
             <input type="file" id="imageInput" accept="image/*" multiple style="display: none;">
             <small class="field-hint">Select multiple images (max 10) - You can use both gallery and camera. At least one image is required.</small>
+            
+            <!-- NEW: URL Image Input Section -->
+            <div class="url-input-section">
+              <h4><i class="fas fa-link"></i> Add Image URLs</h4>
+              <div class="url-input-group">
+                <input type="url" id="image-url-input" placeholder="Enter image URL (e.g., https://example.com/image.jpg)">
+                <button type="button" class="url-add-btn" id="add-url-btn">
+                  <i class="fas fa-plus"></i> Add URL
+                </button>
+              </div>
+              <div class="url-list" id="url-list">
+                <!-- URL items will be added here -->
+              </div>
+              <small class="field-hint">You can add images from Google Drive, Dropbox, or any public URL</small>
+            </div>
+            
+            <!-- Image Preview Area -->
             <div class="preview" id="preview"></div>
           </div>
         </div>
@@ -1127,6 +1315,7 @@ import {
 /* ===== Global Variables ===== */
 let stream = null;
 let imagesBase64 = [];
+let imageUrls = []; // Store URLs from URL input
 let additionalFieldsCount = 0;
 
 /* ===== PERSONAL INFO VALIDATION - STRONG VERSION ===== */
@@ -1203,7 +1392,7 @@ function containsPersonalInfo(text) {
 function setupRealTimeValidation() {
   const productFields = [
     'stone_name', 'sub_category', 'type', 'color', 'thickness', 
-    'size', 'finish', 'usage', 'water_absorption', 'density',
+    'size', 'finish', 'water_absorption', 'density',
     'compressive_strength', 'description', 'price_unit', 'length', 'width'
   ];
 
@@ -1255,6 +1444,37 @@ document.getElementById('price_unit').addEventListener('change', function() {
     document.getElementById('other_unit').value = '';
   }
 });
+
+/* ===== Usage Checkboxes ===== */
+// Handle "Other" checkbox
+document.getElementById('usage_other').addEventListener('change', function() {
+  const otherContainer = document.getElementById('usage-other-container');
+  if (this.checked) {
+    otherContainer.style.display = 'block';
+  } else {
+    otherContainer.style.display = 'none';
+    document.getElementById('usage_other_text').value = '';
+  }
+});
+
+// Get selected usage values
+function getSelectedUsage() {
+  const selected = [];
+  const checkboxes = document.querySelectorAll('#usage-checkboxes input[type="checkbox"]:checked');
+  
+  checkboxes.forEach(checkbox => {
+    if (checkbox.value === 'Other') {
+      const otherText = document.getElementById('usage_other_text').value.trim();
+      if (otherText) {
+        selected.push(otherText);
+      }
+    } else {
+      selected.push(checkbox.value);
+    }
+  });
+  
+  return selected;
+}
 
 /* ===== Additional Fields Functionality ===== */
 document.getElementById('add-field-btn').addEventListener('click', addAdditionalField);
@@ -1330,6 +1550,77 @@ function validateAdditionalFields() {
   return { isValid: true };
 }
 
+/* ===== URL Image Input Functionality ===== */
+document.getElementById('add-url-btn').addEventListener('click', addImageUrl);
+document.getElementById('image-url-input').addEventListener('keypress', function(e) {
+  if (e.key === 'Enter') {
+    e.preventDefault();
+    addImageUrl();
+  }
+});
+
+function addImageUrl() {
+  const urlInput = document.getElementById('image-url-input');
+  const url = urlInput.value.trim();
+  
+  if (!url) {
+    alert('Please enter a valid URL');
+    return;
+  }
+  
+  // Validate URL format
+  try {
+    new URL(url);
+  } catch (e) {
+    alert('Please enter a valid URL starting with http:// or https://');
+    return;
+  }
+  
+  // Add to URL list
+  const urlList = document.getElementById('url-list');
+  const urlId = 'url_' + Date.now();
+  
+  const urlItem = document.createElement('div');
+  urlItem.className = 'url-item';
+  urlItem.id = urlId;
+  urlItem.innerHTML = `
+    <span class="url-text">${url}</span>
+    <button type="button" class="url-remove-btn" onclick="removeImageUrl('${urlId}', '${url}')">
+      <i class="fas fa-times"></i>
+    </button>
+  `;
+  
+  urlList.appendChild(urlItem);
+  imageUrls.push(url);
+  
+  // Also add to preview
+  addImageToPreview(url, true);
+  
+  // Clear input
+  urlInput.value = '';
+}
+
+function removeImageUrl(urlId, url) {
+  const urlItem = document.getElementById(urlId);
+  if (urlItem) {
+    urlItem.remove();
+    
+    // Remove from imageUrls array
+    const index = imageUrls.indexOf(url);
+    if (index > -1) {
+      imageUrls.splice(index, 1);
+    }
+    
+    // Remove from preview
+    const previewImages = document.querySelectorAll('.preview-item img');
+    previewImages.forEach(img => {
+      if (img.src === url) {
+        img.closest('.preview-item').remove();
+      }
+    });
+  }
+}
+
 /* ===== Camera Functionality ===== */
 document.getElementById('camera-btn').addEventListener('click', openCamera);
 document.getElementById('camera-close-btn').addEventListener('click', closeCamera);
@@ -1390,7 +1681,7 @@ function capturePhoto() {
 }
 
 // Add image to preview
-function addImageToPreview(imageDataUrl) {
+function addImageToPreview(imageSrc, isUrl = false) {
   const preview = document.getElementById('preview');
   const imageId = 'img_' + Date.now();
   
@@ -1398,32 +1689,50 @@ function addImageToPreview(imageDataUrl) {
   previewItem.className = 'preview-item';
   previewItem.id = imageId;
   previewItem.innerHTML = `
-    <img src="${imageDataUrl}" alt="Product Image">
-    <button type="button" class="remove-image" onclick="removeImage('${imageId}')">
+    <img src="${imageSrc}" alt="Product Image" ${isUrl ? 'data-is-url="true"' : ''}>
+    <button type="button" class="remove-image" onclick="removeImage('${imageId}', '${imageSrc}', ${isUrl})">
       <i class="fas fa-times"></i>
     </button>
   `;
   
   preview.appendChild(previewItem);
-  imagesBase64.push(imageDataUrl);
+  
+  if (!isUrl) {
+    imagesBase64.push(imageSrc);
+  }
+  
   updateFileInput();
 }
 
 // Remove image from preview
-function removeImage(imageId) {
+function removeImage(imageId, imageSrc, isUrl = false) {
   const previewItem = document.getElementById(imageId);
   if (previewItem) {
-    const img = previewItem.querySelector('img');
-    const imgSrc = img.src;
-    
-    const index = imagesBase64.findIndex(image => image === imgSrc);
-    if (index > -1) {
-      imagesBase64.splice(index, 1);
-    }
-    
     previewItem.remove();
     
-    if (imagesBase64.length === 0) {
+    if (isUrl) {
+      // Remove from imageUrls array
+      const index = imageUrls.indexOf(imageSrc);
+      if (index > -1) {
+        imageUrls.splice(index, 1);
+      }
+      
+      // Remove from URL list
+      const urlItems = document.querySelectorAll('.url-item .url-text');
+      urlItems.forEach(item => {
+        if (item.textContent === imageSrc) {
+          item.closest('.url-item').remove();
+        }
+      });
+    } else {
+      // Remove from imagesBase64 array
+      const index = imagesBase64.findIndex(image => image === imageSrc);
+      if (index > -1) {
+        imagesBase64.splice(index, 1);
+      }
+    }
+    
+    if (imagesBase64.length === 0 && imageUrls.length === 0) {
       document.getElementById('imageInput').value = '';
     }
   }
@@ -1433,14 +1742,16 @@ function removeImage(imageId) {
 document.getElementById('cancel-upload').addEventListener('click', function() {
   document.getElementById('imageInput').value = '';
   document.getElementById('preview').innerHTML = '';
+  document.getElementById('url-list').innerHTML = '';
   imagesBase64 = [];
+  imageUrls = [];
   updateFileInput();
 });
 
 // Update file input for validation
 function updateFileInput() {
   const fileInput = document.getElementById('imageInput');
-  if (imagesBase64.length > 0) {
+  if (imagesBase64.length > 0 || imageUrls.length > 0) {
     fileInput.setCustomValidity('');
   } else {
     fileInput.setCustomValidity('Please select at least one image');
@@ -1479,7 +1790,7 @@ const processingOverlay = document.getElementById("processing-overlay");
 
 // Handle file input changes
 imageInput.addEventListener("change", () => {
-  const files = Array.from(imageInput.files).slice(0, 10 - imagesBase64.length);
+  const files = Array.from(imageInput.files).slice(0, 10 - imagesBase64.length - imageUrls.length);
 
   files.forEach(file => {
     const reader = new FileReader();
@@ -1492,7 +1803,7 @@ imageInput.addEventListener("change", () => {
 
 /* IMAGE UPLOAD TO WORKER */
 async function uploadImages() {
-  let urls = [];
+  let uploadedUrls = [];
 
   for (let img of imagesBase64) {
     try {
@@ -1503,13 +1814,13 @@ async function uploadImages() {
       });
 
       const out = await res.json();
-      if (out.status === "success") urls.push(out.url);
+      if (out.status === "success") uploadedUrls.push(out.url);
 
     } catch (e) {
       console.error("Upload Error:", e);
     }
   }
-  return urls;
+  return uploadedUrls;
 }
 
 /* EDIT MODE - FOR MY HISTORY PAGE */
@@ -1555,7 +1866,25 @@ window.addEventListener("DOMContentLoaded", () => {
     document.getElementById('width').value = p.width || "";
     document.getElementById('size').value = p.size || "";
     document.getElementById('finish').value = p.finish || "";
-    document.getElementById('usage').value = p.usage || "";
+    
+    // Handle usage (array)
+    if (p.usage && Array.isArray(p.usage)) {
+      p.usage.forEach(usage => {
+        const checkbox = document.querySelector(`#usage-checkboxes input[value="${usage}"]`);
+        if (checkbox) {
+          checkbox.checked = true;
+        } else {
+          // If usage not in predefined list, add to Other
+          document.getElementById('usage_other').checked = true;
+          document.getElementById('usage-other-container').style.display = 'block';
+          document.getElementById('usage_other_text').value = usage;
+        }
+      });
+    }
+    
+    // Handle latest field
+    document.getElementById('latest').value = p.latest || "";
+    
     document.getElementById('water_absorption').value = p.water_absorption || "";
     document.getElementById('density').value = p.density || "";
     document.getElementById('compressive_strength').value = p.compressive_strength || "";
@@ -1608,11 +1937,20 @@ window.addEventListener("DOMContentLoaded", () => {
       });
     }
 
-    // Show existing images
+    // Show existing images (could be base64 or URLs)
     if (p.images && p.images.length) {
       imagesBase64 = [];
+      imageUrls = [];
+      
       p.images.forEach(img => {
-        addImageToPreview(img);
+        if (img.startsWith('data:image') || img.startsWith('blob:')) {
+          // Base64 or blob URL
+          addImageToPreview(img);
+        } else {
+          // Regular URL
+          imageUrls.push(img);
+          addImageToPreview(img, true);
+        }
       });
     }
   }
@@ -1649,7 +1987,6 @@ form.onsubmit = async (e) => {
     { value: document.getElementById('thickness').value, name: 'Thickness', field: document.getElementById('thickness') },
     { value: document.getElementById('size').value, name: 'Size', field: document.getElementById('size') },
     { value: document.getElementById('finish').value, name: 'Finish', field: document.getElementById('finish') },
-    { value: document.getElementById('usage').value, name: 'Usage', field: document.getElementById('usage') },
     { value: document.getElementById('water_absorption').value, name: 'Water Absorption', field: document.getElementById('water_absorption') },
     { value: document.getElementById('density').value, name: 'Density', field: document.getElementById('density') },
     { value: document.getElementById('compressive_strength').value, name: 'Compressive Strength', field: document.getElementById('compressive_strength') },
@@ -1700,9 +2037,25 @@ form.onsubmit = async (e) => {
     return;
   }
 
-  // Validate images
-  if (imagesBase64.length === 0) {
-    alert("Please add at least one product image");
+  // Validate required fields
+  if (!document.getElementById('category').value) {
+    alert("Please select a category");
+    return;
+  }
+
+  if (!document.getElementById('stone_name').value) {
+    alert("Please enter stone name");
+    return;
+  }
+
+  if (!document.getElementById('price').value) {
+    alert("Please enter price");
+    return;
+  }
+
+  // Validate images (at least one from any source)
+  if (imagesBase64.length === 0 && imageUrls.length === 0) {
+    alert("Please add at least one product image from gallery, camera, or URL");
     return;
   }
 
@@ -1726,16 +2079,28 @@ form.onsubmit = async (e) => {
   submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
 
   try {
-    // Upload images
-    let imageUrls = await uploadImages();
+    // Upload base64 images to worker
+    let uploadedImageUrls = [];
+    if (imagesBase64.length > 0) {
+      uploadedImageUrls = await uploadImages();
+    }
+
+    // Combine all image sources into one array
+    const allImageUrls = [...uploadedImageUrls, ...imageUrls];
 
     // Determine final values for uses, type, and price_unit
     const finalUses = document.getElementById('uses').value === 'Other' ? document.getElementById('other_uses').value : document.getElementById('uses').value;
     const finalType = document.getElementById('type').value === 'Other' ? document.getElementById('type_other').value : document.getElementById('type').value;
     const finalPriceUnit = document.getElementById('price_unit').value === 'other' ? document.getElementById('other_unit').value : document.getElementById('price_unit').value;
 
+    // Get selected usage as array
+    const selectedUsage = getSelectedUsage();
+
+    // Get timestamp
+    const now = new Date().toISOString();
+
     const data = {
-      // Basic Information - USES FIRST, then CATEGORY
+      // Basic Information
       uses: finalUses,
       category: document.getElementById('category').value,
       stone_name: document.getElementById('stone_name').value,
@@ -1749,7 +2114,8 @@ form.onsubmit = async (e) => {
       width: document.getElementById('width').value,
       size: document.getElementById('size').value,
       finish: document.getElementById('finish').value,
-      usage: document.getElementById('usage').value,
+      usage: selectedUsage, // Array of selected usages
+      latest: document.getElementById('latest').value || "None", // Latest field
       
       // Technical Specifications
       water_absorption: document.getElementById('water_absorption').value,
@@ -1772,9 +2138,13 @@ form.onsubmit = async (e) => {
       // Additional Fields
       additional_fields: getAdditionalFieldsData(),
       
+      // Image System (combined from all sources)
+      images: allImageUrls,
+      
       // System Fields
-      images: imageUrls,
-      created_at: serverTimestamp(),
+      is_active: true,
+      created_at: productIdInput.value ? new Date().toISOString() : now, // Keep original if editing
+      updated_at: now,
       userId: user.uid
     };
 
@@ -1795,11 +2165,19 @@ form.onsubmit = async (e) => {
     // Reset form
     form.reset();
     preview.innerHTML = "";
+    document.getElementById('url-list').innerHTML = "";
     imageInput.value = "";
     imagesBase64 = [];
+    imageUrls = [];
     productIdInput.value = "";
     document.getElementById('additional-fields-container').innerHTML = "";
     additionalFieldsCount = 0;
+    
+    // Reset checkboxes
+    document.querySelectorAll('#usage-checkboxes input[type="checkbox"]').forEach(cb => {
+      cb.checked = false;
+    });
+    document.getElementById('usage-other-container').style.display = 'none';
     
     // Reset country code to default
     document.getElementById('contact_country_code').value = "91";
@@ -1829,6 +2207,7 @@ form.onsubmit = async (e) => {
 
 // Make functions available globally for onclick events
 window.removeImage = removeImage;
+window.removeImageUrl = removeImageUrl;
 window.removeAdditionalField = removeAdditionalField;
 window.validatePhoneNumber = validatePhoneNumber;
 window.validateCountryCode = validateCountryCode;
